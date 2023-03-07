@@ -13,7 +13,7 @@ app.post("/payload", jsonParser, (req, res) => {
   //@ts-ignore
 
   console.log("POST REQ FROM GITHUB BELOW: \n" + JSON.stringify(req.payload));
-  console.log("POST REQ FROM GITHUB BELOW: \n" + JSON.stringify(req.body));
+  console.log("POST REQ FROM GITHUB BELOW: \n" + JSON.parse(req.body));
   // res.send("POST REQ FROM GITHUB BELOW: \n" + JSON.stringify(req.body));
   //@ts-ignore
   res.send("POST REQ FROM GITHUB BELOW : \n" + JSON.stringify(req.payload));
