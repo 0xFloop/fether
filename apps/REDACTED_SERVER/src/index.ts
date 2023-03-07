@@ -12,7 +12,7 @@ app.post("/payload", (req, res) => {
   console.log("POST REQ FROM GITHUB BELOW: \n" + JSON.stringify(req.payload));
   // res.send("POST REQ FROM GITHUB BELOW: \n" + JSON.stringify(req.body));
   //@ts-ignore
-  res.send("POST REQ FROM GITHUB BELOW: \n" + JSON.stringify(req.payload));
+  res.send("POST REQ FROM GITHUB BELOW : \n" + JSON.stringify(req.payload));
 });
 
 app.listen(port, () => {
