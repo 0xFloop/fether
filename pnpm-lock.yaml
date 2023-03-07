@@ -12,6 +12,25 @@ importers:
       prettier: 2.8.4
       turbo: 1.8.3
 
+  apps/REDACTED_SERVER:
+    specifiers:
+      '@types/express': ^4.17.17
+      '@types/node': ^18.14.6
+      body-parser: ^1.20.2
+      express: ^4.18.2
+      nodemon: ^2.0.21
+      ts-node: ^10.9.1
+      typescript: ^4.7.4
+    dependencies:
+      body-parser: 1.20.2
+      express: 4.18.2
+    devDependencies:
+      '@types/express': 4.17.17
+      '@types/node': 18.14.6
+      nodemon: 2.0.21
+      ts-node: 10.9.1_alpjt73dvgv6kni625hu7f2l4m
+      typescript: 4.9.5
+
   apps/testing-client:
     specifiers:
       '@remix-run/dev': ^1.14.0
@@ -2806,6 +2825,26 @@ packages:
       unpipe: 1.0.0
     transitivePeerDependencies:
       - supports-color
+
+  /body-parser/1.20.2:
+    resolution: {integrity: sha512-ml9pReCu3M61kGlqoTm2umSXTlRTuGTx0bfYj+uIUKKYycG5NtSbeetV3faSU6R7ajOPw0g/J1PvK4qNy7s5bA==}
+    engines: {node: '>= 0.8', npm: 1.2.8000 || >= 1.4.16}
+    dependencies:
+      bytes: 3.1.2
+      content-type: 1.0.5
+      debug: 2.6.9
+      depd: 2.0.0
+      destroy: 1.2.0
+      http-errors: 2.0.0
+      iconv-lite: 0.4.24
+      on-finished: 2.4.1
+      qs: 6.11.0
+      raw-body: 2.5.2
+      type-is: 1.6.18
+      unpipe: 1.0.0
+    transitivePeerDependencies:
+      - supports-color
+    dev: false
 
   /brace-expansion/1.1.11:
     resolution: {integrity: sha512-iCuPHDFgrHX7H2vEI/5xpz07zSHB00TpugqhmYtVmMO6518mCuRMoOYFldEBl0g187ufozdaHgWKcYFb61qGiA==}
@@ -6771,7 +6810,6 @@ packages:
       http-errors: 2.0.0
       iconv-lite: 0.4.24
       unpipe: 1.0.0
-    dev: true
 
   /react-dom/18.2.0_react@18.2.0:
     resolution: {integrity: sha512-6IMTriUmvsjHUjNtEDudZfuDQUoWXVxKHhlEGSk81n4YFS+r/Kl99wXiwlVXtPBtJenozv2P+hxDsw9eA7Xo6g==}
