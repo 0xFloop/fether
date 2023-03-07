@@ -6,7 +6,7 @@ app.get("/", (req, res) => {
   res.send("Hello World!");
 });
 
-app.post("/", (req, res) => {
+app.post("/payload", (req, res) => {
   console.log("POST REQ FROM GITHUB BELOW: \n" + JSON.stringify(req.body));
   res.send("POST REQ FROM GITHUB BELOW: \n" + JSON.stringify(req.body));
 });
