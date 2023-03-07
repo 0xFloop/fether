@@ -7,7 +7,8 @@ app.get("/", (req, res) => {
 });
 
 app.post("/payload", (req, res) => {
-  console.log("POST REQ FROM GITHUB BELOW: \n" + JSON.stringify(req.body));
+  console.log("POST REQ FROM GITHUB BELOW: \n");
+  console.log(JSON.parse(req.body));
   res.send("POST REQ FROM GITHUB BELOW: \n" + JSON.stringify(req.body));
 });
 
