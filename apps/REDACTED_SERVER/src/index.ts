@@ -14,6 +14,8 @@ app.post("/payload", jsonParser, (req, res) => {
 
   console.log("POST REQ FROM GITHUB BELOW: \n");
   console.log(JSON.stringify(req.body, null, 2));
+
+  console.log("modified file is : " + req.body.commits[0].modified[0]);
   // res.send("POST REQ FROM GITHUB BELOW: \n" + JSON.stringify(req.body));
   //@ts-ignore
   res.send("POST REQ FROM GITHUB BELOW : \n" + JSON.stringify(req.body));
