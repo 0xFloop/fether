@@ -19,7 +19,7 @@ export default function Index() {
               delay: 40,
               loop: false,
               deleteSpeed: 10,
-              pauseFor: 5000,
+              pauseFor: 4000,
             }}
           />{" "}
         </p>
