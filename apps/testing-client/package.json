@@ -1,9 +1,10 @@
 {
+  "name": "fether-testing-client",
   "private": true,
   "sideEffects": false,
   "scripts": {
     "build": "remix build",
-    "dev": "remix dev",
+    "dev": "PORT=3002 remix dev",
     "typecheck": "tsc"
   },
   "dependencies": {

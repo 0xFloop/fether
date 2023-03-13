@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap");
+
+@font-face {
+  font-family: "HelveticaNeue";
+  font-style: normal;
+  font-weight: normal;
+  font-display: swap;
+  src: url("/fonts/HelveticaNeue.woff2") format("woff2");
+}
+
+@layer utilities {
+  /* Chrome, Safari, and Opera */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none; /* IE */
+    scrollbar-width: none; /* Firefox */
+  }
+}
