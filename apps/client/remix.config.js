@@ -5,7 +5,6 @@ module.exports = {
     unstable_tailwind: true,
   },
   cacheDirectory: "./node_modules/.cache/remix",
-  serverBuildTarget: "vercel",
   ignoredRouteFiles: ["**/.*"],
   server: process.env.NODE_ENV === "development" ? undefined : "./server.js",
   serverBuildPath: "api/index.js",
