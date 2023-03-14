@@ -8,7 +8,9 @@ var jsonParser = bodyParser.json();
 
 const port = 3001;
 
-const octo = new Octo({ appId: "302483", privateKey: process.env.appPK as string });
+const pk = process.env.appPK as string;
+
+const octo = new Octo({ appId: "302483", privateKey: pk.replace(/\\n/g, "\n") });
 
 app.get("/", (req, res) => {
   res.send("Hello World!");
