@@ -16,8 +16,7 @@
     "prisma:migrate-reset": "turbo run prisma:migrate-reset",
     "prisma:studio": "turbo run prisma:studio",
     "prisma:seed": "turbo run prisma:seed",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "postinstall": "manypkg check"
+    "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
   "dependencies": {
     "@manypkg/cli": "^0.19.2",
