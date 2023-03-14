@@ -26,7 +26,7 @@ app.post("/payload", jsonParser, async (req, res) => {
   });
   console.log(contentsReq);
 
-  // res.send("POST REQ FROM GITHUB BELOW: \n" + JSON.stringify(req.body));
+  // res.send("POST REQ FROM GITHU B BELOW: \n" + JSON.stringify(req.body));
   //@ts-ignore
   res.send("yay");
 });
