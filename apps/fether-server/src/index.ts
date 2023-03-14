@@ -10,7 +10,9 @@ const port = 3001;
 
 const pk = process.env.appPK as string;
 
-const octo = new Octo({ appId: "302483", privateKey: pk.replace(/\\n/g, "\n") });
+const formattedPk = pk.replace(/\\n/g, "\n");
+
+const octo = new Octo({ appId: "302483", privateKey: formattedPk });
 
 app.get("/", (req, res) => {
   res.send("Hello Wor ld!");
