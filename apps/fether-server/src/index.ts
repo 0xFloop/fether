@@ -16,7 +16,7 @@ app.get("/", (req, res) => {
 
 app.post("/payload", jsonParser, (req, res) => {
   //@ts-ignore
-  console.log(process.env.appPK);
+  console.log(req.body);
   for (let i = 0; i < req.body.commits.length; i++) {
     for (let j = 0; j < req.body.commits[i].modified.length; j++)
       console.log("modified file: " + req.body.commits[i].modified[j]);
