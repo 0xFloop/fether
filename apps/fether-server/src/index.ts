@@ -13,7 +13,7 @@ const pk = process.env.appPK as string;
 const octo = new Octo({ appId: "302483", privateKey: pk.replace(/\\n/g, "\n") });
 
 app.get("/", (req, res) => {
-  res.send("Hello World!");
+  res.send("Hello Wor ld!");
 });
 
 app.post("/payload", jsonParser, async (req, res) => {
