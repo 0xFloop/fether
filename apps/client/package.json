@@ -1,9 +1,7 @@
 {
   "name": "fether-frontend",
   "private": true,
-  "sideEffects": [
-    "polyfills.ts"
-  ],
+  "sideEffects": false,
   "scripts": {
     "build": "pnpm run build:css && pnpm run build:remix",
     "build:css": "tailwindcss -i ./styles/app.css -o ./app/styles/app.css -m",
