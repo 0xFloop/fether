@@ -1,9 +1,14 @@
 import express from "express";
+import { App as Octo } from "octokit";
+import * as dotenv from "dotenv";
+dotenv.config();
 const app = express();
 var bodyParser = require("body-parser");
 var jsonParser = bodyParser.json();
 
 const port = 3001;
+
+const octo = new Octo({ appId: "302483", privateKey: process.env.appPK as string });
 
 app.get("/", (req, res) => {
   res.send("Hello World!");
@@ -11,9 +16,7 @@ app.get("/", (req, res) => {
 
 app.post("/payload", jsonParser, (req, res) => {
   //@ts-ignore
-
-  console.log("POST REQ FROM GITHUB BELOW: \n");
-  console.log(JSON.stringify(req.body, null, 2));
+  console.log(process.env.appPK);
   for (let i = 0; i < req.body.commits.length; i++) {
     for (let j = 0; j < req.body.commits[i].modified.length; j++)
       console.log("modified file: " + req.body.commits[i].modified[j]);
