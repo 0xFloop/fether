@@ -19,16 +19,13 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "postinstall": "manypkg check"
   },
-  "devDependencies": {
-    "eslint-config-custom": "workspace:*",
+  "dependencies": {
+    "@manypkg/cli": "^0.19.2",
     "prettier": "latest",
     "turbo": "latest"
   },
   "engines": {
     "node": ">=18.0.0"
-  },
-  "dependencies": {
-    "@manypkg/cli": "^0.19.2"
   },
   "packageManager": "pnpm@7.14.1"
 }
