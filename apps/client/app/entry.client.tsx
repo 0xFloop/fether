@@ -1,7 +1,6 @@
-import './polyfills';
-import { RemixBrowser } from '@remix-run/react';
-import { startTransition, StrictMode } from 'react';
-import { hydrateRoot } from 'react-dom/client';
+import { RemixBrowser } from "@remix-run/react";
+import { startTransition, StrictMode } from "react";
+import { hydrateRoot } from "react-dom/client";
 
 const hydrate = () => {
   startTransition(() => {
@@ -9,7 +8,7 @@ const hydrate = () => {
       document,
       <StrictMode>
         <RemixBrowser />
-      </StrictMode>,
+      </StrictMode>
     );
   });
 };

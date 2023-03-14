@@ -29,99 +29,36 @@ __export(stdin_exports, {
 });
 module.exports = __toCommonJS(stdin_exports);
 
-// ../../node_modules/.pnpm/@remix-run+dev@1.14.1_@remix-run+serve@1.14.1/node_modules/@remix-run/dev/dist/config/defaults/entry.server.node.tsx
-var entry_server_node_exports = {};
-__export(entry_server_node_exports, {
+// app/entry.server.tsx
+var entry_server_exports = {};
+__export(entry_server_exports, {
   default: () => handleRequest
 });
 var import_stream = require("stream"), import_node = require("@remix-run/node"), import_react = require("@remix-run/react"), import_isbot = __toESM(require("isbot")), import_server = require("react-dom/server"), import_jsx_dev_runtime = require("react/jsx-dev-runtime"), ABORT_DELAY = 5e3;
 function handleRequest(request, responseStatusCode, responseHeaders, remixContext) {
-  return (0, import_isbot.default)(request.headers.get("user-agent")) ? handleBotRequest(
-    request,
-    responseStatusCode,
-    responseHeaders,
-    remixContext
-  ) : handleBrowserRequest(
-    request,
-    responseStatusCode,
-    responseHeaders,
-    remixContext
-  );
-}
-function handleBotRequest(request, responseStatusCode, responseHeaders, remixContext) {
+  let callbackName = (0, import_isbot.default)(request.headers.get("user-agent")) ? "onAllReady" : "onShellReady";
   return new Promise((resolve, reject) => {
-    let { pipe, abort } = (0, import_server.renderToPipeableStream)(
-      /* @__PURE__ */ (0, import_jsx_dev_runtime.jsxDEV)(
-        import_react.RemixServer,
-        {
-          context: remixContext,
-          url: request.url,
-          abortDelay: ABORT_DELAY
-        },
-        void 0,
-        !1,
-        {
-          fileName: "../../node_modules/.pnpm/@remix-run+dev@1.14.1_@remix-run+serve@1.14.1/node_modules/@remix-run/dev/dist/config/defaults/entry.server.node.tsx",
-          lineNumber: 39,
-          columnNumber: 7
-        },
-        this
-      ),
+    let didError = !1, { pipe, abort } = (0, import_server.renderToPipeableStream)(
+      /* @__PURE__ */ (0, import_jsx_dev_runtime.jsxDEV)(import_react.RemixServer, { context: remixContext, url: request.url }, void 0, !1, {
+        fileName: "app/entry.server.tsx",
+        lineNumber: 22,
+        columnNumber: 7
+      }, this),
       {
-        onAllReady() {
+        [callbackName]: () => {
           let body = new import_stream.PassThrough();
           responseHeaders.set("Content-Type", "text/html"), resolve(
             new import_node.Response(body, {
               headers: responseHeaders,
-              status: responseStatusCode
+              status: didError ? 500 : responseStatusCode
             })
           ), pipe(body);
         },
-        onShellError(error) {
-          reject(error);
+        onShellError: (err) => {
+          reject(err);
         },
-        onError(error) {
-          responseStatusCode = 500, console.error(error);
-        }
-      }
-    );
-    setTimeout(abort, ABORT_DELAY);
-  });
-}
-function handleBrowserRequest(request, responseStatusCode, responseHeaders, remixContext) {
-  return new Promise((resolve, reject) => {
-    let { pipe, abort } = (0, import_server.renderToPipeableStream)(
-      /* @__PURE__ */ (0, import_jsx_dev_runtime.jsxDEV)(
-        import_react.RemixServer,
-        {
-          context: remixContext,
-          url: request.url,
-          abortDelay: ABORT_DELAY
-        },
-        void 0,
-        !1,
-        {
-          fileName: "../../node_modules/.pnpm/@remix-run+dev@1.14.1_@remix-run+serve@1.14.1/node_modules/@remix-run/dev/dist/config/defaults/entry.server.node.tsx",
-          lineNumber: 81,
-          columnNumber: 7
-        },
-        this
-      ),
-      {
-        onShellReady() {
-          let body = new import_stream.PassThrough();
-          responseHeaders.set("Content-Type", "text/html"), resolve(
-            new import_node.Response(body, {
-              headers: responseHeaders,
-              status: responseStatusCode
-            })
-          ), pipe(body);
-        },
-        onShellError(error) {
-          reject(error);
-        },
-        onError(error) {
-          console.error(error), responseStatusCode = 500;
+        onError: (error) => {
+          didError = !0, console.error(error);
         }
       }
     );
@@ -268,10 +205,10 @@ function Index() {
 }
 
 // server-assets-manifest:@remix-run/dev/assets-manifest
-var assets_manifest_default = { version: "9f32f955", entry: { module: "/build/entry.client-PRKZQEE2.js", imports: ["/build/_shared/chunk-APV4T5R2.js", "/build/_shared/chunk-G2RR7455.js"] }, routes: { root: { id: "root", parentId: void 0, path: "", index: void 0, caseSensitive: void 0, module: "/build/root-XZW26MYL.js", imports: void 0, hasAction: !1, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/_index": { id: "routes/_index", parentId: "root", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/_index-KY23HS55.js", imports: void 0, hasAction: !1, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 } }, cssBundleHref: void 0, hmr: void 0, url: "/build/manifest-9F32F955.js" };
+var assets_manifest_default = { version: "3625b012", entry: { module: "/build/entry.client-FN4CUNZU.js", imports: ["/build/_shared/chunk-APV4T5R2.js", "/build/_shared/chunk-G2RR7455.js"] }, routes: { root: { id: "root", parentId: void 0, path: "", index: void 0, caseSensitive: void 0, module: "/build/root-XZW26MYL.js", imports: void 0, hasAction: !1, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 }, "routes/_index": { id: "routes/_index", parentId: "root", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/_index-KY23HS55.js", imports: void 0, hasAction: !1, hasLoader: !1, hasCatchBoundary: !1, hasErrorBoundary: !1 } }, cssBundleHref: void 0, hmr: void 0, url: "/build/manifest-3625B012.js" };
 
 // server-entry-module:@remix-run/dev/server-build
-var assetsBuildDirectory = "public/build", future = { unstable_cssModules: !1, unstable_cssSideEffectImports: !1, unstable_dev: !1, unstable_postcss: !1, unstable_tailwind: !0, unstable_vanillaExtract: !1, v2_errorBoundary: !1, v2_meta: !1, v2_routeConvention: !0 }, publicPath = "/build/", entry = { module: entry_server_node_exports }, routes = {
+var assetsBuildDirectory = "public/build", future = { unstable_cssModules: !1, unstable_cssSideEffectImports: !1, unstable_dev: !1, unstable_postcss: !1, unstable_tailwind: !0, unstable_vanillaExtract: !1, v2_errorBoundary: !1, v2_meta: !1, v2_routeConvention: !0 }, publicPath = "/build/", entry = { module: entry_server_exports }, routes = {
   root: {
     id: "root",
     parentId: void 0,
