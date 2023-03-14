@@ -8,9 +8,16 @@
   ],
   "scripts": {
     "build": "turbo run build",
-    "dev": "turbo run dev",
+    "dev": "turbo run dev --parallel",
     "lint": "turbo run lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+    "prisma:generate": "turbo run prisma:generate",
+    "prisma:push": "turbo run prisma:push",
+    "prisma:push-accept-data-loss": "turbo run prisma:push-accept-data-loss",
+    "prisma:migrate-reset": "turbo run prisma:migrate-reset",
+    "prisma:studio": "turbo run prisma:studio",
+    "prisma:seed": "turbo run prisma:seed",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "postinstall": "manypkg check"
   },
   "devDependencies": {
     "eslint-config-custom": "workspace:*",
