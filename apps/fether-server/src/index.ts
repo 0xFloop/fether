@@ -22,9 +22,10 @@ app.post("/payload", jsonParser, async (req, res) => {
   console.log(formattedPk);
   //@ts-ignore
   const octokit = await octo.getInstallationOctokit(req.body.installation.id);
-  let contentsReq = await octokit.request("GET /repos/{owner}/{repo}/contents", {
+  let contentsReq = await octokit.request("GET /repos/{owner}/{repo}/contents/{path}", {
     owner: "0xfloop",
     repo: "fether",
+    path: "apps/fether-server/src/index.ts",
     headers: {
       "X-GitHub-Api-Version": "2022-11-28",
     },
