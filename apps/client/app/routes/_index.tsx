@@ -3,7 +3,7 @@ import Typewriter from "typewriter-effect";
 export default function Index() {
   return (
     <div className="w-screen h-screen overflow-hidden">
-      <div className="m-auto relative flex flex-col justify-center items-center p-6 text-center w-full h-full">
+      <div className="m-auto relative flex flex-col justify-center items-center p-6 text-center w-full h-5/6 md:h-full">
         <div className="font-display flex flex-row text-[150px] absolute  bottom-4 left-6 align-bottom items-baseline">
           <h1 className="text-[100px] leading-[80px] md:text-[150px] md:leading-[120px]">fether</h1>
           <p className="text-base md:text-2xl">by floop</p>
