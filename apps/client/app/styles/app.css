@@ -699,6 +699,10 @@ select {
   right: 1.5rem;
 }
 
+.bottom-12 {
+  bottom: 3rem;
+}
+
 .m-auto {
   margin: auto;
 }
@@ -828,6 +832,10 @@ select {
 }
 
 @media (min-width: 768px) {
+  .md\:bottom-4 {
+    bottom: 1rem;
+  }
+
   .md\:h-full {
     height: 100%;
   }
