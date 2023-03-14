@@ -3,7 +3,9 @@
   "private": true,
   "sideEffects": false,
   "scripts": {
-    "build": "remix build",
+    "build": "npm run build:css && npm run build:remix",
+    "build:css": "tailwindcss -i ./styles/app.css -o ./app/styles/app.css -m",
+    "build:remix": "remix build",
     "dev": "remix dev",
     "typecheck": "tsc"
   },
