@@ -12,7 +12,7 @@ const pk = process.env.appPK as string;
 
 const formattedPk = pk.replace(/\\n/g, "\n");
 
-const octo = new Octo({ appId: "302483", privateKey: formattedPk });
+const octo = new Octo({ appId: "302483", privateKey: pk });
 
 app.get("/", (req, res) => {
   res.send("Hello Wor ld!");
