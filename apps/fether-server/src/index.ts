@@ -14,13 +14,18 @@ app.get("/", (req, res) => {
   res.send("Hello World!");
 });
 
-app.post("/payload", jsonParser, (req, res) => {
+app.post("/payload", jsonParser, async (req, res) => {
   //@ts-ignore
-  console.log(req.body.installation.id);
-  for (let i = 0; i < req.body.commits.length; i++) {
-    for (let j = 0; j < req.body.commits[i].modified.length; j++)
-      console.log("modified file: " + req.body.commits[i].modified[j]);
-  }
+  const octokit = await app.getInstallationOctokit(req.body.installation.id);
+  let contentsReq = await octokit.request("GET /repos/{owner}/{repo}/contents", {
+    owner: "0xfloop",
+    repo: "fether",
+    headers: {
+      "X-GitHub-Api-Version": "2022-11-28",
+    },
+  });
+  console.log(contentsReq);
+
   // res.send("POST REQ FROM GITHUB BELOW: \n" + JSON.stringify(req.body));
   //@ts-ignore
   res.send("yay");
