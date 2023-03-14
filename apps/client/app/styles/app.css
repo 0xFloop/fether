@@ -695,22 +695,6 @@ select {
   left: 1.5rem;
 }
 
-.right-6 {
-  right: 1.5rem;
-}
-
-.bottom-12 {
-  bottom: 3rem;
-}
-
-.bottom-20 {
-  bottom: 5rem;
-}
-
-.bottom-16 {
-  bottom: 4rem;
-}
-
 .m-auto {
   margin: auto;
 }
@@ -734,10 +718,6 @@ select {
 
 .h-screen {
   height: 100vh;
-}
-
-.h-5\/6 {
-  height: 83.333333%;
 }
 
 .min-h-screen {
@@ -776,30 +756,6 @@ select {
   overflow: hidden;
 }
 
-.border {
-  border-width: 1px;
-}
-
-.bg-\[\#fff5db\] {
-  --tw-bg-opacity: 1;
-  background-color: rgb(255 245 219 / var(--tw-bg-opacity));
-}
-
-.bg-\[\#fffaeb\] {
-  --tw-bg-opacity: 1;
-  background-color: rgb(255 250 235 / var(--tw-bg-opacity));
-}
-
-.bg-\[\#fffcf2\] {
-  --tw-bg-opacity: 1;
-  background-color: rgb(255 252 242 / var(--tw-bg-opacity));
-}
-
-.bg-\[\#fffefa\] {
-  --tw-bg-opacity: 1;
-  background-color: rgb(255 254 250 / var(--tw-bg-opacity));
-}
-
 .p-6 {
   padding: 1.5rem;
 }
@@ -816,18 +772,12 @@ select {
   font-family: HelveticaNeue, Helvetica, Arial, sans-serif;
 }
 
-.text-2xl {
-  font-size: 1.5rem;
-  line-height: 2rem;
+.text-\[100px\] {
+  font-size: 100px;
 }
 
 .text-\[150px\] {
   font-size: 150px;
-}
-
-.text-lg {
-  font-size: 1.125rem;
-  line-height: 1.75rem;
 }
 
 .text-base {
@@ -835,31 +785,8 @@ select {
   line-height: 1.5rem;
 }
 
-.text-\[100px\] {
-  font-size: 100px;
-}
-
-.leading-\[120px\] {
-  line-height: 120px;
-}
-
 .leading-\[80px\] {
   line-height: 80px;
-}
-
-.text-\[\#120d00\] {
-  --tw-text-opacity: 1;
-  color: rgb(18 13 0 / var(--tw-text-opacity));
-}
-
-.text-\[\#e6be50\] {
-  --tw-text-opacity: 1;
-  color: rgb(230 190 80 / var(--tw-text-opacity));
-}
-
-.text-\[\#211801\] {
-  --tw-text-opacity: 1;
-  color: rgb(33 24 1 / var(--tw-text-opacity));
 }
 
 /* Chrome, Safari, and Opera */
@@ -876,22 +803,7 @@ select {
   src: url("/fonts/HelveticaNeue.woff2") format("woff2");
 }
 
-@media (min-width: 640px) {
-  .sm\:text-2xl {
-    font-size: 1.5rem;
-    line-height: 2rem;
-  }
-}
-
 @media (min-width: 768px) {
-  .md\:bottom-4 {
-    bottom: 1rem;
-  }
-
-  .md\:h-full {
-    height: 100%;
-  }
-
   .md\:text-2xl {
     font-size: 1.5rem;
     line-height: 2rem;
