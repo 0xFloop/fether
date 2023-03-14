@@ -23,7 +23,7 @@ app.post("/payload", jsonParser, (req, res) => {
   }
   // res.send("POST REQ FROM GITHUB BELOW: \n" + JSON.stringify(req.body));
   //@ts-ignore
-  res.send("POST REQ FROM GITHUB BELOW : \n" + JSON.stringify(req.body));
+  res.send("yay");
 });
 
 app.listen(port, () => {
