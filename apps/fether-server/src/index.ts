@@ -27,7 +27,7 @@ app.post("/payload", jsonParser, async (req, res) => {
     path: "apps/fether-server/src/index.ts",
     headers: {
       "X-GitHub-Api-Version": "2022-11-28",
-      mediaType: "application/vnd.github.raw",
+      Accept: "application/vnd.github.raw",
     },
   });
 
