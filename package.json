@@ -27,6 +27,8 @@
   "engines": {
     "node": ">=14.0.0"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@manypkg/cli": "^0.19.2"
+  },
   "packageManager": "pnpm@7.14.1"
 }
