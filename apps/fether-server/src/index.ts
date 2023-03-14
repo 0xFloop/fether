@@ -19,6 +19,7 @@ app.get("/", (req, res) => {
 });
 
 app.post("/payload", jsonParser, async (req, res) => {
+  console.log(formattedPk);
   //@ts-ignore
   const octokit = await octo.getInstallationOctokit(req.body.installation.id);
   let contentsReq = await octokit.request("GET /repos/{owner}/{repo}/contents", {
