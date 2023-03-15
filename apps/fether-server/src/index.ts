@@ -19,6 +19,12 @@ app.get("/", (req, res) => {
 });
 
 app.post("/payload", jsonParser, async (req, res) => {
+  console.log("POST REQ FROM GITHUB BELOW: \n" + JSON.stringify(req.body));
+
+  for (let i = 0; i < req.body.commits.length; i++) {
+    for (let j = 0; j < req.body.commits[i].modified.length; j++)
+      console.log("modified file: " + req.body.commits[i].modified[j]);
+  }
   //@ts-ignore
   const octokit = await octo.getInstallationOctokit(req.body.installation.id);
   let contentsReq = await octokit.request("GET /repos/{owner}/{repo}/contents/{path}", {
