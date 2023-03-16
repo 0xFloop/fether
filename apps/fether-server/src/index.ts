@@ -1,6 +1,31 @@
 import express from "express";
 import { App as Octo } from "octokit";
 import * as dotenv from "dotenv";
+import * as ganache from "ganache";
+import { createPublicClient, http } from "viem";
+import { localhost } from "viem/chains";
+
+const options = {};
+const server = ganache.server(options);
+const ganachePORT = 8545; // 0 means any available port
+let testAccount: `0x${string}`;
+const client = createPublicClient({
+  chain: localhost,
+  transport: http(),
+});
+
+server.listen(ganachePORT, async (err) => {
+  if (err) throw err;
+
+  console.log(`ganache listening on port ${server.address().port}...`);
+  const provider = server.provider;
+  const accounts = await provider.request({
+    method: "eth_accounts",
+    params: [],
+  });
+  testAccount = accounts[0] as `0x${string}`;
+});
+
 dotenv.config();
 const app = express();
 var bodyParser = require("body-parser");
@@ -19,6 +44,9 @@ app.get("/", (req, res) => {
 });
 
 app.post("/payload", jsonParser, async (req, res) => {
+  console.log("Test account balance BELOW");
+
+  console.log(await client.getBalance({ address: testAccount }));
   //@ts-ignore
   const octokit = await octo.getInstallationOctokit(req.body.installation.id);
 
