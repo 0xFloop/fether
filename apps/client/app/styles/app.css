@@ -776,10 +776,6 @@ select {
   font-size: 100px;
 }
 
-.text-\[150px\] {
-  font-size: 150px;
-}
-
 .text-base {
   font-size: 1rem;
   line-height: 1.5rem;
