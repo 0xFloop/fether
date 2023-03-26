@@ -10,6 +10,7 @@ const options = {};
 const server = ganache.server(options);
 const ganachePORT = 8545; // 0 means any available port
 let testAccount: `0x${string}`;
+
 const client = createPublicClient({
   chain: localhost,
   transport: http(),
