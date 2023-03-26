@@ -2,8 +2,9 @@ import express from "express";
 import { App as Octo } from "octokit";
 import * as dotenv from "dotenv";
 import * as ganache from "ganache";
-import { createPublicClient, http } from "viem";
-import { localhost } from "viem/chains";
+import { createPublicClient, createTestClient, http } from "viem";
+import { foundry, localhost } from "viem/chains";
+dotenv.config();
 
 const options = {};
 const server = ganache.server(options);
@@ -26,7 +27,6 @@ server.listen(ganachePORT, async (err) => {
   testAccount = accounts[0] as `0x${string}`;
 });
 
-dotenv.config();
 const app = express();
 var bodyParser = require("body-parser");
 var jsonParser = bodyParser.json();
