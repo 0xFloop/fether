@@ -61,7 +61,12 @@ app.post("/payload", jsonParser, async (req, res) => {
         let fileName = modifiedContractPath.split("/").pop();
 
         console.log("fileName: " + fileName);
-        console.log(modifiedContractPath.split("/"));
+        console.log(
+          modifiedContractPath
+            .split("/") // split to an array
+            .slice(-2) // take the two last elements
+            .join("/")
+        );
         let contentsReq = await octokit.request("GET /repos/{owner}/{repo}/contents/{path}", {
           owner: "0xfloop",
           repo: "fether",
