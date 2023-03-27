@@ -62,19 +62,13 @@ app.post("/payload", jsonParser, async (req, res) => {
         pathArray.pop();
         console.log("fileName: " + fileName);
         console.log(pathArray);
-        console.log(
-          "bytecode path: " +
-            pathArray.join("/") +
-            "/out/" +
-            fileName +
-            "/" +
-            fileName?.split(".")[0] +
-            ".json"
-        );
+        let byteCodePath =
+          pathArray.join("/") + "/out/" + fileName + "/" + fileName?.split(".")[0] + ".json";
+        console.log("bytecode path: " + byteCodePath);
         let contentsReq = await octokit.request("GET /repos/{owner}/{repo}/contents/{path}", {
           owner: "0xfloop",
           repo: "fether",
-          path: modifiedContractPath,
+          path: byteCodePath,
           headers: {
             "X-GitHub-Api-Version": "2022-11-28",
             Accept: "application/vnd.github.raw",
