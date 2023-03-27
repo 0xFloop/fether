@@ -68,13 +68,15 @@ importers:
       ts-node: ^10.9.1
       typescript: ^4.8.4
       viem: ^0.1.21
+      zod: ^3.21.4
     dependencies:
       body-parser: 1.20.2
       dotenv: 16.0.3
       express: 4.18.2
       ganache: 7.7.7
       octokit: 2.0.14
-      viem: 0.1.21_typescript@4.9.5
+      viem: 0.1.21_wnc3eutrhvkpx2b7oumqzgx5he
+      zod: 3.21.4
     devDependencies:
       '@types/express': 4.17.17
       '@types/node': 18.15.2
@@ -3272,7 +3274,7 @@ packages:
     resolution: {integrity: sha512-nne9/IiQ/hzIhY6pdDnbBtz7DjPTKrY00P/zvPSm5pOFkl6xuGrGnXn/VtTNNfNtAfZ9/1RtehkszU9qcTii0Q==}
     dev: true
 
-  /abitype/0.7.1_typescript@4.9.5:
+  /abitype/0.7.1_wnc3eutrhvkpx2b7oumqzgx5he:
     resolution: {integrity: sha512-VBkRHTDZf9Myaek/dO3yMmOzB/y2s3Zo6nVU7yaw1G+TvCHAjwaJzNGN9yo4K5D8bU/VZXKP1EJpRhFr862PlQ==}
     peerDependencies:
       typescript: '>=4.9.4'
@@ -3282,6 +3284,7 @@ packages:
         optional: true
     dependencies:
       typescript: 4.9.5
+      zod: 3.21.4
     dev: false
 
   /abort-controller/3.0.0:
@@ -9433,13 +9436,13 @@ packages:
       vfile-message: 3.1.4
     dev: true
 
-  /viem/0.1.21_typescript@4.9.5:
+  /viem/0.1.21_wnc3eutrhvkpx2b7oumqzgx5he:
     resolution: {integrity: sha512-m5yR9EsibcPT9UBS3bM9EUPv7ORyVT1Bwp0RKJRHlJiE+vc+et3ufAbua+jXm/KFJlmyZksmFduMB9z5X5qFHw==}
     dependencies:
       '@noble/hashes': 1.2.0
       '@noble/secp256k1': 1.7.1
       '@wagmi/chains': 0.2.12_typescript@4.9.5
-      abitype: 0.7.1_typescript@4.9.5
+      abitype: 0.7.1_wnc3eutrhvkpx2b7oumqzgx5he
       idna-uts46-hx: 4.1.2
       isomorphic-ws: 5.0.0_ws@8.13.0
       ws: 8.13.0
@@ -9720,6 +9723,10 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
     dev: true
+
+  /zod/3.21.4:
+    resolution: {integrity: sha512-m46AKbrzKVzOzs/DZgVnG5H55N1sv1M8qZU3A8RIKbs3mrACDNeIOeilDymVb2HdmP8uwshOCF4uJ8uM9rCqJw==}
+    dev: false
 
   /zwitch/2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}

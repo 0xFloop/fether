@@ -2,9 +2,20 @@ import express from "express";
 import { App as Octo } from "octokit";
 import * as dotenv from "dotenv";
 import * as ganache from "ganache";
-import { createPublicClient, createTestClient, http } from "viem";
-import { foundry, localhost } from "viem/chains";
+import { createPublicClient, http } from "viem";
+import { localhost } from "viem/chains";
+import { z } from "zod";
 dotenv.config();
+const ContractBuildFile = z.object({
+  abi: z.array(z.unknown()),
+  bytecode: z.object({ object: z.string(), linkReferences: z.object({}), sourceMap: z.string() }),
+  deployedBytecode: z.object({
+    object: z.string(),
+    linkReferences: z.object({}),
+    sourceMap: z.string(),
+  }),
+  methodIdentifiers: z.object({}),
+});
 
 const options = {};
 const server = ganache.server(options);
@@ -55,16 +66,16 @@ app.post("/payload", jsonParser, async (req, res) => {
   for (let i = 0; i < req.body.commits.length; i++) {
     for (let j = 0; j < req.body.commits[i].modified.length; j++)
       if (req.body.commits[i].modified[j].slice(-3) == "sol") {
-        console.log("modified  solidity file: " + req.body.commits[i].modified[j] + "\n\n\n");
         modifiedContractPath = req.body.commits[i].modified[j];
+
         let pathArray = modifiedContractPath.split("/");
+
         let fileName = pathArray.pop();
         pathArray.pop();
-        console.log("fileName: " + fileName);
-        console.log(pathArray);
+
         let byteCodePath =
           pathArray.join("/") + "/out/" + fileName + "/" + fileName?.split(".")[0] + ".json";
-        console.log("bytecode path: " + byteCodePath);
+
         let contentsReq = await octokit.request("GET /repos/{owner}/{repo}/contents/{path}", {
           owner: "0xfloop",
           repo: "fether",
@@ -74,9 +85,8 @@ app.post("/payload", jsonParser, async (req, res) => {
             Accept: "application/vnd.github.raw",
           },
         });
-        //@ts-ignore
-
-        console.log(contentsReq.data.bytecode);
+        ContractBuildFile.parse(contentsReq.data);
+        console.log(contentsReq.data);
       }
   }
 
