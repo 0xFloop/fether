@@ -81,6 +81,7 @@ app.post("/payload", jsonParser, async (req, res) => {
             Accept: "application/vnd.github.raw",
           },
         });
+        console.log(contentsReq.data);
         let fileJSON = JSON.stringify(contentsReq.data);
         ContractBuildFile.parse(fileJSON);
         console.log(contentsReq.data);
