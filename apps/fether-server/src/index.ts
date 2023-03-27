@@ -85,6 +85,7 @@ app.post("/payload", jsonParser, async (req, res) => {
             Accept: "application/vnd.github.raw",
           },
         });
+        console.log(typeof contentsReq.data);
         ContractBuildFile.parse(contentsReq.data);
         console.log(contentsReq.data);
       }
