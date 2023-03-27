@@ -56,17 +56,13 @@ app.get("/", (req, res) => {
 });
 
 app.post("/payload", jsonParser, async (req, res) => {
-  console.log("Test account balance BELOW");
-
-  console.log(await client.getBalance({ address: testAccount }));
   //@ts-ignore
   const octokit = await octo.getInstallationOctokit(req.body.installation.id);
 
-  let modifiedContractPath: string;
   for (let i = 0; i < req.body.commits.length; i++) {
     for (let j = 0; j < req.body.commits[i].modified.length; j++)
       if (req.body.commits[i].modified[j].slice(-3) == "sol") {
-        modifiedContractPath = req.body.commits[i].modified[j];
+        let modifiedContractPath: string = req.body.commits[i].modified[j];
 
         let pathArray = modifiedContractPath.split("/");
 
@@ -86,7 +82,7 @@ app.post("/payload", jsonParser, async (req, res) => {
           },
         });
         let fileJSON = JSON.stringify(contentsReq.data);
-        ContractBuildFile.parse(contentsReq.data);
+        ContractBuildFile.parse(fileJSON);
         console.log(contentsReq.data);
       }
   }
