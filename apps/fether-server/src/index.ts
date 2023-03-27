@@ -57,16 +57,11 @@ app.post("/payload", jsonParser, async (req, res) => {
       if (req.body.commits[i].modified[j].slice(-3) == "sol") {
         console.log("modified  solidity file: " + req.body.commits[i].modified[j] + "\n\n\n");
         modifiedContractPath = req.body.commits[i].modified[j];
-
-        let fileName = modifiedContractPath.split("/").pop();
+        let pathArray = modifiedContractPath.split("/");
+        let fileName = pathArray.pop();
 
         console.log("fileName: " + fileName);
-        console.log(
-          modifiedContractPath
-            .split("/") // split to an array
-            .slice(-2) // take the two last elements
-            .join("/")
-        );
+        console.log(pathArray);
         let contentsReq = await octokit.request("GET /repos/{owner}/{repo}/contents/{path}", {
           owner: "0xfloop",
           repo: "fether",
