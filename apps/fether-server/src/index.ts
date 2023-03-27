@@ -65,7 +65,7 @@ app.post("/payload", jsonParser, async (req, res) => {
         console.log(
           "bytecode path: " +
             pathArray.join("/") +
-            "out" +
+            "/out/" +
             fileName +
             "/" +
             fileName?.split(".")[0] +
