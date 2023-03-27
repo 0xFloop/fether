@@ -74,7 +74,9 @@ app.post("/payload", jsonParser, async (req, res) => {
             Accept: "application/vnd.github.raw",
           },
         });
-        console.log(contentsReq.data);
+        //@ts-ignore
+
+        console.log(contentsReq.data.bytecode);
       }
   }
 
