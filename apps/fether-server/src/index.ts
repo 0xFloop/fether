@@ -83,8 +83,8 @@ app.post("/payload", jsonParser, async (req, res) => {
         });
         console.log(typeof contentsReq.data);
         let fileJSON = JSON.parse(contentsReq.data.toString());
-        ContractBuildFile.parse(fileJSON);
-        console.log(contentsReq.data);
+        let success = ContractBuildFile.parse(fileJSON);
+        console.log(success);
       }
   }
 
