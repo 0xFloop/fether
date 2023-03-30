@@ -1,7 +1,7 @@
 import express from "express";
 import { App as Octo } from "octokit";
 import * as dotenv from "dotenv";
-import { createTestClient, http } from "viem";
+import { createPublicClient, createTestClient, http } from "viem";
 import { foundry } from "viem/chains";
 import { z } from "zod";
 dotenv.config();
@@ -16,9 +16,8 @@ const ContractBuildFile = z.object({
   methodIdentifiers: z.object({}),
 });
 
-const client = createTestClient({
+const client = createPublicClient({
   chain: foundry,
-  mode: "anvil",
   transport: http(),
 });
 
@@ -41,7 +40,7 @@ app.get("/", (req, res) => {
 app.post("/payload", jsonParser, async (req, res) => {
   //@ts-ignore
   const octokit = await octo.getInstallationOctokit(req.body.installation.id);
-  const mine = await client.mine({ blocks: 2 });
+  console.log(await client.getBlockNumber());
   for (let i = 0; i < req.body.commits.length; i++) {
     for (let j = 0; j < req.body.commits[i].modified.length; j++)
       if (req.body.commits[i].modified[j].slice(-3) == "sol") {
