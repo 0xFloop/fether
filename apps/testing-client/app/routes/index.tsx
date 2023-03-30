@@ -1,32 +1,50 @@
+import "@rainbow-me/rainbowkit/styles.css";
+import {
+  ConnectButton,
+  darkTheme,
+  getDefaultWallets,
+  RainbowKitProvider,
+} from "@rainbow-me/rainbowkit";
+import { configureChains, createClient, WagmiConfig } from "wagmi";
+import { mainnet, polygon, optimism, arbitrum } from "wagmi/chains";
+import { alchemyProvider } from "wagmi/providers/alchemy";
+import { publicProvider } from "wagmi/providers/public";
+
+const { chains, provider } = configureChains(
+  [mainnet, polygon, optimism, arbitrum],
+  [alchemyProvider({ apiKey: "r8ilH_ju-8gNnskLhLGNGtIYpVwaIvOO" }), publicProvider()]
+);
+const { connectors } = getDefaultWallets({
+  appName: "My RainbowKit App",
+  chains,
+});
+
+const wagmiClient = createClient({
+  autoConnect: true,
+  connectors,
+  provider,
+});
+
 export default function Index() {
   return (
-    <div style={{ fontFamily: "system-ui, sans-serif", lineHeight: "1.4" }}>
-      <h1>Welcome to Remix</h1>
-      <ul>
-        <li>
-          <a
-            target="_blank"
-            href="https://remix.run/tutorials/blog"
-            rel="noreferrer"
-          >
-            15m Quickstart Blog Tutorial
-          </a>
-        </li>
-        <li>
-          <a
-            target="_blank"
-            href="https://remix.run/tutorials/jokes"
-            rel="noreferrer"
-          >
-            Deep Dive Jokes App Tutorial
-          </a>
-        </li>
-        <li>
-          <a target="_blank" href="https://remix.run/docs" rel="noreferrer">
-            Remix Docs
-          </a>
-        </li>
-      </ul>
-    </div>
+    <WagmiConfig client={wagmiClient}>
+      <RainbowKitProvider
+        theme={darkTheme({
+          accentColor: "#7b3fe4",
+          accentColorForeground: "white",
+          borderRadius: "small",
+          fontStack: "system",
+          overlayBlur: "small",
+        })}
+        chains={chains}
+      >
+        <ConnectButton
+          showBalance={{
+            smallScreen: false,
+            largeScreen: true,
+          }}
+        />{" "}
+      </RainbowKitProvider>
+    </WagmiConfig>
   );
 }

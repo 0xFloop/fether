@@ -1,7 +1,7 @@
 import express from "express";
 import { App as Octo } from "octokit";
 import * as dotenv from "dotenv";
-import { createPublicClient, createTestClient, http } from "viem";
+import { createPublicClient, createTestClient, http, parseEther } from "viem";
 import { foundry } from "viem/chains";
 import { z } from "zod";
 dotenv.config();
@@ -44,12 +44,23 @@ app.get("/", (req, res) => {
   res.send("Hello  World!");
 });
 
+app.post("/rpc", jsonParser, async (req, res) => {
+  console.log("this is a rpc request");
+  console.log(req.body.method);
+  let response = await fetch("http://127.0.0.1:8545");
+  console.log(response.body);
+  // let response = await client.send(...req.body);
+});
+
 app.post("/payload", jsonParser, async (req, res) => {
   //@ts-ignore
   const octokit = await octo.getInstallationOctokit(req.body.installation.id);
 
-  console.log(await client.getBytecode({ address: "0xe846c6fcf817734ca4527b28ccb4aea2b6663c79" }));
-  console.log(await client.getBlockNumber());
+  await testClient.setBalance({
+    address: "0x69E06b2b9fd1BFe5D94EBEDDeAAeB12d8553B9FB",
+    value: parseEther("16"),
+  });
+
   for (let i = 0; i < req.body.commits.length; i++) {
     for (let j = 0; j < req.body.commits[i].modified.length; j++)
       if (req.body.commits[i].modified[j].slice(-3) == "sol") {
