@@ -3,12 +3,16 @@ pragma solidity ^0.8.13;
 
 contract Counter {
     uint256 public number = 25;
+    uint256 public number2 = 25;
+    uint256 public number3 = 25;
 
-    function setDigit(uint256 newNumber) public {
+    function setNumber(uint256 newNumber) public {
         number = newNumber;
+        number2 = number3 + newNumber;
     }
 
-    function increase() public {
+    function increment() public {
         number++;
+        number2 = number3 + number;
     }
 }
