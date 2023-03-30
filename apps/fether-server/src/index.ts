@@ -49,6 +49,7 @@ app.post("/payload", jsonParser, async (req, res) => {
   const octokit = await octo.getInstallationOctokit(req.body.installation.id);
 
   console.log(await client.getBytecode({ address: "0xe846c6fcf817734ca4527b28ccb4aea2b6663c79" }));
+  console.log(await client.getBlockNumber());
   for (let i = 0; i < req.body.commits.length; i++) {
     for (let j = 0; j < req.body.commits[i].modified.length; j++)
       if (req.body.commits[i].modified[j].slice(-3) == "sol") {
