@@ -1,9 +1,8 @@
 import express from "express";
 import { App as Octo } from "octokit";
 import * as dotenv from "dotenv";
-import * as ganache from "ganache";
-import { createPublicClient, http } from "viem";
-import { localhost } from "viem/chains";
+import { createTestClient, http } from "viem";
+import { foundry } from "viem/chains";
 import { z } from "zod";
 dotenv.config();
 const ContractBuildFile = z.object({
@@ -17,26 +16,10 @@ const ContractBuildFile = z.object({
   methodIdentifiers: z.object({}),
 });
 
-const options = {};
-const server = ganache.server(options);
-const ganachePORT = 8545; // 0 means any available port
-let testAccount: `0x${string}`;
-
-const client = createPublicClient({
-  chain: localhost,
+const client = createTestClient({
+  chain: foundry,
+  mode: "anvil",
   transport: http(),
-});
-
-server.listen(ganachePORT, async (err) => {
-  if (err) throw err;
-
-  console.log(`ganache listening on port ${server.address().port}...`);
-  const provider = server.provider;
-  const accounts = await provider.request({
-    method: "eth_accounts",
-    params: [],
-  });
-  testAccount = accounts[0] as `0x${string}`;
 });
 
 const app = express();
@@ -45,11 +28,11 @@ var jsonParser = bodyParser.json();
 
 const port = 3001;
 
-const pk = process.env.appPK as string;
+const githubAppPk = process.env.appPK as string;
 
-const formattedPk = pk.replace(/\\n/g, "\n");
+const formattedGithubAppPk = githubAppPk.replace(/\\n/g, "\n");
 
-const octo = new Octo({ appId: "302483", privateKey: formattedPk });
+const octo = new Octo({ appId: "302483", privateKey: githubAppPk });
 
 app.get("/", (req, res) => {
   res.send("Hello  World!");
@@ -58,7 +41,7 @@ app.get("/", (req, res) => {
 app.post("/payload", jsonParser, async (req, res) => {
   //@ts-ignore
   const octokit = await octo.getInstallationOctokit(req.body.installation.id);
-
+  const mine = await client.mine({ blocks: 1 });
   for (let i = 0; i < req.body.commits.length; i++) {
     for (let j = 0; j < req.body.commits[i].modified.length; j++)
       if (req.body.commits[i].modified[j].slice(-3) == "sol") {
@@ -81,12 +64,10 @@ app.post("/payload", jsonParser, async (req, res) => {
             Accept: "application/vnd.github.raw",
           },
         });
-        console.log(typeof contentsReq.data);
         let fileJSON = JSON.parse(contentsReq.data.toString());
         let validatedJSON = ContractBuildFile.parse(fileJSON);
 
         let byteCode = validatedJSON.deployedBytecode.object;
-        console.log(byteCode);
       }
   }
 
