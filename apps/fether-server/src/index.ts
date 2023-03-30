@@ -41,7 +41,7 @@ app.get("/", (req, res) => {
 app.post("/payload", jsonParser, async (req, res) => {
   //@ts-ignore
   const octokit = await octo.getInstallationOctokit(req.body.installation.id);
-  const mine = await client.mine({ blocks: 1 });
+  const mine = await client.mine({ blocks: 2 });
   for (let i = 0; i < req.body.commits.length; i++) {
     for (let j = 0; j < req.body.commits[i].modified.length; j++)
       if (req.body.commits[i].modified[j].slice(-3) == "sol") {
