@@ -37,7 +37,7 @@ const githubAppPk = process.env.appPK as string;
 
 const formattedGithubAppPk = githubAppPk.replace(/\\n/g, "\n");
 
-const octo = new Octo({ appId: "302483", privateKey: githubAppPk });
+const octo = new Octo({ appId: "302483", privateKey: formattedGithubAppPk });
 
 app.get("/", (req, res) => {
   res.send("Hello  World!");
