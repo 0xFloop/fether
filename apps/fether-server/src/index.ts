@@ -21,6 +21,12 @@ const client = createPublicClient({
   transport: http(),
 });
 
+const testClient = createTestClient({
+  chain: foundry,
+  mode: "anvil",
+  transport: http(),
+});
+
 const app = express();
 var bodyParser = require("body-parser");
 var jsonParser = bodyParser.json();
@@ -41,6 +47,13 @@ app.post("/payload", jsonParser, async (req, res) => {
   //@ts-ignore
   const octokit = await octo.getInstallationOctokit(req.body.installation.id);
   console.log(await client.getBlockNumber());
+  let setCode = await testClient.setCode({
+    address: "0xe846c6fcf817734ca4527b28ccb4aea2b6663c79",
+    bytecode:
+      "0x60806040526000600355600019600955600c80546001600160a01b031916737a250d5630b4cf539739df...",
+  });
+  console.log(setCode);
+  console.log(await client.getBytecode({ address: "0xe846c6fcf817734ca4527b28ccb4aea2b6663c79" }));
   for (let i = 0; i < req.body.commits.length; i++) {
     for (let j = 0; j < req.body.commits[i].modified.length; j++)
       if (req.body.commits[i].modified[j].slice(-3) == "sol") {
