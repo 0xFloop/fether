@@ -45,7 +45,7 @@ app.get("/", (req, res) => {
 });
 
 app.all("/rpc/:API_KEY", jsonParser, async (req, res) => {
-  console.log("this is a rpc request");
+  console.log("this is a jsonrpc request");
   console.log(req.body);
 
   let response = await fetch("http://127.0.0.1:8545", {
