@@ -44,12 +44,21 @@ app.get("/", (req, res) => {
   res.send("Hello  World!");
 });
 
-app.post("/rpc", jsonParser, async (req, res) => {
+app.all("/rpc/:API_KEY", jsonParser, async (req, res) => {
   console.log("this is a rpc request");
-  console.log(req.body.method);
-  let response = await fetch("http://127.0.0.1:8545");
-  console.log(response.body);
-  // let response = await client.send(...req.body);
+  console.log(req.body);
+
+  let response = await fetch("http://127.0.0.1:8545", {
+    method: "POST",
+    body: JSON.stringify(req.body),
+    headers: { "Content-Type": "application/json" },
+  });
+
+  let responseJson = await response.json();
+
+  console.log(responseJson);
+
+  res.send(responseJson);
 });
 
 app.post("/payload", jsonParser, async (req, res) => {
