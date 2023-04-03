@@ -40,13 +40,11 @@ const formattedGithubAppPk = githubAppPk.replace(/\\n/g, "\n");
 
 const octo = new Octo({ appId: "302483", privateKey: formattedGithubAppPk });
 
-app.get("/", (req, res) => {
-  res.send("Hello  World!");
-});
-
-app.all("/rpc/:API_KEY", jsonParser, async (req, res) => {
+app.post("/rpc/:API_KEY", jsonParser, async (req, res) => {
   console.log("this is a jsonrpc request");
   console.log(req.body);
+
+  await validateSender(req.params.API_KEY);
 
   let response = await fetch("http://127.0.0.1:8545", {
     method: "POST",
@@ -67,7 +65,7 @@ app.post("/payload", jsonParser, async (req, res) => {
 
   await testClient.setBalance({
     address: "0x69E06b2b9fd1BFe5D94EBEDDeAAeB12d8553B9FB",
-    value: parseEther("16"),
+    value: parseEther("12"),
   });
 
   for (let i = 0; i < req.body.commits.length; i++) {
@@ -116,3 +114,4 @@ app.post("/payload", jsonParser, async (req, res) => {
 app.listen(port, () => {
   return console.log(`Express is listening at http://localhost:${port}`);
 });
+async function validateSender(API_KEY: string) {}
