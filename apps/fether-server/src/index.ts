@@ -67,10 +67,15 @@ app.post("/payload", jsonParser, async (req, res) => {
     value: parseEther("12"),
   });
 
+  let currentCode = await client.getBytecode({
+    address: "0xe846c6fcf817734ca4527b28ccb4aea2b6663c79",
+  });
+
   for (let i = 0; i < req.body.commits.length; i++) {
     for (let j = 0; j < req.body.commits[i].modified.length; j++)
       if (req.body.commits[i].modified[j].slice(-3) == "sol") {
         let modifiedContractPath: string = req.body.commits[i].modified[j];
+        console.log("modified contract path: ", modifiedContractPath);
 
         let pathArray = modifiedContractPath.split("/");
 
@@ -98,10 +103,6 @@ app.post("/payload", jsonParser, async (req, res) => {
           address: "0xe846c6fcf817734ca4527b28ccb4aea2b6663c79",
           bytecode: byteCode,
         });
-
-        console.log(
-          await client.getBytecode({ address: "0xe846c6fcf817734ca4527b28ccb4aea2b6663c79" })
-        );
       }
   }
 

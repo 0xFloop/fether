@@ -1,6 +1,7 @@
 import { WagmiConfig, createClient, Chain } from "wagmi";
 import { getContract } from "@wagmi/core";
 import { ConnectKitProvider, ConnectKitButton, getDefaultClient } from "connectkit";
+import { useState } from "react";
 
 const fetherChain: Chain = {
   id: 696969,
@@ -19,6 +20,19 @@ const fetherChain: Chain = {
 };
 
 const testAbi = [
+  {
+    inputs: [],
+    name: "getNumber",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
   {
     inputs: [],
     name: "increment",
@@ -89,15 +103,25 @@ const client = createClient(
 );
 
 export default function Index() {
+  const [number, setNumber] = useState<number>(0);
   const contract = getContract({
-    address: "0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e",
+    address: "0xe846c6fcf817734ca4527b28ccb4aea2b6663c79",
     abi: testAbi,
   });
+
+  const updateStateNumber = async () => {
+    console.log("within updateStateNumber");
+    console.log(await contract.getNumber());
+  };
+
   return (
     <WagmiConfig client={client}>
       <ConnectKitProvider>
         <ConnectKitButton />
-        <button onClick={await contract.}></button>
+        <button onClick={updateStateNumber}>click to get contract number value</button>
+        <br />
+        <br />
+        <p>{number}</p>
       </ConnectKitProvider>
     </WagmiConfig>
   );
