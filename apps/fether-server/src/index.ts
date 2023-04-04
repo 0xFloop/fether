@@ -4,6 +4,7 @@ import * as dotenv from "dotenv";
 import { createPublicClient, createTestClient, http, parseEther } from "viem";
 import { foundry } from "viem/chains";
 import { z } from "zod";
+import { validateSender } from "./utils/validate";
 dotenv.config();
 
 const ContractBuildFile = z.object({
@@ -41,11 +42,11 @@ const formattedGithubAppPk = githubAppPk.replace(/\\n/g, "\n");
 const octo = new Octo({ appId: "302483", privateKey: formattedGithubAppPk });
 
 app.post("/rpc/:API_KEY", jsonParser, async (req, res) => {
-  console.log("this is a jsonrpc request");
-  console.log(req.body);
+  let validated = await validateSender(req.params.API_KEY);
 
-  await validateSender(req.params.API_KEY);
-
+  if (!validated) {
+    res.status(500).end("Invalid api key!");
+  }
   let response = await fetch("http://127.0.0.1:8545", {
     method: "POST",
     body: JSON.stringify(req.body),
@@ -53,8 +54,6 @@ app.post("/rpc/:API_KEY", jsonParser, async (req, res) => {
   });
 
   let responseJson = await response.json();
-
-  console.log(responseJson);
 
   res.send(responseJson);
 });
@@ -114,4 +113,3 @@ app.post("/payload", jsonParser, async (req, res) => {
 app.listen(port, () => {
   return console.log(`Express is listening at http://localhost:${port}`);
 });
-async function validateSender(API_KEY: string) {}
