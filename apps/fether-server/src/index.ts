@@ -71,6 +71,8 @@ app.post("/payload", jsonParser, async (req, res) => {
     address: "0xe846c6fcf817734ca4527b28ccb4aea2b6663c79",
   });
 
+  console.log("current code: ", currentCode);
+
   for (let i = 0; i < req.body.commits.length; i++) {
     for (let j = 0; j < req.body.commits[i].modified.length; j++)
       if (req.body.commits[i].modified[j].slice(-3) == "sol") {
