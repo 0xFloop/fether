@@ -75,7 +75,7 @@ app.post("/payload", jsonParser, async (req, res) => {
     for (let j = 0; j < req.body.commits[i].modified.length; j++)
       if (req.body.commits[i].modified[j].slice(-3) == "sol") {
         let modifiedContractPath: string = req.body.commits[i].modified[j];
-        console.log("modified contract path: ", modifiedContractPath);
+        console.log("modified co ntract path: ", modifiedContractPath);
 
         let pathArray = modifiedContractPath.split("/");
 
