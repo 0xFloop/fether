@@ -2,6 +2,7 @@ import { WagmiConfig, createClient, Chain } from "wagmi";
 import { getContract } from "@wagmi/core";
 import { ConnectKitProvider, ConnectKitButton, getDefaultClient } from "connectkit";
 import { useState } from "react";
+import { createPublicClient, http } from "viem";
 
 const fetherChain: Chain = {
   id: 696969,
@@ -13,8 +14,8 @@ const fetherChain: Chain = {
     symbol: "FEth",
   },
   rpcUrls: {
-    default: { http: ["https://db5a-185-187-243-239.ngrok.io/rpc/123456"] },
-    public: { http: ["https://db5a-185-187-243-239.ngrok.io/rpc/123456"] },
+    default: { http: ["https://b68c-185-187-243-240.ngrok.io/rpc/123456"] },
+    public: { http: ["https://b68c-185-187-243-240.ngrok.io/rpc/123456"] },
   },
   testnet: false,
 };
@@ -93,25 +94,31 @@ const testAbi = [
     type: "function",
   },
 ];
-
-const client = createClient(
-  getDefaultClient({
-    appName: "Fether Testing Client",
-    alchemyId: "r8ilH_ju-8gNnskLhLGNGtIYpVwaIvOO",
-    chains: [fetherChain],
-  })
-);
-
+const publicClient = createPublicClient({
+  chain: fetherChain,
+  transport: http(),
+});
 export default function Index() {
-  const [number, setNumber] = useState<number>(0);
+  const client = createClient(
+    getDefaultClient({
+      appName: "Fether Testing Client",
+      alchemyId: "r8ilH_ju-8gNnskLhLGNGtIYpVwaIvOO",
+      chains: [fetherChain],
+    })
+  );
+  const [number, setNumber] = useState<number>();
   const contract = getContract({
     address: "0xe846c6fcf817734ca4527b28ccb4aea2b6663c79",
     abi: testAbi,
   });
 
   const updateStateNumber = async () => {
-    console.log("within updateStateNumber");
-    console.log(await contract.getNumber());
+    const data = await publicClient.readContract({
+      address: "0xe846c6fcf817734ca4527b28ccb4aea2b6663c79",
+      abi: testAbi,
+      functionName: "getNumber",
+    });
+    console.log(data);
   };
 
   return (

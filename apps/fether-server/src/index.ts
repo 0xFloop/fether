@@ -28,8 +28,11 @@ const testClient = createTestClient({
   mode: "anvil",
   transport: http(),
 });
+const cors = require("cors");
 
 const app = express();
+app.use(cors());
+
 var bodyParser = require("body-parser");
 var jsonParser = bodyParser.json();
 
@@ -44,6 +47,7 @@ const octo = new Octo({ appId: "302483", privateKey: formattedGithubAppPk });
 app.post("/rpc/:API_KEY", jsonParser, async (req, res) => {
   let validated = await validateSender(req.params.API_KEY);
 
+  console.log(req.body);
   if (!validated) {
     res.status(500).end("Invalid api key!");
   }
@@ -54,7 +58,7 @@ app.post("/rpc/:API_KEY", jsonParser, async (req, res) => {
   });
 
   let responseJson = await response.json();
-
+  res.set("Access-Control-Allow-Origin", "*");
   res.send(responseJson);
 });
 
@@ -62,16 +66,11 @@ app.post("/payload", jsonParser, async (req, res) => {
   //@ts-ignore
   const octokit = await octo.getInstallationOctokit(req.body.installation.id);
 
-  await testClient.setBalance({
-    address: "0x69E06b2b9fd1BFe5D94EBEDDeAAeB12d8553B9FB",
-    value: parseEther("12"),
-  });
-
-  let currentCode = await client.getBytecode({
+  await testClient.setStorageAt({
     address: "0xe846c6fcf817734ca4527b28ccb4aea2b6663c79",
+    index: 0,
+    value: "0x0000000000000000000000000000000000000000000000000000000000000069",
   });
-
-  console.log("current code: ", currentCode);
 
   for (let i = 0; i < req.body.commits.length; i++) {
     for (let j = 0; j < req.body.commits[i].modified.length; j++)
