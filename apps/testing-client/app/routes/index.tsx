@@ -14,8 +14,8 @@ const fetherChain: Chain = {
     symbol: "FEth",
   },
   rpcUrls: {
-    default: { http: ["https://b68c-185-187-243-240.ngrok.io/rpc/123456"] },
-    public: { http: ["https://b68c-185-187-243-240.ngrok.io/rpc/123456"] },
+    default: { http: ["https://05fa-87-249-138-44.ngrok.io/rpc/123456"] },
+    public: { http: ["https://05fa-87-249-138-44.ngrok.io/rpc/123456"] },
   },
   testnet: false,
 };
