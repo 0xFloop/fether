@@ -49,7 +49,7 @@ const testClient = createTestClient({
 
 app.post("/rpc/:API_KEY", jsonParser, async (req, res) => {
   let validated = await validateSender(req.params.API_KEY);
-
+  console.log("rpc call");
   console.log(req.body);
   if (!validated) {
     res.status(500).end("Invalid api key!");

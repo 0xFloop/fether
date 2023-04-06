@@ -3,8 +3,6 @@ import { getContract } from "@wagmi/core";
 import { ConnectKitProvider, ConnectKitButton, getDefaultClient } from "connectkit";
 import { useState } from "react";
 import { createPublicClient, http } from "viem";
-import * as dotenv from "dotenv";
-dotenv.config();
 
 const fetherChain: Chain = {
   id: 696969,
