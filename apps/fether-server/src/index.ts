@@ -8,6 +8,7 @@ import {
   getContractAddress,
   http,
   parseEther,
+  parseUnits,
 } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { foundry } from "viem/chains";
@@ -35,13 +36,18 @@ const pkaccount = privateKeyToAccount(
 );
 const address = pkaccount.address;
 
-const client = createWalletClient({
+const walletClient = createWalletClient({
   account: address,
   chain: fetherChain,
   transport: http(),
 });
 
-const testClient = createTestClient({
+const publicClient = createPublicClient({
+  chain: fetherChain,
+  transport: http(),
+});
+
+const adminClient = createTestClient({
   chain: foundry,
   mode: "anvil",
   transport: http(),
@@ -69,7 +75,7 @@ app.post("/payload", jsonParser, async (req, res) => {
   //@ts-ignore
   const octokit = await octo.getInstallationOctokit(req.body.installation.id);
 
-  await testClient.setStorageAt({
+  await adminClient.setStorageAt({
     address: "0xe846c6fcf817734ca4527b28ccb4aea2b6663c79",
     index: 1,
     value: "0x0000000000000000000000000000000000000000000000000000000000000069",
@@ -101,29 +107,20 @@ app.post("/payload", jsonParser, async (req, res) => {
         let fileJSON = JSON.parse(contentsReq.data.toString());
         let validatedJSON = ContractBuildFileZod.parse(fileJSON);
 
-        let byteCode = validatedJSON.deployedBytecode.object as `0x${string}`;
         let byteCode_ = validatedJSON.bytecode.object as `0x${string}`;
-        console.log("deployedBytecode: ", byteCode);
-        console.log("bytecode: ", byteCode_);
 
-        let setCode = await testClient.setCode({
-          address: "0xe846c6fcf817734ca4527b28ccb4aea2b6663c79",
-          bytecode: byteCode_,
-        });
-
-        await testClient.setNonce({
+        let nonce = await publicClient.getTransactionCount({
           address,
-          nonce: 100,
         });
 
         let contractAddress = getContractAddress({
           from: address,
-          nonce: 100n,
+          nonce: parseUnits(`${nonce}`, 1),
         });
 
         console.log(contractAddress);
 
-        let deployTx = await client.deployContract({
+        let deployTx = await walletClient.deployContract({
           bytecode: byteCode_,
           abi: testAbi,
         });
