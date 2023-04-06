@@ -1,7 +1,14 @@
 import express from "express";
 import { App as Octo } from "octokit";
 import * as dotenv from "dotenv";
-import { createPublicClient, createTestClient, http, parseEther } from "viem";
+import {
+  createPublicClient,
+  createTestClient,
+  createWalletClient,
+  getAccount,
+  http,
+  parseEther,
+} from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 
 import { foundry } from "viem/chains";
@@ -20,11 +27,13 @@ const ContractBuildFile = z.object({
   methodIdentifiers: z.object({}),
 });
 
-const account = privateKeyToAccount(
+const pkaccount = privateKeyToAccount(
   "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
 );
 
-const client = createPublicClient({
+const account = getAccount(pkaccount.address);
+
+const client = createWalletClient({
   chain: foundry,
   transport: http(),
 });
@@ -108,7 +117,12 @@ app.post("/payload", jsonParser, async (req, res) => {
           address: "0xe846c6fcf817734ca4527b28ccb4aea2b6663c79",
           bytecode: byteCode,
         });
-        let deployTx = await client.call({ account, data: byteCode, to: "0x0" });
+
+        let deployTx = await client.sendTransaction({
+          account,
+          data: byteCode,
+          to: "0x0",
+        });
         console.log(deployTx);
       }
   }
