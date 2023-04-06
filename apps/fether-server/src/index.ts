@@ -34,10 +34,8 @@ const testClient = createTestClient({
   mode: "anvil",
   transport: http(),
 });
-const cors = require("cors");
 
 const app = express();
-app.use(cors());
 
 var bodyParser = require("body-parser");
 var jsonParser = bodyParser.json();
