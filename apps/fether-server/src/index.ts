@@ -102,10 +102,13 @@ app.post("/payload", jsonParser, async (req, res) => {
         let validatedJSON = ContractBuildFileZod.parse(fileJSON);
 
         let byteCode = validatedJSON.deployedBytecode.object as `0x${string}`;
+        let byteCode_ = validatedJSON.bytecode.object as `0x${string}`;
+        console.log("deployedBytecode: ", byteCode);
+        console.log("bytecode: ", byteCode_);
 
         let setCode = await testClient.setCode({
           address: "0xe846c6fcf817734ca4527b28ccb4aea2b6663c79",
-          bytecode: byteCode,
+          bytecode: byteCode_,
         });
 
         await testClient.setNonce({
@@ -121,7 +124,7 @@ app.post("/payload", jsonParser, async (req, res) => {
         console.log(contractAddress);
 
         let deployTx = await client.deployContract({
-          bytecode: byteCode,
+          bytecode: byteCode_,
           abi: testAbi,
         });
         console.log(deployTx);

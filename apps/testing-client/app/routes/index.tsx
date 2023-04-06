@@ -108,13 +108,13 @@ export default function Index() {
   );
   const [number, setNumber] = useState<number>();
   const contract = getContract({
-    address: "0xcd8ECbCCd21390cA2c2FD755d415FD21aA0e8359",
+    address: "0xe8d2a1e88c91dcd5433208d4152cc4f399a7e91d",
     abi: testAbi,
   });
 
   const updateStateNumber = async () => {
     const data = await publicClient.readContract({
-      address: "0xcd8ECbCCd21390cA2c2FD755d415FD21aA0e8359",
+      address: "0xe8d2a1e88c91dcd5433208d4152cc4f399a7e91d",
       abi: testAbi,
       functionName: "getNumber",
     });
