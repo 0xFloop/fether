@@ -6,7 +6,13 @@ import { privateKeyToAccount } from "viem/accounts";
 import { foundry } from "viem/chains";
 import { z } from "zod";
 import { validateSender } from "./utils/validate";
-import { ContractBuildFileZod, formattedGithubAppPk, port, testAbi } from "./utils/config";
+import {
+  ContractBuildFileZod,
+  fetherChain,
+  formattedGithubAppPk,
+  port,
+  testAbi,
+} from "./utils/config";
 const cors = require("cors");
 const app = express();
 app.use(cors());
@@ -23,7 +29,7 @@ const pkaccount = privateKeyToAccount(
 
 const client = createWalletClient({
   account: pkaccount.address,
-  chain: foundry,
+  chain: fetherChain,
   transport: http(),
 });
 
