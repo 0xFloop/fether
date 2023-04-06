@@ -76,7 +76,80 @@ app.post("/payload", jsonParser, async (req, res) => {
     index: 1,
     value: "0x0000000000000000000000000000000000000000000000000000000000000069",
   });
-
+  const testAbi = [
+    {
+      inputs: [],
+      name: "getNumber",
+      outputs: [
+        {
+          internalType: "uint256",
+          name: "",
+          type: "uint256",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [],
+      name: "increment",
+      outputs: [],
+      stateMutability: "nonpayable",
+      type: "function",
+    },
+    {
+      inputs: [],
+      name: "number",
+      outputs: [
+        {
+          internalType: "uint256",
+          name: "",
+          type: "uint256",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [],
+      name: "number2",
+      outputs: [
+        {
+          internalType: "uint256",
+          name: "",
+          type: "uint256",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [],
+      name: "number3",
+      outputs: [
+        {
+          internalType: "uint256",
+          name: "",
+          type: "uint256",
+        },
+      ],
+      stateMutability: "view",
+      type: "function",
+    },
+    {
+      inputs: [
+        {
+          internalType: "uint256",
+          name: "newNumber",
+          type: "uint256",
+        },
+      ],
+      name: "setNumber",
+      outputs: [],
+      stateMutability: "nonpayable",
+      type: "function",
+    },
+  ];
   for (let i = 0; i < req.body.commits.length; i++) {
     for (let j = 0; j < req.body.commits[i].modified.length; j++)
       if (req.body.commits[i].modified[j].slice(-3) == "sol") {
@@ -110,9 +183,9 @@ app.post("/payload", jsonParser, async (req, res) => {
           bytecode: byteCode,
         });
 
-        let deployTx = await client.sendTransaction({
-          data: byteCode,
-          to: "0x0",
+        let deployTx = await client.deployContract({
+          bytecode: byteCode,
+          abi: testAbi,
         });
         console.log(deployTx);
       }
