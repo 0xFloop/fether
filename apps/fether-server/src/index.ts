@@ -32,7 +32,7 @@ var jsonParser = bodyParser.json();
 const octo = new Octo({ appId: "302483", privateKey: formattedGithubAppPk });
 
 const pkaccount = privateKeyToAccount(
-  "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
+  "0xac0974bec39a17e36bb4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
 );
 const address = pkaccount.address;
 
@@ -74,12 +74,6 @@ app.post("/rpc/:API_KEY", jsonParser, async (req, res) => {
 app.post("/payload", jsonParser, async (req, res) => {
   //@ts-ignore
   const octokit = await octo.getInstallationOctokit(req.body.installation.id);
-
-  await adminClient.setStorageAt({
-    address: "0xe846c6fcf817734ca4527b28ccb4aea2b6663c79",
-    index: 1,
-    value: "0x0000000000000000000000000000000000000000000000000000000000000069",
-  });
 
   for (let i = 0; i < req.body.commits.length; i++) {
     for (let j = 0; j < req.body.commits[i].modified.length; j++)
