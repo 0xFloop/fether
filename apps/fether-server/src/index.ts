@@ -3,22 +3,19 @@ import { App as Octo } from "octokit";
 import * as dotenv from "dotenv";
 import { createPublicClient, createTestClient, createWalletClient, http, parseEther } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
-
 import { foundry } from "viem/chains";
 import { z } from "zod";
 import { validateSender } from "./utils/validate";
+import { ContractBuildFileZod, formattedGithubAppPk, port, testAbi } from "./utils/config";
+const cors = require("cors");
+const app = express();
+app.use(cors());
 dotenv.config();
 
-const ContractBuildFile = z.object({
-  abi: z.array(z.unknown()),
-  bytecode: z.object({ object: z.string(), linkReferences: z.object({}), sourceMap: z.string() }),
-  deployedBytecode: z.object({
-    object: z.string().startsWith("0x"),
-    linkReferences: z.object({}),
-    sourceMap: z.string(),
-  }),
-  methodIdentifiers: z.object({}),
-});
+var bodyParser = require("body-parser");
+var jsonParser = bodyParser.json();
+
+const octo = new Octo({ appId: "302483", privateKey: formattedGithubAppPk });
 
 const pkaccount = privateKeyToAccount(
   "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
@@ -35,19 +32,6 @@ const testClient = createTestClient({
   mode: "anvil",
   transport: http(),
 });
-
-const app = express();
-
-var bodyParser = require("body-parser");
-var jsonParser = bodyParser.json();
-
-const port = 3001;
-
-const githubAppPk = process.env.appPK as string;
-
-const formattedGithubAppPk = githubAppPk.replace(/\\n/g, "\n");
-
-const octo = new Octo({ appId: "302483", privateKey: formattedGithubAppPk });
 
 app.post("/rpc/:API_KEY", jsonParser, async (req, res) => {
   let validated = await validateSender(req.params.API_KEY);
@@ -76,80 +60,7 @@ app.post("/payload", jsonParser, async (req, res) => {
     index: 1,
     value: "0x0000000000000000000000000000000000000000000000000000000000000069",
   });
-  const testAbi = [
-    {
-      inputs: [],
-      name: "getNumber",
-      outputs: [
-        {
-          internalType: "uint256",
-          name: "",
-          type: "uint256",
-        },
-      ],
-      stateMutability: "view",
-      type: "function",
-    },
-    {
-      inputs: [],
-      name: "increment",
-      outputs: [],
-      stateMutability: "nonpayable",
-      type: "function",
-    },
-    {
-      inputs: [],
-      name: "number",
-      outputs: [
-        {
-          internalType: "uint256",
-          name: "",
-          type: "uint256",
-        },
-      ],
-      stateMutability: "view",
-      type: "function",
-    },
-    {
-      inputs: [],
-      name: "number2",
-      outputs: [
-        {
-          internalType: "uint256",
-          name: "",
-          type: "uint256",
-        },
-      ],
-      stateMutability: "view",
-      type: "function",
-    },
-    {
-      inputs: [],
-      name: "number3",
-      outputs: [
-        {
-          internalType: "uint256",
-          name: "",
-          type: "uint256",
-        },
-      ],
-      stateMutability: "view",
-      type: "function",
-    },
-    {
-      inputs: [
-        {
-          internalType: "uint256",
-          name: "newNumber",
-          type: "uint256",
-        },
-      ],
-      name: "setNumber",
-      outputs: [],
-      stateMutability: "nonpayable",
-      type: "function",
-    },
-  ];
+
   for (let i = 0; i < req.body.commits.length; i++) {
     for (let j = 0; j < req.body.commits[i].modified.length; j++)
       if (req.body.commits[i].modified[j].slice(-3) == "sol") {
@@ -174,7 +85,7 @@ app.post("/payload", jsonParser, async (req, res) => {
           },
         });
         let fileJSON = JSON.parse(contentsReq.data.toString());
-        let validatedJSON = ContractBuildFile.parse(fileJSON);
+        let validatedJSON = ContractBuildFileZod.parse(fileJSON);
 
         let byteCode = validatedJSON.deployedBytecode.object as `0x${string}`;
 
