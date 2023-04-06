@@ -110,12 +110,12 @@ app.post("/payload", jsonParser, async (req, res) => {
 
         await testClient.setNonce({
           address,
-          nonce: 69420,
+          nonce: 100,
         });
 
         let contractAddress = getContractAddress({
           from: address,
-          nonce: 69420n,
+          nonce: 100n,
         });
 
         console.log(contractAddress);
