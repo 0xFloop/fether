@@ -59,6 +59,7 @@ importers:
     specifiers:
       '@types/express': ^4.17.17
       '@types/node': ^18.15.11
+      abitype: ^0.7.1
       body-parser: ^1.20.2
       cors: ^2.8.5
       dotenv: ^16.0.3
@@ -68,9 +69,10 @@ importers:
       octokit: ^2.0.14
       ts-node: ^10.9.1
       typescript: ^4.9.5
-      viem: latest
+      viem: 0.2.9
       zod: ^3.21.4
     dependencies:
+      abitype: 0.7.1_wnc3eutrhvkpx2b7oumqzgx5he
       body-parser: 1.20.2
       cors: 2.8.5
       dotenv: 16.0.3
