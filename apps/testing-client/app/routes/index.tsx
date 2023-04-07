@@ -108,16 +108,17 @@ export default function Index() {
   );
   const [number, setNumber] = useState<number>();
   const contract = getContract({
-    address: "0xe8d2a1e88c91dcd5433208d4152cc4f399a7e91d",
+    address: "0x8464135c8f25da09e49bc8782676a84730c318bc",
     abi: testAbi,
   });
 
   const updateStateNumber = async () => {
-    const data = await publicClient.readContract({
-      address: "0xe8d2a1e88c91dcd5433208d4152cc4f399a7e91d",
+    const data = (await publicClient.readContract({
+      address: "0x8464135c8f25da09e49bc8782676a84730c318bc",
       abi: testAbi,
       functionName: "getNumber",
-    });
+    })) as bigint;
+    setNumber(Number(data));
     console.log(data);
   };
 
@@ -128,7 +129,7 @@ export default function Index() {
         <button onClick={updateStateNumber}>click to get contract number value</button>
         <br />
         <br />
-        <p>{number}</p>
+        <p style={{ color: "black" }}>this is number {number}</p>
       </ConnectKitProvider>
     </WagmiConfig>
   );
