@@ -1,7 +1,7 @@
 import express from "express";
 import { App as Octo } from "octokit";
 import { getContractAddress, parseUnits } from "viem";
-
+import { Abi } from "abitype/zod";
 import { validateSender } from "./utils/validate";
 import { ContractBuildFileZod, formattedGithubAppPk, port, testAbi } from "./utils/config";
 import { address, publicClient, walletClient } from "./utils/viemClients";
@@ -73,7 +73,7 @@ app.post("/payload", jsonParser, async (req, res) => {
         let validatedJSON = ContractBuildFileZod.parse(fileJSON);
 
         let byteCode = validatedJSON.bytecode.object as `0x${string}`;
-        let abi = validatedJSON.abi;
+        let abi = Abi.parse(fileJSON.abi);
 
         let nonce = await publicClient.getTransactionCount({
           address,
@@ -84,14 +84,10 @@ app.post("/payload", jsonParser, async (req, res) => {
           nonce: parseUnits(`${nonce}`, 1),
         });
 
-        console.log(contractAddress);
-        console.log(abi);
-
         let deployTx = await walletClient.deployContract({
           bytecode: byteCode,
           abi: abi,
         });
-        console.log(deployTx);
       }
   }
 
