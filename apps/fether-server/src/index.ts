@@ -1,57 +1,16 @@
 import express from "express";
 import { App as Octo } from "octokit";
-import * as dotenv from "dotenv";
-import {
-  createPublicClient,
-  createTestClient,
-  createWalletClient,
-  getContractAddress,
-  http,
-  parseEther,
-  parseUnits,
-} from "viem";
-import { privateKeyToAccount } from "viem/accounts";
-import { foundry } from "viem/chains";
-import { z } from "zod";
+import { getContractAddress, parseUnits } from "viem";
+
 import { validateSender } from "./utils/validate";
-import {
-  ContractBuildFileZod,
-  fetherChain,
-  formattedGithubAppPk,
-  port,
-  testAbi,
-} from "./utils/config";
-const cors = require("cors");
+import { ContractBuildFileZod, formattedGithubAppPk, port, testAbi } from "./utils/config";
+import { address, publicClient, walletClient } from "./utils/viemClients";
 const app = express();
+const bodyParser = require("body-parser");
+const jsonParser = bodyParser.json();
+const cors = require("cors");
 app.use(cors());
-dotenv.config();
-
-var bodyParser = require("body-parser");
-var jsonParser = bodyParser.json();
-
 const octo = new Octo({ appId: "302483", privateKey: formattedGithubAppPk });
-
-const pkaccount = privateKeyToAccount(
-  "0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d"
-);
-const address = pkaccount.address;
-
-const walletClient = createWalletClient({
-  account: address,
-  chain: fetherChain,
-  transport: http(),
-});
-
-const publicClient = createPublicClient({
-  chain: fetherChain,
-  transport: http(),
-});
-
-const adminClient = createTestClient({
-  chain: foundry,
-  mode: "anvil",
-  transport: http(),
-});
 
 app.post("/rpc/:API_KEY", jsonParser, async (req, res) => {
   console.log(req.body.method);
