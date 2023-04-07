@@ -54,21 +54,33 @@ const adminClient = createTestClient({
 });
 
 app.post("/rpc/:API_KEY", jsonParser, async (req, res) => {
-  let validated = await validateSender(req.params.API_KEY);
-  console.log("rpc call");
-  console.log(req.body);
-  if (!validated) {
-    res.status(500).end("Invalid api key!");
-  }
-  let response = await fetch("http://127.0.0.1:8545", {
-    method: "POST",
-    body: JSON.stringify(req.body),
-    headers: { "Content-Type": "application/json" },
-  });
+  console.log(req.body.method);
 
-  let responseJson = await response.json();
-  res.set("Access-Control-Allow-Origin", "*");
-  res.send(responseJson);
+  let validated = await validateSender(req.params.API_KEY);
+  if (!validated) {
+    res.set("Access-Control-Allow-Origin", "*");
+    let error = {
+      jsonrpc: "2.0",
+      error: {
+        code: -32000,
+        message: "Invalid Fether api key. Get api key here https://www.fether.xyz.",
+      },
+      id: "1",
+    };
+
+    res.status(500);
+    res.json(error);
+  } else {
+    let response = await fetch("http://127.0.0.1:8545", {
+      method: "POST",
+      body: JSON.stringify(req.body),
+      headers: { "Content-Type": "application/json" },
+    });
+
+    let responseJson = await response.json();
+    res.set("Access-Control-Allow-Origin", "*");
+    res.send(responseJson);
+  }
 });
 
 app.post("/payload", jsonParser, async (req, res) => {
