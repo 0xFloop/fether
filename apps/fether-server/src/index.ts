@@ -5,6 +5,9 @@ import { Abi } from "abitype/zod";
 import { validateSender } from "./utils/validate";
 import { ContractBuildFileZod, formattedGithubAppPk, port, testAbi } from "./utils/config";
 import { address, publicClient, walletClient } from "./utils/viemClients";
+import { PrismaClient } from "database";
+const db = new PrismaClient();
+
 const app = express();
 const bodyParser = require("body-parser");
 const jsonParser = bodyParser.json();
@@ -16,13 +19,14 @@ app.post("/rpc/:API_KEY", jsonParser, async (req, res) => {
   console.log(req.body.method);
 
   let validated = await validateSender(req.params.API_KEY);
+
   if (!validated) {
     res.set("Access-Control-Allow-Origin", "*");
     let error = {
       jsonrpc: "2.0",
       error: {
         code: -32000,
-        message: "Invalid Fether api key. Get api key here https://www.fether.xyz.",
+        message: "Invalid Fether api key. Sign up here https://www.fether.xyz.",
       },
       id: "1",
     };
@@ -79,12 +83,14 @@ app.post("/payload", jsonParser, async (req, res) => {
           address,
         });
 
-        let contractAddress = getContractAddress({
+        let newContractAddress = getContractAddress({
           from: address,
           nonce: parseUnits(`${nonce}`, 1),
         });
 
-        let deployTx = await walletClient.deployContract({
+        // update their contract address in the db
+
+        await walletClient.deployContract({
           bytecode: byteCode,
           abi: abi,
         });

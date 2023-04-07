@@ -2,19 +2,22 @@
   "name": "database",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "./index.ts",
+  "types": "./index.ts",
   "scripts": {
-    "prisma:generate": "pnpm with-env prisma generate",
-    "prisma:push": "pnpm with-env prisma db push --skip-generate",
-    "prisma:push-accept-data-loss": "pnpm with-env prisma db push --skip-generate --accept-data-loss",
-    "prisma:studio": "pnpm with-env prisma studio",
-    "prisma:seed": "pnpm with-env prisma db seed",
-    "prisma:migrate-reset": "pnpm with-env prisma migrate reset --force",
-    "with-env": "dotenv -e ./.env --"
+    "prisma:generate": "prisma generate",
+    "prisma:push": "prisma db push --skip-generate",
+    "prisma:push-accept-data-loss": "prisma db push --skip-generate --accept-data-loss",
+    "prisma:studio": "prisma studio",
+    "prisma:seed": "prisma db seed",
+    "prisma:migrate-reset": "prisma migrate reset --force"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "dependencies": {
+    "@prisma/client": "latest"
+  },
   "devDependencies": {
     "@types/node": "^18.15.11",
     "prisma": "^4.12.0",
