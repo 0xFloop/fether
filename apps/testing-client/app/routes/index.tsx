@@ -20,6 +20,8 @@ const fetherChain: Chain = {
   testnet: false,
 };
 
+let contractAddress: `0x${string}` = "0x0000000000000000000000000000000012345678";
+
 const testAbi = [
   {
     inputs: [],
@@ -108,13 +110,13 @@ export default function Index() {
   );
   const [number, setNumber] = useState<number>();
   const contract = getContract({
-    address: "0x8464135c8f25da09e49bc8782676a84730c318bc",
+    address: contractAddress,
     abi: testAbi,
   });
 
   const updateStateNumber = async () => {
     const data = (await publicClient.readContract({
-      address: "0x8464135c8f25da09e49bc8782676a84730c318bc",
+      address: contractAddress,
       abi: testAbi,
       functionName: "getNumber",
     })) as bigint;
@@ -129,7 +131,7 @@ export default function Index() {
         <button onClick={updateStateNumber}>click to get contract number value</button>
         <br />
         <br />
-        <p style={{ color: "black" }}>this is number {number}</p>
+        <p>this is number {number}</p>
       </ConnectKitProvider>
     </WagmiConfig>
   );
