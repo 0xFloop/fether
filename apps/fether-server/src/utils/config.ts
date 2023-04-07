@@ -99,8 +99,12 @@ export const fetherChain: Chain = {
 };
 
 export const ContractBuildFileZod = z.object({
-  abi: z.array(z.unknown()),
-  bytecode: z.object({ object: z.string(), linkReferences: z.object({}), sourceMap: z.string() }),
+  abi: z.array(z.object({})),
+  bytecode: z.object({
+    object: z.string().startsWith("0x"),
+    linkReferences: z.object({}),
+    sourceMap: z.string(),
+  }),
   deployedBytecode: z.object({
     object: z.string().startsWith("0x"),
     linkReferences: z.object({}),

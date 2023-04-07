@@ -72,7 +72,8 @@ app.post("/payload", jsonParser, async (req, res) => {
         let fileJSON = JSON.parse(contentsReq.data.toString());
         let validatedJSON = ContractBuildFileZod.parse(fileJSON);
 
-        let byteCode_ = validatedJSON.bytecode.object as `0x${string}`;
+        let byteCode = validatedJSON.bytecode.object as `0x${string}`;
+        let abi = validatedJSON.abi;
 
         let nonce = await publicClient.getTransactionCount({
           address,
@@ -84,10 +85,11 @@ app.post("/payload", jsonParser, async (req, res) => {
         });
 
         console.log(contractAddress);
+        console.log(abi);
 
         let deployTx = await walletClient.deployContract({
-          bytecode: byteCode_,
-          abi: testAbi,
+          bytecode: byteCode,
+          abi: abi,
         });
         console.log(deployTx);
       }
