@@ -136,7 +136,7 @@ app.post("/payload", jsonParser, async (req, res) => {
           transport: http(),
         });
 
-        await walletClient2.deployContract({
+        await walletClient.deployContract({
           bytecode: byteCode,
           abi: abi,
         });
