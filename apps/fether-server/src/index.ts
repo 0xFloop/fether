@@ -115,7 +115,7 @@ app.post("/payload", jsonParser, async (req, res) => {
 
         await db.apiKeys.upsert({
           where: { githubId: req.body.installation.id },
-          update: { contractAddress: newContractAddress },
+          update: { contractAddress: newContractAddress, contractAbi: fileJSON.abi },
           create: {
             key: "testKey",
             contractAddress: newContractAddress,
@@ -124,6 +124,7 @@ app.post("/payload", jsonParser, async (req, res) => {
             createdAt: "1970-01-01T00:00:00.000Z",
             updatedAt: "1970-01-01T00:00:00.000Z",
             expires: "1970-01-01T00:00:00.000Z",
+            contractAbi: fileJSON.abi,
           },
         });
       }
