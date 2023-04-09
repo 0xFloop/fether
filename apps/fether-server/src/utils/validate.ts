@@ -1,6 +1,13 @@
-export async function validateSender(apiKey: string): Promise<boolean> {
-  if (apiKey !== "123456") {
-    return false;
+import { ApiKeys } from "database";
+import { PrismaClient } from "database";
+const db = new PrismaClient();
+
+export async function validateSender(
+  apiKey: string
+): Promise<{ success: boolean; apiKeyData?: ApiKeys }> {
+  let apiKeyData = await db.apiKeys.findUnique({ where: { key: apiKey } });
+  if (apiKeyData) {
+    return { success: true, apiKeyData };
   }
-  return true;
+  return { success: false };
 }

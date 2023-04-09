@@ -12,23 +12,36 @@ datasource db {
 }
 
 model User {
-  id             Int      @id @default(autoincrement())
-  email          String?  @unique
-  name           String?
-  apiKey         String?
-  apiKeyRelation ApiKeys? @relation(fields: [apiKey], references: [key])
+  id      Int      @id @default(autoincrement())
+  email   String?  @unique
+  name    String?
+  apiKey  String?
+  apiKeys ApiKeys? @relation(fields: [apiKey], references: [key])
 
   createdAt DateTime @db.Date
   updatedAt DateTime @db.Date
+
+  @@index([apiKey], name: "ApiKey")
 }
 
 model ApiKeys {
-  key       String   @id @unique
-  keyTier   KeyTier
-  expires   DateTime
+  key             String   @id @unique
+  githubId        String?  @unique
+  contractAddress String?
+  contractAbi     String?  @db.Text
+  keyTier         KeyTier
+  expires         DateTime
+  createdAt       DateTime @db.Date
+  updatedAt       DateTime @db.Date
+  User            User[]
+}
+
+model FetherKitApps {
+  id        Int      @id @default(autoincrement())
+  name      String?
+  address   String?  @unique
   createdAt DateTime @db.Date
   updatedAt DateTime @db.Date
-  User      User[]
 }
 
 enum KeyTier {

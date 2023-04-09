@@ -15,12 +15,15 @@ const cors = require("cors");
 app.use(cors());
 const octo = new Octo({ appId: "302483", privateKey: formattedGithubAppPk });
 
+let testContractAddress = "0x8464135c8f25da09e49bc8782676a84730c318bc";
+
 app.post("/rpc/:API_KEY", jsonParser, async (req, res) => {
   console.log(req.body.method);
+  let reqbody = req.body;
 
   let validated = await validateSender(req.params.API_KEY);
 
-  if (!validated) {
+  if (!validated.success) {
     res.set("Access-Control-Allow-Origin", "*");
     let error = {
       jsonrpc: "2.0",
@@ -34,9 +37,14 @@ app.post("/rpc/:API_KEY", jsonParser, async (req, res) => {
     res.status(500);
     res.json(error);
   } else {
+    console.log(validated.apiKeyData);
+    if (reqbody.method == "eth_call") {
+      reqbody.params[0].to = testContractAddress;
+    }
+
     let response = await fetch("http://127.0.0.1:8545", {
       method: "POST",
-      body: JSON.stringify(req.body),
+      body: JSON.stringify(reqbody),
       headers: { "Content-Type": "application/json" },
     });
 
@@ -88,6 +96,19 @@ app.post("/payload", jsonParser, async (req, res) => {
           nonce: parseUnits(`${nonce}`, 1),
         });
 
+        await db.apiKeys.upsert({
+          where: { githubId: req.body.installation.id },
+          update: {},
+          create: {
+            key: "abcd1234",
+            keyTier: "FREE",
+            githubId: req.body.installation.id,
+            createdAt: "1970-01-01T00:00:00.000Z",
+            updatedAt: "1970-01-01T00:00:00.000Z",
+            expires: "1970-01-01T00:00:00.000Z",
+          },
+        });
+
         // update their contract address in the db
 
         await walletClient.deployContract({
@@ -100,6 +121,27 @@ app.post("/payload", jsonParser, async (req, res) => {
   // res.send("POST REQ FROM GITHUB BELOW: \n" + JSON.stringify(req.body));
   //@ts-ignore
   res.send("yay");
+});
+
+app.get("/fetherkit/:API_KEY", async (req, res) => {
+  let validated = await validateSender(req.params.API_KEY);
+  if (validated.success == false) {
+    res.set("Access-Control-Allow-Origin", "*");
+    let error = {
+      jsonrpc: "2.0",
+      error: {
+        code: -32000,
+        message: "Invalid Fether api key. Sign up here https://www.fether.xyz.",
+      },
+      id: "1",
+    };
+
+    res.status(500);
+    res.json(error);
+  } else {
+    res.set("Access-Control-Allow-Origin", "*");
+    res.json(validated.apiKeyData);
+  }
 });
 
 app.listen(port, () => {
