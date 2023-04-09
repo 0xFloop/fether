@@ -3,13 +3,13 @@ import { privateKeyToAccount } from "viem/accounts";
 import { fetherChain } from "./config";
 import type {} from "abitype";
 
-export const pkaccount = privateKeyToAccount(
-  "0x7c852118294e51e653712a81e05800f419141751be58f605c371e15141b007a6"
+const pkaccount = privateKeyToAccount(
+  "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
 );
-export const address = pkaccount.address;
+export const deployerAddress = pkaccount.address;
 
 export const walletClient = createWalletClient({
-  account: address,
+  account: deployerAddress,
   chain: fetherChain,
   transport: http(),
 });

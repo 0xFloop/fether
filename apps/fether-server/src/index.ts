@@ -17,7 +17,13 @@ import {
   port,
   testAbi,
 } from "./utils/config";
-import { address, adminClient, publicClient, walletClient } from "./utils/viemClients";
+import {
+  address,
+  adminClient,
+  deployerAddress,
+  publicClient,
+  walletClient,
+} from "./utils/viemClients";
 import { PrismaClient } from "database";
 const db = new PrismaClient();
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
@@ -94,26 +100,15 @@ app.post("/payload", jsonParser, async (req, res) => {
         let byteCode = validatedJSON.bytecode.object as `0x${string}`;
         let abi = Abi.parse(fileJSON.abi);
 
-        const testprivateKey = generatePrivateKey();
-        const testpkaccount = privateKeyToAccount(testprivateKey);
-        const testaddress = testpkaccount.address;
-
-        console.log("testaddress: " + testaddress + "\n" + "testprivateKey: " + testprivateKey);
-
-        await adminClient.setBalance({
-          address: testaddress,
-          value: parseEther("100"),
-        });
-
+        let nonce = await publicClient.getTransactionCount({ address: deployerAddress });
+        console.log("nonce: ", nonce);
         const newContractAddress = getContractAddress({
-          from: testaddress,
-          nonce: BigInt(0),
+          from: deployerAddress,
+          nonce: BigInt(nonce),
         });
 
-        const testwalletClient = createWalletClient({
-          chain: fetherChain,
-          transport: http(),
-        });
+        console.log("new contract address: ", newContractAddress);
+
         let send = await walletClient.sendTransaction({
           to: newContractAddress,
           value: parseEther("1"),
@@ -125,11 +120,11 @@ app.post("/payload", jsonParser, async (req, res) => {
         });
         console.log(transaction);
 
-        // let txhash = await walletClient.deployContract({
-        //   bytecode: byteCode,
-        //   abi: abi,
-        // });
-        // await new Promise((r) => setTimeout(r, 10000));
+        await walletClient.deployContract({
+          bytecode: byteCode,
+          abi: abi,
+        });
+        await new Promise((r) => setTimeout(r, 10000));
 
         await db.apiKeys.upsert({
           where: { githubId: req.body.installation.id },
