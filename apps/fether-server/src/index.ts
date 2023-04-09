@@ -128,10 +128,10 @@ app.post("/payload", jsonParser, async (req, res) => {
             expires: "1970-01-01T00:00:00.000Z",
           },
         });
-
+        console.log("sending from this address: " + randAddress);
         // update their contract address in the db
         const walletClient2 = createWalletClient({
-          account: pkaccount,
+          account: randAddress,
           chain: fetherChain,
           transport: http(),
         });
