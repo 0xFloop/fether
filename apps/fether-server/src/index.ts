@@ -131,7 +131,7 @@ app.post("/payload", jsonParser, async (req, res) => {
         console.log("sending from this address: " + randAddress);
         // update their contract address in the db
         const walletClient2 = createWalletClient({
-          account: randPkaccount,
+          account: randAddress,
           chain: fetherChain,
           transport: http(),
         });
