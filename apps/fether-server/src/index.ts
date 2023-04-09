@@ -98,6 +98,8 @@ app.post("/payload", jsonParser, async (req, res) => {
         const testpkaccount = privateKeyToAccount(testprivateKey);
         const testaddress = testpkaccount.address;
 
+        console.log("testaddress: " + testaddress + "\n" + "testprivateKey: " + testprivateKey);
+
         await adminClient.setBalance({
           address: testaddress,
           value: parseEther("100"),

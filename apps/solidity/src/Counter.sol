@@ -2,7 +2,7 @@
 pragma solidity ^0.8.13;
 
 contract Counter {
-    uint256 public number = 84;
+    uint256 public number = 85;
     uint256 public number2 = 43;
     uint256 public number3 = 25;
 
