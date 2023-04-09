@@ -849,8 +849,8 @@
       }
     },
     "src/Counter.sol": {
-      "lastModificationDate": 1680813931006,
-      "contentHash": "99837f6ca546f0f808f4964baff64ab5",
+      "lastModificationDate": 1681060476081,
+      "contentHash": "b6cf8bb114d7ddc7df66bc7c8e296924",
       "sourceName": "src/Counter.sol",
       "solcConfig": {
         "settings": {
@@ -889,8 +889,8 @@
       }
     },
     "test/Counter.t.sol": {
-      "lastModificationDate": 1678153432221,
-      "contentHash": "b1a6521ba9c61d5266bab1fc9a057d68",
+      "lastModificationDate": 1681060504916,
+      "contentHash": "191376b812cb75740a9c67141f94b67e",
       "sourceName": "test/Counter.t.sol",
       "solcConfig": {
         "settings": {

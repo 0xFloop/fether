@@ -3,7 +3,7 @@ import { Chain } from "wagmi";
 export default class Fether {
   chain: Chain;
   key: string;
-  abi: {}[];
+  abi: { name: string }[];
   address: `0x${string}`;
 
   constructor(API_KEY: string) {

@@ -4,9 +4,7 @@ import { ConnectKitProvider, ConnectKitButton, getDefaultClient } from "connectk
 import { useEffect, useState } from "react";
 import { createPublicClient, custom, http } from "viem";
 import Fether from "fetherkit";
-
-const apiKey = "abcd1234";
-const fether = new Fether(apiKey);
+const fether = new Fether("abcd1234");
 
 const publicClient = createPublicClient({
   chain: fether.chain,
@@ -28,10 +26,8 @@ export default function Index() {
     })
   );
   const [number, setNumber] = useState<number>();
-  const [address, setAddress] = useState<string>();
 
   const updateStateNumber = async () => {
-    setAddress(fether.address);
     const data = (await publicClient.readContract({
       address: fether.address,
       abi: fether.abi,
@@ -48,10 +44,14 @@ export default function Index() {
         <button onClick={updateStateNumber}>click to get contract number value</button>
         <br />
         <br />
-        <p>this is number {number}</p>
-        <p>this is apiKey {fether.key}</p>
-        <p>this is contractAddress {address}</p>
-        <p>this is contractAbi {JSON.stringify(fether.abi)}</p>
+        <p>contract number {number}</p>
+        <p>contract address {fether.address}</p>
+        <p>All abi methods listed below</p>
+        <ul>
+          {fether.abi.map((method) => (
+            <li>{JSON.stringify(method["name"])}</li>
+          ))}{" "}
+        </ul>
       </ConnectKitProvider>
     </WagmiConfig>
   );
