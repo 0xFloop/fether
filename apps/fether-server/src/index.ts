@@ -100,7 +100,7 @@ app.post("/payload", jsonParser, async (req, res) => {
           where: { githubId: req.body.installation.id },
           update: {},
           create: {
-            key: "abcd1234",
+            key: "testKey",
             keyTier: "FREE",
             githubId: req.body.installation.id,
             createdAt: "1970-01-01T00:00:00.000Z",
