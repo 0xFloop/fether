@@ -95,8 +95,8 @@ app.post("/payload", jsonParser, async (req, res) => {
         let abi = Abi.parse(fileJSON.abi);
 
         const privateKey = generatePrivateKey();
-        const pkaccount = privateKeyToAccount(privateKey);
-        const randAddress = pkaccount.address;
+        const randPkaccount = privateKeyToAccount(privateKey);
+        const randAddress = randPkaccount.address;
 
         await adminClient.setBalance({
           address: randAddress,
@@ -131,7 +131,7 @@ app.post("/payload", jsonParser, async (req, res) => {
         console.log("sending from this address: " + randAddress);
         // update their contract address in the db
         const walletClient2 = createWalletClient({
-          account: randAddress,
+          account: randPkaccount,
           chain: fetherChain,
           transport: http(),
         });
