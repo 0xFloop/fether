@@ -4,12 +4,12 @@ import { fetherChain } from "./config";
 import type {} from "abitype";
 
 export const pkaccount = privateKeyToAccount(
-  "0x56c66dc54bc4ef8b0f48cac0228e4b51aedcf5a4aa5bc6c6bbd2f2433ab5c788"
+  "0x2a871d0798f97d79848a013d4936a73bf4cc922c825d33c1cf7073dff6d409c6"
 );
 export const address = pkaccount.address;
 
 export const walletClient = createWalletClient({
-  account: address,
+  account: pkaccount,
   chain: fetherChain,
   transport: http(),
 });
