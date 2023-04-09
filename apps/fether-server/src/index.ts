@@ -15,8 +15,6 @@ const cors = require("cors");
 app.use(cors());
 const octo = new Octo({ appId: "302483", privateKey: formattedGithubAppPk });
 
-let testContractAddress = "0x8464135c8f25da09e49bc8782676a84730c318bc";
-
 app.post("/rpc/:API_KEY", jsonParser, async (req, res) => {
   console.log(req.body.method);
   let reqbody = req.body;
@@ -37,11 +35,6 @@ app.post("/rpc/:API_KEY", jsonParser, async (req, res) => {
     res.status(500);
     res.json(error);
   } else {
-    console.log(validated.apiKeyData);
-    if (reqbody.method == "eth_call") {
-      reqbody.params[0].to = testContractAddress;
-    }
-
     let response = await fetch("http://127.0.0.1:8545", {
       method: "POST",
       body: JSON.stringify(reqbody),

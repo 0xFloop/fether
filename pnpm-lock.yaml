@@ -104,6 +104,7 @@ importers:
       '@vercel/node': ^2.6.2
       '@wagmi/core': ^0.10.8
       connectkit: ^1.2.2
+      database: workspace:*
       eslint: ^8.27.0
       ethers: ^5
       fetherkit: workspace:*
@@ -121,6 +122,7 @@ importers:
       '@vercel/node': 2.9.12
       '@wagmi/core': 0.10.8_g3fphb2knf3gjv43r4lorflusm
       connectkit: 1.2.2_all3yrswmt5nxabyazjphq6wau
+      database: link:../../packages/database
       ethers: 5.7.2
       fetherkit: link:../../packages/fetherkit
       isbot: 3.6.8
@@ -3654,7 +3656,7 @@ packages:
       '@tanstack/react-query': 4.28.0
     dependencies:
       '@tanstack/query-persist-client-core': 4.27.0
-      '@tanstack/react-query': 4.28.0
+      '@tanstack/react-query': 4.28.0_biqbaboplfbrettd7655fr4n2y
     dev: false
 
   /@tanstack/react-query/4.28.0:

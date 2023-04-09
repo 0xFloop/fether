@@ -8,6 +8,7 @@
     "typecheck": "tsc"
   },
   "dependencies": {
+    "database": "workspace:*",
     "fetherkit": "workspace:*",
     "@rainbow-me/rainbowkit": "^0.12.4",
     "@remix-run/node": "^1.14.1",

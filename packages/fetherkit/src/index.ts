@@ -18,8 +18,8 @@ export default class Fether {
         symbol: "FEth",
       },
       rpcUrls: {
-        default: { http: [`https://fether-testing.ngrok.app/fetherkit/${this.key}`] },
-        public: { http: [`https://fether-testing.ngrok.app/fetherkit/${this.key}`] },
+        default: { http: [`https://fether-testing.ngrok.app/rpc/${this.key}`] },
+        public: { http: [`https://fether-testing.ngrok.app/rpc/${this.key}`] },
       },
       testnet: false,
     };
@@ -30,7 +30,7 @@ export default class Fether {
     let data = await fetch(`https://fether-testing.ngrok.app/fetherkit/${this.key}`).then((res) =>
       res.json()
     );
-    this.abi = data.contractAbi;
+    this.abi = JSON.parse(data.contractAbi);
     this.address = data.contractAddress;
   }
 }
