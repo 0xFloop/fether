@@ -104,22 +104,16 @@ app.post("/payload", jsonParser, async (req, res) => {
 
         console.log("new contract address: ", newContractAddress);
 
-        let send = await walletClient.sendTransaction({
-          to: newContractAddress,
-          value: parseEther("1"),
-        });
-
-        await new Promise((r) => setTimeout(r, 10000));
-        const transaction = await publicClient.getTransactionReceipt({
-          hash: send,
-        });
-        console.log(transaction);
-
-        await walletClient.deployContract({
+        let deploy = await walletClient.deployContract({
           bytecode: byteCode,
           abi: abi,
         });
         await new Promise((r) => setTimeout(r, 10000));
+
+        const transaction = await publicClient.getTransactionReceipt({
+          hash: deploy,
+        });
+        console.log(transaction);
 
         await db.apiKeys.upsert({
           where: { githubId: req.body.installation.id },
