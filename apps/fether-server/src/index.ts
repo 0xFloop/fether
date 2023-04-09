@@ -1,12 +1,13 @@
 import express from "express";
 import { App as Octo } from "octokit";
-import { getContractAddress, parseUnits } from "viem";
+import { getAddress, getContractAddress, parseUnits } from "viem";
 import { Abi } from "abitype/zod";
 import { validateSender } from "./utils/validate";
 import { ContractBuildFileZod, formattedGithubAppPk, port, testAbi } from "./utils/config";
 import { address, publicClient, walletClient } from "./utils/viemClients";
 import { PrismaClient } from "database";
 const db = new PrismaClient();
+import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 
 const app = express();
 const bodyParser = require("body-parser");
@@ -80,14 +81,18 @@ app.post("/payload", jsonParser, async (req, res) => {
         let byteCode = validatedJSON.bytecode.object as `0x${string}`;
         let abi = Abi.parse(fileJSON.abi);
 
+        const privateKey = generatePrivateKey();
+        const pkaccount = privateKeyToAccount(privateKey);
+        const randAddress = pkaccount.address;
+
         let nonce = await publicClient.getTransactionCount({
-          address,
+          address: randAddress,
         });
         console.log("nonce: " + nonce);
 
-        let newContractAddress = getContractAddress({
+        const newContractAddress = getContractAddress({
           from: address,
-          nonce: parseUnits(`${nonce}`, 1),
+          nonce: parseUnits(`${0}`, 1),
         });
 
         console.log("new contract address: " + newContractAddress);
@@ -109,6 +114,7 @@ app.post("/payload", jsonParser, async (req, res) => {
         // update their contract address in the db
 
         await walletClient.deployContract({
+          account: randAddress,
           bytecode: byteCode,
           abi: abi,
         });
