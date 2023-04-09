@@ -119,7 +119,7 @@ app.post("/payload", jsonParser, async (req, res) => {
         // update their contract address in the db
 
         await walletClient.deployContract({
-          account: randAddress,
+          account: pkaccount,
           bytecode: byteCode,
           abi: abi,
         });
