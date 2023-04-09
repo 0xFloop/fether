@@ -56,6 +56,7 @@ app.post("/rpc/:API_KEY", jsonParser, async (req, res) => {
     });
 
     let responseJson = await response.json();
+    console.log(responseJson);
     res.set("Access-Control-Allow-Origin", "*");
     res.send(responseJson);
   }
