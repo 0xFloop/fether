@@ -98,9 +98,10 @@ app.post("/payload", jsonParser, async (req, res) => {
 
         await db.apiKeys.upsert({
           where: { githubId: req.body.installation.id },
-          update: {},
+          update: { contractAddress: newContractAddress },
           create: {
             key: "testKey",
+            contractAddress: newContractAddress,
             keyTier: "FREE",
             githubId: req.body.installation.id,
             createdAt: "1970-01-01T00:00:00.000Z",
