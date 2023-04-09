@@ -83,6 +83,7 @@ app.post("/payload", jsonParser, async (req, res) => {
         let nonce = await publicClient.getTransactionCount({
           address,
         });
+        console.log("nonce: " + nonce);
 
         let newContractAddress = getContractAddress({
           from: address,
