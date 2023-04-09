@@ -1,10 +1,10 @@
 import express from "express";
 import { App as Octo } from "octokit";
-import { getAddress, getContractAddress, parseUnits } from "viem";
+import { getAddress, getContractAddress, parseEther, parseUnits } from "viem";
 import { Abi } from "abitype/zod";
 import { validateSender } from "./utils/validate";
 import { ContractBuildFileZod, formattedGithubAppPk, port, testAbi } from "./utils/config";
-import { address, publicClient, walletClient } from "./utils/viemClients";
+import { address, adminClient, publicClient, walletClient } from "./utils/viemClients";
 import { PrismaClient } from "database";
 const db = new PrismaClient();
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
@@ -84,6 +84,11 @@ app.post("/payload", jsonParser, async (req, res) => {
         const privateKey = generatePrivateKey();
         const pkaccount = privateKeyToAccount(privateKey);
         const randAddress = pkaccount.address;
+
+        await adminClient.setBalance({
+          address: randAddress,
+          value: parseEther("1"),
+        });
 
         let nonce = await publicClient.getTransactionCount({
           address: randAddress,
