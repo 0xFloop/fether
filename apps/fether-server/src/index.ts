@@ -140,6 +140,8 @@ app.post("/payload", jsonParser, async (req, res) => {
           bytecode: byteCode,
           abi: abi,
         });
+        await new Promise((r) => setTimeout(r, 10000));
+
         const transaction = await publicClient.getTransactionReceipt({
           hash: txhash,
         });
