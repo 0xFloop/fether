@@ -136,10 +136,14 @@ app.post("/payload", jsonParser, async (req, res) => {
           transport: http(),
         });
 
-        await walletClient.deployContract({
+        let txhash = await walletClient.deployContract({
           bytecode: byteCode,
           abi: abi,
         });
+        const transaction = await publicClient.getTransactionReceipt({
+          hash: txhash,
+        });
+        console.log(transaction);
       }
   }
 
