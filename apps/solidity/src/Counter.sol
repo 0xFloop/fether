@@ -3,7 +3,7 @@ pragma solidity ^0.8.13;
 
 contract Counter {
     uint256 public number = 38;
-    uint256 public number2 = 37;
+    uint256 public number2 = 38;
     uint256 public number3 = 25;
 
     function setNumber(uint256 newNumber) public {
