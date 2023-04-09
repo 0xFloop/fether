@@ -9,7 +9,7 @@ export const pkaccount = privateKeyToAccount(
 export const address = pkaccount.address;
 
 export const walletClient = createWalletClient({
-  account: pkaccount,
+  account: address,
   chain: fetherChain,
   transport: http(),
 });
