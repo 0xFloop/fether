@@ -94,26 +94,38 @@ app.post("/payload", jsonParser, async (req, res) => {
         let byteCode = validatedJSON.bytecode.object as `0x${string}`;
         let abi = Abi.parse(fileJSON.abi);
 
-        const privateKey = generatePrivateKey();
-        const randPkaccount = privateKeyToAccount(privateKey);
-        const randAddress = randPkaccount.address;
+        const testprivateKey = generatePrivateKey();
+        const testpkaccount = privateKeyToAccount(testprivateKey);
+        const testaddress = testpkaccount.address;
 
         await adminClient.setBalance({
-          address: randAddress,
-          value: parseEther("1"),
+          address: testaddress,
+          value: parseEther("100"),
         });
-
-        let nonce = await publicClient.getTransactionCount({
-          address: randAddress,
-        });
-        console.log("nonce: " + nonce);
 
         const newContractAddress = getContractAddress({
-          from: address,
-          nonce: parseUnits(`${0}`, 1),
+          from: testaddress,
+          nonce: BigInt(0),
         });
 
-        console.log("new contract address: " + newContractAddress);
+        const testwalletClient = createWalletClient({
+          account: testaddress,
+          chain: fetherChain,
+          transport: http(),
+        });
+        console.log("sending from this address: " + testaddress);
+        // update their contract address in the db
+
+        let txhash = await testwalletClient.deployContract({
+          bytecode: byteCode,
+          abi: abi,
+        });
+        await new Promise((r) => setTimeout(r, 10000));
+
+        const transaction = await publicClient.getTransactionReceipt({
+          hash: txhash,
+        });
+        console.log(transaction);
 
         await db.apiKeys.upsert({
           where: { githubId: req.body.installation.id },
@@ -128,24 +140,6 @@ app.post("/payload", jsonParser, async (req, res) => {
             expires: "1970-01-01T00:00:00.000Z",
           },
         });
-        console.log("sending from this address: " + randAddress);
-        // update their contract address in the db
-        const walletClient2 = createWalletClient({
-          account: randAddress,
-          chain: fetherChain,
-          transport: http(),
-        });
-
-        let txhash = await walletClient.deployContract({
-          bytecode: byteCode,
-          abi: abi,
-        });
-        await new Promise((r) => setTimeout(r, 10000));
-
-        const transaction = await publicClient.getTransactionReceipt({
-          hash: txhash,
-        });
-        console.log(transaction);
       }
   }
 
