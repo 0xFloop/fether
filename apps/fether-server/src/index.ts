@@ -94,6 +94,7 @@ app.post("/payload", jsonParser, async (req, res) => {
 
         let byteCode = validatedJSON.bytecode.object as `0x${string}`;
         let abi = Abi.parse(fileJSON.abi);
+        let dbAbi = JSON.stringify(fileJSON.abi);
 
         let nonce = await publicClient.getTransactionCount({ address: deployerAddress });
         console.log("nonce: ", nonce);
@@ -115,7 +116,7 @@ app.post("/payload", jsonParser, async (req, res) => {
 
         await db.apiKeys.upsert({
           where: { githubId: req.body.installation.id },
-          update: { contractAddress: newContractAddress, contractAbi: fileJSON.abi },
+          update: { contractAddress: newContractAddress, contractAbi: dbAbi },
           create: {
             key: "testKey",
             contractAddress: newContractAddress,
