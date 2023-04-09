@@ -1,9 +1,22 @@
 import express from "express";
 import { App as Octo } from "octokit";
-import { getAddress, getContractAddress, parseEther, parseUnits } from "viem";
+import {
+  createWalletClient,
+  getAddress,
+  getContractAddress,
+  http,
+  parseEther,
+  parseUnits,
+} from "viem";
 import { Abi } from "abitype/zod";
 import { validateSender } from "./utils/validate";
-import { ContractBuildFileZod, formattedGithubAppPk, port, testAbi } from "./utils/config";
+import {
+  ContractBuildFileZod,
+  fetherChain,
+  formattedGithubAppPk,
+  port,
+  testAbi,
+} from "./utils/config";
 import { address, adminClient, publicClient, walletClient } from "./utils/viemClients";
 import { PrismaClient } from "database";
 const db = new PrismaClient();
@@ -117,9 +130,13 @@ app.post("/payload", jsonParser, async (req, res) => {
         });
 
         // update their contract address in the db
-
-        await walletClient.deployContract({
+        const walletClient2 = createWalletClient({
           account: pkaccount,
+          chain: fetherChain,
+          transport: http(),
+        });
+
+        await walletClient2.deployContract({
           bytecode: byteCode,
           abi: abi,
         });
