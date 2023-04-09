@@ -109,6 +109,7 @@ app.post("/payload", jsonParser, async (req, res) => {
         });
         //@ts-ignore
         let newContractAddress = transaction["result"]["contractAddress"];
+        console.log("transaction below");
         console.log(transaction);
 
         await db.apiKeys.upsert({
