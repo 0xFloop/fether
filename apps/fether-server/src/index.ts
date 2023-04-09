@@ -111,12 +111,12 @@ app.post("/payload", jsonParser, async (req, res) => {
         });
 
         const testwalletClient = createWalletClient({
-          account: testpkaccount,
+          account: testaddress,
           chain: fetherChain,
           transport: http(),
         });
 
-        let txhash = await walletClient.deployContract({
+        let txhash = await testwalletClient.deployContract({
           bytecode: byteCode,
           abi: abi,
         });
