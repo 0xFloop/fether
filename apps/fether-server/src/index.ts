@@ -17,13 +17,7 @@ import {
   port,
   testAbi,
 } from "./utils/config";
-import {
-  address,
-  adminClient,
-  deployerAddress,
-  publicClient,
-  walletClient,
-} from "./utils/viemClients";
+import { adminClient, deployerAddress, publicClient, walletClient } from "./utils/viemClients";
 import { PrismaClient } from "database";
 const db = new PrismaClient();
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
