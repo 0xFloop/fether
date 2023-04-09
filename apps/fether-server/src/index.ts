@@ -108,9 +108,10 @@ app.post("/payload", jsonParser, async (req, res) => {
           hash: deploy,
         });
         //@ts-ignore
-        let newContractAddress = transaction["result"]["contractAddress"];
         console.log("transaction below");
         console.log(transaction);
+
+        let newContractAddress = transaction["contractAddress"];
 
         await db.apiKeys.upsert({
           where: { githubId: req.body.installation.id },
