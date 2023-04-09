@@ -115,10 +115,9 @@ app.post("/payload", jsonParser, async (req, res) => {
           chain: fetherChain,
           transport: http(),
         });
-        console.log("sending from this address: " + testaddress);
-        // update their contract address in the db
 
         let txhash = await testwalletClient.deployContract({
+          account: testaddress,
           bytecode: byteCode,
           abi: abi,
         });
