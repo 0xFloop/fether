@@ -31,7 +31,7 @@ export default function Index() {
     const data = (await publicClient.readContract({
       address: fether.address,
       abi: fether.abi,
-      functionName: "getNumber",
+      functionName: "getCurrentNumber",
     })) as bigint;
 
     setNumber(Number(data));
