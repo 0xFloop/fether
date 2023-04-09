@@ -4,7 +4,7 @@ import { fetherChain } from "./config";
 import type {} from "abitype";
 
 export const pkaccount = privateKeyToAccount(
-  "0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356"
+  "0x56c66dc54bc4ef8b0f48cac0228e4b51aedcf5a4aa5bc6c6bbd2f2433ab5c788"
 );
 export const address = pkaccount.address;
 
