@@ -89,6 +89,8 @@ app.post("/payload", jsonParser, async (req, res) => {
           nonce: parseUnits(`${nonce}`, 1),
         });
 
+        console.log("new contract address: " + newContractAddress);
+
         await db.apiKeys.upsert({
           where: { githubId: req.body.installation.id },
           update: { contractAddress: newContractAddress },
