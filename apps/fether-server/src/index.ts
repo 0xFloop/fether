@@ -97,12 +97,6 @@ app.post("/payload", jsonParser, async (req, res) => {
 
         let nonce = await publicClient.getTransactionCount({ address: deployerAddress });
         console.log("nonce: ", nonce);
-        const newContractAddress = getContractAddress({
-          from: deployerAddress,
-          nonce: BigInt(nonce),
-        });
-
-        console.log("new contract address: ", newContractAddress);
 
         let deploy = await walletClient.deployContract({
           bytecode: byteCode,
@@ -113,6 +107,8 @@ app.post("/payload", jsonParser, async (req, res) => {
         const transaction = await publicClient.getTransactionReceipt({
           hash: deploy,
         });
+        //@ts-ignore
+        let newContractAddress = transaction["result"]["contractAddress"];
         console.log(transaction);
 
         await db.apiKeys.upsert({
