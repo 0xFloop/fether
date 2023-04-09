@@ -116,7 +116,6 @@ app.post("/payload", jsonParser, async (req, res) => {
         });
 
         let txhash = await walletClient.deployContract({
-          account: testpkaccount,
           bytecode: byteCode,
           abi: abi,
         });
