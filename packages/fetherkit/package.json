@@ -17,6 +17,7 @@
     "typescript": "^5.0.4"
   },
   "dependencies": {
+    "abitype": "^0.7.1",
     "wagmi": "^0.12.8"
   }
 }
