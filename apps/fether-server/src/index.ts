@@ -103,14 +103,11 @@ app.post("/payload", jsonParser, async (req, res) => {
           bytecode: byteCode,
           abi: abi,
         });
-        await new Promise((r) => setTimeout(r, 10000));
+        await new Promise((r) => setTimeout(r, 5500));
 
         const transaction = await publicClient.getTransactionReceipt({
           hash: deploy,
         });
-        //@ts-ignore
-        console.log("transaction below");
-        console.log(transaction);
 
         let newContractAddress = transaction["contractAddress"];
 
