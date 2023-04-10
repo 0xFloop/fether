@@ -98,7 +98,7 @@ export const fetherChain: Chain = {
   testnet: false,
 };
 
-export const ContractBuildFileZod = z.object({
+export const zodContractBuildFileSchema = z.object({
   abi: z.array(z.object({})),
   bytecode: z.object({
     object: z.string().startsWith("0x"),
@@ -111,4 +111,11 @@ export const ContractBuildFileZod = z.object({
     sourceMap: z.string(),
   }),
   methodIdentifiers: z.object({}),
+});
+
+export const zodEthereumJsonRpcRequestSchema = z.object({
+  jsonrpc: z.literal("2.0"),
+  id: z.union([z.number(), z.string()]),
+  method: z.string(),
+  params: z.array(z.any()),
 });

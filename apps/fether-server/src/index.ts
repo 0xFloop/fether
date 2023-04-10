@@ -11,11 +11,12 @@ import {
 import { Abi } from "abitype/zod";
 import { validateSender } from "./utils/validate";
 import {
-  ContractBuildFileZod,
   fetherChain,
   formattedGithubAppPk,
   port,
   testAbi,
+  zodContractBuildFileSchema,
+  zodEthereumJsonRpcRequestSchema,
 } from "./utils/config";
 import { adminClient, deployerAddress, publicClient, walletClient } from "./utils/viemClients";
 import { PrismaClient } from "database";
@@ -30,8 +31,7 @@ app.use(cors());
 const octo = new Octo({ appId: "302483", privateKey: formattedGithubAppPk });
 
 app.post("/rpc/:API_KEY", jsonParser, async (req, res) => {
-  console.log(req.body.method);
-  let reqbody = req.body;
+  let reqbody = zodEthereumJsonRpcRequestSchema.parse(req.body);
 
   let validated = await validateSender(req.params.API_KEY);
 
@@ -90,7 +90,7 @@ app.post("/payload", jsonParser, async (req, res) => {
           },
         });
         let fileJSON = JSON.parse(contentsReq.data.toString());
-        let validatedJSON = ContractBuildFileZod.parse(fileJSON);
+        let validatedJSON = zodContractBuildFileSchema.parse(fileJSON);
 
         let byteCode = validatedJSON.bytecode.object as `0x${string}`;
         let abi = Abi.parse(fileJSON.abi);
