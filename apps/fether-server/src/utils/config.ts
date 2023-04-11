@@ -117,5 +117,5 @@ export const zodEthereumJsonRpcRequestSchema = z.object({
   jsonrpc: z.literal("2.0"),
   id: z.union([z.number(), z.string()]),
   method: z.string(),
-  params: z.array(z.any()),
+  params: z.array(z.any()).optional(),
 });
