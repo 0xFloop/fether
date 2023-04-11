@@ -51,6 +51,7 @@ app.post("/rpc/:API_KEY", jsonParser, async (req, res) => {
 });
 
 app.post("/payload", jsonParser, async (req, res) => {
+  console.log(req.body.repository.id);
   const octokit = await octo.getInstallationOctokit(req.body.installation.id);
   console.log(req.body.installation.id);
   //needs to plan for if there are multiple commits in a push with sol files changed
