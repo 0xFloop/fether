@@ -33,7 +33,8 @@ class Fether {
     init() {
         return __awaiter(this, void 0, void 0, function* () {
             let data = yield fetch(`https://fether-testing.ngrok.app/fetherkit/${this.key}`).then((res) => res.json());
-            this.abi = JSON.parse(data.contractAbi);
+            const _abi = JSON.parse(data.contractAbi);
+            this.abi = _abi;
             this.address = data.contractAddress;
         });
     }

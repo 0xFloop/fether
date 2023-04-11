@@ -1,9 +1,34 @@
 import { Chain } from "wagmi";
+import { ExtractAbiFunctionNames, Narrow } from "abitype";
+import { AbiFunction } from "abitype";
 
 export default class Fether {
   chain: Chain;
   key: string;
-  abi: { name: string }[];
+  abi: Narrow<
+    | {
+        inputs: never[];
+        name: string;
+        outputs: {
+          internalType: string;
+          name: string;
+          type: string;
+        }[];
+        stateMutability: string;
+        type: string;
+      }
+    | {
+        inputs: {
+          internalType: string;
+          name: string;
+          type: string;
+        }[];
+        name: string;
+        outputs: never[];
+        stateMutability: string;
+        type: string;
+      }
+  >[];
   address: `0x${string}`;
 
   constructor(API_KEY: string) {
@@ -30,7 +55,9 @@ export default class Fether {
     let data = await fetch(`https://fether-testing.ngrok.app/fetherkit/${this.key}`).then((res) =>
       res.json()
     );
-    this.abi = JSON.parse(data.contractAbi);
+    const _abi = JSON.parse(data.contractAbi);
+
+    this.abi = _abi;
     this.address = data.contractAddress;
   }
 }

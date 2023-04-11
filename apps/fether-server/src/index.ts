@@ -56,7 +56,6 @@ app.post("/rpc/:API_KEY", jsonParser, async (req, res) => {
     });
 
     let responseJson = await response.json();
-    console.log(responseJson);
     res.set("Access-Control-Allow-Origin", "*");
     res.send(responseJson);
   }
@@ -70,7 +69,7 @@ app.post("/payload", jsonParser, async (req, res) => {
     for (let j = 0; j < req.body.commits[i].modified.length; j++)
       if (req.body.commits[i].modified[j].slice(-3) == "sol") {
         let modifiedContractPath: string = req.body.commits[i].modified[j];
-        console.log("modified co ntract path: ", modifiedContractPath);
+        console.log("modified contract path: ", modifiedContractPath);
 
         let pathArray = modifiedContractPath.split("/");
 
@@ -95,9 +94,6 @@ app.post("/payload", jsonParser, async (req, res) => {
         let byteCode = validatedJSON.bytecode.object as `0x${string}`;
         let abi = Abi.parse(fileJSON.abi);
         let dbAbi = JSON.stringify(fileJSON.abi);
-
-        let nonce = await publicClient.getTransactionCount({ address: deployerAddress });
-        console.log("nonce: ", nonce);
 
         let deploy = await walletClient.deployContract({
           bytecode: byteCode,

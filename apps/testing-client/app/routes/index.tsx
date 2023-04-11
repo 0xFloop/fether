@@ -1,15 +1,10 @@
 import { WagmiConfig, createClient, Chain } from "wagmi";
-import { Ethereum, getContract } from "@wagmi/core";
+import { Ethereum } from "@wagmi/core";
 import { ConnectKitProvider, ConnectKitButton, getDefaultClient } from "connectkit";
 import { useEffect, useState } from "react";
 import { createPublicClient, custom, http } from "viem";
 import Fether from "fetherkit";
 const fether = new Fether("abcd1234");
-
-const publicClient = createPublicClient({
-  chain: fether.chain,
-  transport: http(),
-});
 
 export default function Index() {
   useEffect(() => {
@@ -27,14 +22,19 @@ export default function Index() {
   );
   const [number, setNumber] = useState<number>();
 
+  let publicClient = createPublicClient({
+    chain: fether.chain,
+    transport: http(),
+  });
+
   const updateStateNumber = async () => {
-    const data = (await publicClient.readContract({
+    const test = await publicClient.readContract({
       address: fether.address,
       abi: fether.abi,
       functionName: "getLeNumber",
-    })) as bigint;
+    });
 
-    setNumber(Number(data));
+    setNumber(Number(test));
   };
 
   return (
