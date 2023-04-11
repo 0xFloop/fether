@@ -32,7 +32,7 @@ const octo = new Octo({ appId: "302483", privateKey: formattedGithubAppPk });
 
 app.post("/rpc/:API_KEY", jsonParser, async (req, res) => {
   let reqbody = zodEthereumJsonRpcRequestSchema.parse(req.body);
-
+  console.log(reqbody.method);
   let validated = await validateSender(req.params.API_KEY);
 
   if (!validated.success) {
