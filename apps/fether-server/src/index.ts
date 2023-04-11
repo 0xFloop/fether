@@ -51,72 +51,75 @@ app.post("/rpc/:API_KEY", jsonParser, async (req, res) => {
 });
 
 app.post("/payload", jsonParser, async (req, res) => {
-  const octokit = await octo.getInstallationOctokit(req.body.installation.id);
+  const repoId = req.body.repository.id;
+  let repoApiKeyData = await db.apiKeys.findUnique({ where: { githubId: repoId } });
+  if (repoApiKeyData) {
+    const octokit = await octo.getInstallationOctokit(repoId);
+    //needs to plan for if there are multiple commits in a push with sol files changed
+    for (let i = 0; i < req.body.commits.length; i++) {
+      for (let j = 0; j < req.body.commits[i].modified.length; j++)
+        if (req.body.commits[i].modified[j].slice(-3) == "sol") {
+          let modifiedContractPath: string = req.body.commits[i].modified[j];
+          console.log("modified contract path: ", modifiedContractPath);
 
-  //needs to plan for if there are multiple commits in a push with sol files changed
+          let pathArray = modifiedContractPath.split("/");
 
-  for (let i = 0; i < req.body.commits.length; i++) {
-    for (let j = 0; j < req.body.commits[i].modified.length; j++)
-      if (req.body.commits[i].modified[j].slice(-3) == "sol") {
-        let modifiedContractPath: string = req.body.commits[i].modified[j];
-        console.log("modified contract path: ", modifiedContractPath);
+          let fileName = pathArray.pop();
+          pathArray.pop();
 
-        let pathArray = modifiedContractPath.split("/");
+          let byteCodePath =
+            pathArray.join("/") + "/out/" + fileName + "/" + fileName?.split(".")[0] + ".json";
 
-        let fileName = pathArray.pop();
-        pathArray.pop();
+          let contentsReq = await octokit.request("GET /repos/{owner}/{repo}/contents/{path}", {
+            owner: "0xfloop",
+            repo: "fether",
+            path: byteCodePath,
+            headers: {
+              "X-GitHub-Api-Version": "2022-11-28",
+              Accept: "application/vnd.github.raw",
+            },
+          });
+          let fileJSON = JSON.parse(contentsReq.data.toString());
+          let validatedJSON = zodContractBuildFileSchema.parse(fileJSON);
 
-        let byteCodePath =
-          pathArray.join("/") + "/out/" + fileName + "/" + fileName?.split(".")[0] + ".json";
+          let byteCode = validatedJSON.bytecode.object as `0x${string}`;
+          let abi = Abi.parse(fileJSON.abi);
+          let dbAbi = JSON.stringify(fileJSON.abi);
 
-        let contentsReq = await octokit.request("GET /repos/{owner}/{repo}/contents/{path}", {
-          owner: "0xfloop",
-          repo: "fether",
-          path: byteCodePath,
-          headers: {
-            "X-GitHub-Api-Version": "2022-11-28",
-            Accept: "application/vnd.github.raw",
-          },
-        });
-        let fileJSON = JSON.parse(contentsReq.data.toString());
-        let validatedJSON = zodContractBuildFileSchema.parse(fileJSON);
+          let deployHash = await walletClient.deployContract({
+            bytecode: byteCode,
+            abi: abi,
+          });
+          await new Promise((r) => setTimeout(r, 5500));
 
-        let byteCode = validatedJSON.bytecode.object as `0x${string}`;
-        let abi = Abi.parse(fileJSON.abi);
-        let dbAbi = JSON.stringify(fileJSON.abi);
+          const transaction = await publicClient.getTransactionReceipt({
+            hash: deployHash,
+          });
 
-        let deploy = await walletClient.deployContract({
-          bytecode: byteCode,
-          abi: abi,
-        });
-        await new Promise((r) => setTimeout(r, 5500));
+          let newContractAddress = transaction["contractAddress"];
 
-        const transaction = await publicClient.getTransactionReceipt({
-          hash: deploy,
-        });
-
-        let newContractAddress = transaction["contractAddress"];
-
-        await db.apiKeys.upsert({
-          where: { githubId: req.body.installation.id },
-          update: { contractAddress: newContractAddress, contractAbi: dbAbi },
-          create: {
-            key: "testKey",
-            contractAddress: newContractAddress,
-            keyTier: "FREE",
-            githubId: req.body.installation.id,
-            createdAt: "1970-01-01T00:00:00.000Z",
-            updatedAt: "1970-01-01T00:00:00.000Z",
-            expires: "1970-01-01T00:00:00.000Z",
-            contractAbi: dbAbi,
-          },
-        });
-      }
+          await db.apiKeys.upsert({
+            where: { githubId: repoId },
+            update: { contractAddress: newContractAddress, contractAbi: dbAbi },
+            create: {
+              key: "testKey",
+              contractAddress: transaction["contractAddress"],
+              keyTier: "FREE",
+              githubId: repoId,
+              createdAt: "1970-01-01T00:00:00.000Z",
+              updatedAt: "1970-01-01T00:00:00.000Z",
+              expires: "1970-01-01T00:00:00.000Z",
+              contractAbi: dbAbi,
+            },
+          });
+        }
+    }
+    res.send("Success");
+  } else {
+    console.log("no api key found for this repo: ", repoId);
+    res.sendStatus(500);
+    res.end("No api key found for this repo. Please sign up at https://www.fether.xyz");
   }
-
-  // res.send("POST REQ FROM GITHUB BELOW: \n" + JSON.stringify(req.body));
-  //@ts-ignore
-  res.send("yay");
 });
 
 app.get("/fetherkit/:API_KEY", async (req, res) => {
