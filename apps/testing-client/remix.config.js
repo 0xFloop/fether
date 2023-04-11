@@ -7,7 +7,12 @@ module.exports = {
   server: process.env.NODE_ENV === "development" ? undefined : "./server.js",
   serverBuildPath: "api/index.js",
   devServerPort: 3004,
-  serverDependenciesToBundle: [/^@?connectkit.*/, /^@?wagmi.*/],
+  serverDependenciesToBundle: [
+    /^@?connectkit.*/,
+    /^@?wagmi.*/,
+    "@rainbow-me/rainbowkit",
+    /^@?rainbow-me.*/,
+  ],
   // appDirectory: "app",
   // assetsBuildDirectory: "public/build",
   // publicPath: "/build/",
