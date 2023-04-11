@@ -1,27 +1,16 @@
 import express from "express";
 import { App as Octo } from "octokit";
-import {
-  createWalletClient,
-  getAddress,
-  getContractAddress,
-  http,
-  parseEther,
-  parseUnits,
-} from "viem";
 import { Abi } from "abitype/zod";
 import { validateSender } from "./utils/validate";
 import {
-  fetherChain,
   formattedGithubAppPk,
   port,
-  testAbi,
   zodContractBuildFileSchema,
   zodEthereumJsonRpcRequestSchema,
 } from "./utils/config";
-import { adminClient, deployerAddress, publicClient, walletClient } from "./utils/viemClients";
+import { adminClient, publicClient, walletClient } from "./utils/viemClients";
 import { PrismaClient } from "database";
 const db = new PrismaClient();
-import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 
 const app = express();
 const bodyParser = require("body-parser");
@@ -31,8 +20,7 @@ app.use(cors());
 const octo = new Octo({ appId: "302483", privateKey: formattedGithubAppPk });
 
 app.post("/rpc/:API_KEY", jsonParser, async (req, res) => {
-  // let reqbody = zodEthereumJsonRpcRequestSchema.parse(req.body);
-  let reqbody = req.body;
+  let reqbody = zodEthereumJsonRpcRequestSchema.parse(req.body);
   console.log(reqbody.method);
   let validated = await validateSender(req.params.API_KEY);
 
@@ -63,8 +51,9 @@ app.post("/rpc/:API_KEY", jsonParser, async (req, res) => {
 });
 
 app.post("/payload", jsonParser, async (req, res) => {
-  //@ts-ignore
   const octokit = await octo.getInstallationOctokit(req.body.installation.id);
+
+  //needs to plan for if there are multiple commits in a push with sol files changed
 
   for (let i = 0; i < req.body.commits.length; i++) {
     for (let j = 0; j < req.body.commits[i].modified.length; j++)
