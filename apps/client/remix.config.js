@@ -8,4 +8,5 @@ module.exports = {
   ignoredRouteFiles: ["**/.*"],
   server: process.env.NODE_ENV === "development" ? undefined : "./server.js",
   serverBuildPath: "api/index.js",
+  serverDependenciesToBundle: ["database"],
 };
