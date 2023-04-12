@@ -2,17 +2,16 @@ import { ActionArgs, LoaderArgs, json, redirect } from "@remix-run/node";
 import { Form, Link, useActionData, useLoaderData } from "@remix-run/react";
 import { useState } from "react";
 import Typewriter from "typewriter-effect";
-import { ChevronDown, X } from "lucide-react";
-import { AlphaKeyStatus, PrismaClient } from "database";
+import { X } from "lucide-react";
+import { AlphaKeyStatus } from "database";
 import { db } from "../db.server";
-import { createCookieSessionStorage } from "@remix-run/node";
 import { getSession, commitSession } from "./alphaAccessKeySession";
-import { getSession as getUserSessoin, commitSession as commitUserSession } from "./alphaSession";
+import { getSession as getUserSession, commitSession as commitUserSession } from "./alphaSession";
 
 export const loader = async ({ request }: LoaderArgs) => {
   //validate session cookie
   const session = await getSession(request.headers.get("Cookie"));
-  const userSession = await getUserSessoin(request.headers.get("Cookie"));
+  const userSession = await getUserSession(request.headers.get("Cookie"));
 
   if (session.has("alphaKey") || userSession.has("userId")) {
     return json({ hasAccess: true });
