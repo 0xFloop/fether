@@ -34,18 +34,23 @@ model ApiKeys {
   createdAt       DateTime @db.Date
   updatedAt       DateTime @db.Date
   User            User[]
-}
 
-model FetherKitApps {
-  id        Int      @id @default(autoincrement())
-  name      String?
-  address   String?  @unique
-  createdAt DateTime @db.Date
-  updatedAt DateTime @db.Date
+  @@index([githubId], name: "GithubId")
 }
 
 enum KeyTier {
   FREE
   PERSONAL
   PRO
+}
+
+model AlphaAccessKeys {
+  alphaKey  String         @id @unique @default(uuid())
+  keyStatus AlphaKeyStatus @default(UNUSED)
+  issuedTo  String
+}
+
+enum AlphaKeyStatus {
+  UNUSED
+  USED
 }
