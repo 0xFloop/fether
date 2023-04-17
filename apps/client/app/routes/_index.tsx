@@ -5,15 +5,18 @@ import Typewriter from "typewriter-effect";
 import { X } from "lucide-react";
 import { AlphaKeyStatus } from "database";
 import { db } from "../db.server";
-import { getSession, commitSession } from "./alphaAccessKeySession";
-import { getSession as getUserSession, commitSession as commitUserSession } from "./alphaSession";
+import { getSession, commitSession } from "../utils/alphaAccessKeySession";
+import {
+  getSession as getUserSession,
+  commitSession as commitUserSession,
+} from "../utils/alphaSession";
 
 export const loader = async ({ request }: LoaderArgs) => {
   //validate session cookie
   const session = await getSession(request.headers.get("Cookie"));
   const userSession = await getUserSession(request.headers.get("Cookie"));
 
-  if (session.has("alphaKey") || userSession.has("userId")) {
+  if (session.has("alphaKey") || userSession.has("username")) {
     return json({ hasAccess: true });
   }
   return json({ hasAccess: false });
@@ -87,6 +90,13 @@ export default function Index() {
                   Submit
                 </button>
               </Form>
+              <p className="mt-4">
+                Already have fether account?{" "}
+                <Link to="/alpha/login" className="border-b border-black">
+                  Login
+                </Link>
+              </p>
+
               {data && (
                 <p className="font-sans text-red-500 text-base mt-4 inline-block">{data.message}</p>
               )}
@@ -106,6 +116,7 @@ export default function Index() {
                 delay: 40,
                 loop: false,
                 deleteSpeed: 10,
+                //@ts-ignore
                 pauseFor: 4000,
               }}
             />{" "}

@@ -12,11 +12,11 @@ datasource db {
 }
 
 model User {
-  id      Int      @id @default(autoincrement())
-  email   String?  @unique
-  name    String?
-  apiKey  String?
-  apiKeys ApiKeys? @relation(fields: [apiKey], references: [key])
+  id       Int      @id @default(autoincrement())
+  email    String?  @unique
+  username String?  @unique
+  apiKey   String?
+  apiKeys  ApiKeys? @relation(fields: [apiKey], references: [key])
 
   createdAt DateTime @db.Date
   updatedAt DateTime @db.Date
