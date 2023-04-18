@@ -8,6 +8,8 @@ type SessionFlashData = {
   error: string;
 };
 
+let cookieAgeInDays = 30;
+
 const { getSession, commitSession, destroySession } = createCookieSessionStorage<
   SessionData,
   SessionFlashData
@@ -18,6 +20,7 @@ const { getSession, commitSession, destroySession } = createCookieSessionStorage
     sameSite: "lax",
     secrets: ["QOQ27fBvcGbE5Je8"],
     secure: true,
+    maxAge: 60 * 60 * 24 * cookieAgeInDays,
   },
 });
 
