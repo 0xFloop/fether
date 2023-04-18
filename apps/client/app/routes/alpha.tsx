@@ -12,8 +12,8 @@ export const loader = async ({ request, params }: LoaderArgs) => {
   const user = await userGetSession(request.headers.get("Cookie"));
   const url = new URL(request.url);
   if (url.pathname === "/alpha" || url.pathname === "/alpha/") {
-    if (user.has("username")) throw redirect("/alpha/dashboard");
-    else if (session.has("alphaKey")) throw redirect("/alpha/login");
+    if (user.has("userId")) throw redirect("/alpha/dashboard");
+    else if (session.has("alphaKey")) throw redirect("/alpha/signup");
     else throw redirect("/");
   }
   return "success";

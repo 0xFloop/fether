@@ -1,43 +1,45 @@
 import { ActionArgs, LoaderArgs, json, redirect } from "@remix-run/node";
 import { Form, Link, useActionData } from "@remix-run/react";
 import { db } from "../db.server";
-import { getSession, commitSession } from "../utils/alphaAccessKeySession";
+import { getSession, commitSession, destroySession } from "../utils/alphaAccessKeySession";
 import {
   getSession as userGetSession,
   commitSession as userCommitSession,
 } from "../utils/alphaSession";
-import { AlphaKeyStatus, User } from "database";
-import { validateCredentials } from "~/utils/validateUser.server";
+import { AlphaKeyStatus } from "database";
+import { createUser } from "~/utils/validateUser.server";
 
 export const loader = async ({ request }: LoaderArgs) => {
   const session = await getSession(request.headers.get("Cookie"));
   const user = await userGetSession(request.headers.get("Cookie"));
   if (user.has("userId")) throw redirect("/alpha/dashboard");
-  else return null;
+  else if (session.has("alphaKey")) return null;
+  else throw redirect("/");
 };
 
 export async function action({ request }: ActionArgs) {
-  const session = await userGetSession(request.headers.get("Cookie"));
-  const form = await request.formData();
-  const username = form.get("username") as string;
-  const password = form.get("password") as string;
-  let userData;
-  try {
-    userData = await validateCredentials({ username, password });
-  } catch (err: unknown) {
-    if (err instanceof Error) {
-      return json({ message: err.message });
-    } else return json({ message: "Unknown error" });
-  }
+  const formData = await request.formData();
+  const username = formData.get("username") as string;
+  const password = formData.get("password") as string;
 
-  session.set("userId", userData.id as string);
-
-  // Login succeeded, send them to the home page.
-  return redirect("/alpha/dashboard", {
-    headers: {
-      "Set-Cookie": await userCommitSession(session),
-    },
+  let user = await db.user.findUnique({
+    where: { username: username as string },
   });
+
+  if (user) return json({ message: `Username Taken` });
+  else {
+    const userSession = await userGetSession(request.headers.get("Cookie"));
+    //create user in db
+    let newUser = await createUser({ username, password });
+
+    userSession.set("userId", newUser.id.toString());
+
+    return redirect("/alpha/dashboard", {
+      headers: {
+        "Set-Cookie": await userCommitSession(userSession),
+      },
+    });
+  }
 }
 
 export default function Index() {
@@ -48,7 +50,7 @@ export default function Index() {
       {" "}
       <div className="relative left-0 w-full flex flex-col h-full items-center align-middle justify-center">
         <div className="h-auto w-auto relative border-2 border-black rounded p-10">
-          <p className="font-sans text-2xl inline-block">Log in</p>
+          <p className="font-sans text-2xl inline-block">Sign up</p>
           <Form method="post" className="mt-5 flex flex-col">
             <input
               type="text"
@@ -66,6 +68,12 @@ export default function Index() {
               Submit
             </button>
           </Form>
+          <p className="mt-5">
+            Already have fether account?{" "}
+            <Link to="/alpha/login" className="border-b border-black">
+              Login
+            </Link>
+          </p>
 
           {data && (
             <p className="font-sans text-red-500 text-base mt-4 inline-block">{data.message}</p>

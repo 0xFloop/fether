@@ -1,7 +1,7 @@
 import { createCookieSessionStorage } from "@remix-run/node";
 
 type SessionData = {
-  username: string;
+  userId: string;
 };
 
 type SessionFlashData = {

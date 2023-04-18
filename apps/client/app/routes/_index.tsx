@@ -16,7 +16,7 @@ export const loader = async ({ request }: LoaderArgs) => {
   const session = await getSession(request.headers.get("Cookie"));
   const userSession = await getUserSession(request.headers.get("Cookie"));
 
-  if (session.has("alphaKey") || userSession.has("username")) {
+  if (session.has("alphaKey") || userSession.has("userId")) {
     return json({ hasAccess: true });
   }
   return json({ hasAccess: false });
@@ -35,11 +35,10 @@ export async function action({ request }: ActionArgs) {
     if (alphaAccessStatus.keyStatus == AlphaKeyStatus.USED)
       return json({ message: `Key already used` });
     else {
-      //UNCOMMENT TO RESTART SETTING KEYS AS USED
-      // await db.alphaAccessKeys.update({
-      //   where: { alphaKey: alphaAccessKey as string },
-      //   data: { keyStatus: AlphaKeyStatus.USED },
-      // });
+      await db.alphaAccessKeys.update({
+        where: { alphaKey: alphaAccessKey as string },
+        data: { keyStatus: AlphaKeyStatus.USED },
+      });
 
       const session = await getSession(request.headers.get("Cookie"));
       session.set("alphaKey", alphaAccessKey as string);

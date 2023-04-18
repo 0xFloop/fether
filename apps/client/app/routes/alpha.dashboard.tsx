@@ -1,5 +1,5 @@
 import { ActionArgs, LoaderArgs, json, redirect } from "@remix-run/node";
-import { Form } from "@remix-run/react";
+import { Form, useLoaderData } from "@remix-run/react";
 import Typewriter from "typewriter-effect";
 import { db } from "../db.server";
 import { getSession, commitSession } from "../utils/alphaAccessKeySession";
@@ -10,11 +10,15 @@ import {
 
 export const loader = async ({ request }: LoaderArgs) => {
   //validate session cookie
-  const session = await getSession(request.headers.get("Cookie"));
   const user = await userGetSession(request.headers.get("Cookie"));
-  return null;
+  if (!user.has("userId")) throw redirect("/alpha/login");
+
+  let userData = await db.user.findUnique({ where: { id: user.get("userId") } });
+
+  return userData;
 };
 
 export default function Index() {
-  return <div className="w-screen h-screen overflow-hidden">hello you have a userid userid</div>;
+  const data = useLoaderData();
+  return <div className="w-screen h-screen overflow-hidden">{data.username}</div>;
 }
