@@ -21,10 +21,12 @@ importers:
       '@remix-run/serve': ^1.14.1
       '@remix-run/vercel': ^1.8.0
       '@tailwindcss/forms': ^0.5.3
+      '@types/bcryptjs': ^2.4.2
       '@types/react': ^18.0.25
       '@types/react-dom': ^18.0.8
       '@types/react-typical': ^0.1.0
       '@vercel/node': ^2.7.0
+      bcryptjs: ^2.4.3
       concurrently: ^7.6.0
       database: workspace:*
       eslint: ^8.27.0
@@ -40,6 +42,7 @@ importers:
       '@remix-run/react': 1.14.1_biqbaboplfbrettd7655fr4n2y
       '@remix-run/vercel': 1.14.1_@vercel+node@2.9.12
       '@vercel/node': 2.9.12
+      bcryptjs: 2.4.3
       database: link:../../packages/database
       isbot: 3.6.8
       lucide-react: 0.139.0_react@18.2.0
@@ -51,6 +54,7 @@ importers:
       '@remix-run/eslint-config': 1.14.1_g4ssdyyxd6zhf5tqd24yazbeaq
       '@remix-run/serve': 1.14.1
       '@tailwindcss/forms': 0.5.3_tailwindcss@3.2.7
+      '@types/bcryptjs': 2.4.2
       '@types/react': 18.0.28
       '@types/react-dom': 18.0.11
       '@types/react-typical': 0.1.0
@@ -3757,6 +3761,10 @@ packages:
     resolution: {integrity: sha512-M8WpEGfC9iQ6V2Ccq6nGIXoQgeVc6z0Ngk8yCOL5V/TYIxshvb0MWQYLFFTZDesL0zmsoBc4OBjG9DB/4rei6w==}
     dev: false
 
+  /@types/bcryptjs/2.4.2:
+    resolution: {integrity: sha512-LiMQ6EOPob/4yUL66SZzu6Yh77cbzJFYll+ZfaPiPPFswtIlA/Fs1MzdKYA7JApHU49zQTbJGX3PDmCpIdDBRQ==}
+    dev: true
+
   /@types/bn.js/5.1.1:
     resolution: {integrity: sha512-qNrYbZqMx0uJAfKnKclPh+dTwK33KfLHYqtyODwd5HnXOjnkhc4qgn3BrK6RWyGZm5+sIFE7Q7Vz6QQtJB7w7g==}
     dependencies:
@@ -5524,6 +5532,10 @@ packages:
     dependencies:
       safe-buffer: 5.1.2
     dev: true
+
+  /bcryptjs/2.4.3:
+    resolution: {integrity: sha512-V/Hy/X9Vt7f3BbPJEi8BdVFMByHi+jNXrYkW3huaybV/kQ0KJg0Y6PkEMbn+zeT+i+SiKZ/HMqJGIIt4LZDqNQ==}
+    dev: false
 
   /bech32/1.1.4:
     resolution: {integrity: sha512-s0IrSOzLlbvX7yp4WBfPITzpAU8sqQcpsmwXDiKwrG4r491vwCO/XpejasRNl0piBMe/DvP4Tz0mIS/X1DPJBQ==}
