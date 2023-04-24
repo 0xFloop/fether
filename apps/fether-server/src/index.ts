@@ -118,7 +118,7 @@ app.post("/payload", jsonParser, async (req, res) => {
     } else {
       console.log("no api key found for this repo: ", req.body.installation.id);
       res.sendStatus(500);
-      res.send("No api key found for this repo, please sign up at https://www.fether.xyz.");
+      res.end("No api key found for this repo, please sign up at https://www.fether.xyz.");
     }
   } catch (err) {
     console.log("ERROR OCCURED: \n", err);
