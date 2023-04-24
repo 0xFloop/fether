@@ -13,9 +13,10 @@ datasource db {
 
 model User {
   id           String   @id @default(uuid())
+  githubId     Int?     @unique
   email        String?  @unique
   username     String   @unique
-  passwordHash String
+  passwordHash String?
   apiKey       String?
   apiKeys      ApiKeys? @relation(fields: [apiKey], references: [key])
 
@@ -26,7 +27,7 @@ model User {
 }
 
 model ApiKeys {
-  key             String   @id @unique
+  key             String   @id @unique @default(uuid())
   githubId        Int?     @unique
   contractAddress String?
   contractAbi     String?  @db.Text
