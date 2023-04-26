@@ -44,7 +44,7 @@ export const loader = async ({ request }: LoaderArgs) => {
 export default function Index() {
   // const data = useActionData<typeof action>();
   const clientId = "1755f9594459f4e4030c";
-  const redirectUri = "https://442a94caf4b9.ngrok.app/gh-callback";
+  const redirectUri = "http://localhost:3000/gh-callback";
   function handleLogin() {
     const scope = "user:email";
     const url = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}`;
@@ -58,9 +58,9 @@ export default function Index() {
         <div className="h-auto w-auto relative border-2 border-black rounded p-10">
           <Link to={handleLogin()}>Log in with GitHub</Link>
 
-          {data && (
+          {/* {data && (
             <p className="font-sans text-red-500 text-base mt-4 inline-block">{data.message}</p>
-          )}
+          )} */}
         </div>
       </div>
     </div>
