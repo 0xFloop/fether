@@ -157,12 +157,21 @@ export default function Index() {
                     <div>
                       {" "}
                       <p className="text-4xl">
-                        current deployment repo Id: {userData.githubInstallationId}
+                        current deployment repo: {userData.Repository.name}
                       </p>
                       {userData?.Repository?.contractAbi ? (
                         <div>
                           {" "}
-                          <p>Contract ABI: {userData?.Repository?.contractAbi}</p>
+                          <p>
+                            Contract ABI:{" "}
+                            <pre>
+                              {JSON.stringify(
+                                JSON.parse(userData?.Repository?.contractAbi),
+                                null,
+                                4
+                              )}
+                            </pre>
+                          </p>
                           <p>Contract Address: {userData?.Repository?.contractAddress}</p>
                         </div>
                       ) : (
