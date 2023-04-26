@@ -14,9 +14,11 @@
     "prisma:push": "turbo run prisma:push",
     "prisma:push-accept-data-loss": "turbo run prisma:push-accept-data-loss",
     "prisma:migrate-reset": "turbo run prisma:migrate-reset",
-    "prisma:studio": "turbo run prisma:studio",
+    "studio": "turbo run prisma:studio",
     "prisma:seed": "turbo run prisma:seed",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "anvil": "anvil --block-time 5 --chain-id 696969 --steps-tracing",
+    "ngrok": "ngrok http --domain=fether-testing.ngrok.app 3001"
   },
   "dependencies": {
     "@manypkg/cli": "^0.19.2",
