@@ -32,6 +32,7 @@ importers:
       eslint: ^8.27.0
       isbot: latest
       lucide-react: ^0.139.0
+      octokit: ^2.0.14
       react: ^18.2.0
       react-dom: ^18.2.0
       tailwindcss: ^3.2.7
@@ -44,8 +45,9 @@ importers:
       '@vercel/node': 2.9.12
       bcryptjs: 2.4.3
       database: link:../../packages/database
-      isbot: 3.6.8
+      isbot: 3.6.10
       lucide-react: 0.139.0_react@18.2.0
+      octokit: 2.0.14
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
       typewriter-effect: 2.19.0_biqbaboplfbrettd7655fr4n2y
@@ -8664,6 +8666,11 @@ packages:
   /isarray/2.0.5:
     resolution: {integrity: sha512-xHjhDr3cNBK0BzdUJSPXZntQUx/mwMS5Rw4A7lPJ90XGAO6ISP/ePDNuo0vhqOZU+UD5JoodwCAAoZQd3FeAKw==}
     dev: true
+
+  /isbot/3.6.10:
+    resolution: {integrity: sha512-+I+2998oyP4oW9+OTQD8TS1r9P6wv10yejukj+Ksj3+UR5pUhsZN3f8W7ysq0p1qxpOVNbl5mCuv0bCaF8y5iQ==}
+    engines: {node: '>=12'}
+    dev: false
 
   /isbot/3.6.8:
     resolution: {integrity: sha512-V8XUXN0/UYxfgrui4o38pmOve2eO/1KjluxR1G8Qnu5gqlUiNrvtX06t1W5n8vFtrtKfHj96iFYuPL39jXUe8g==}
