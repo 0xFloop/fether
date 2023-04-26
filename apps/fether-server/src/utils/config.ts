@@ -92,8 +92,10 @@ export const fetherChain: Chain = {
     symbol: "FEth",
   },
   rpcUrls: {
-    default: { http: ["https://fether-testing.ngrok.app/rpc/abcd1234"] },
-    public: { http: ["https://fether-testing.ngrok.app/rpc/abcd1234"] },
+    default: {
+      http: ["https://fether-testing.ngrok.app/rpc/f06e4ecf-773e-46aa-94f3-a0521f35269e"],
+    },
+    public: { http: ["https://fether-testing.ngrok.app/rpc/f06e4ecf-773e-46aa-94f3-a0521f35269e"] },
   },
   testnet: false,
 };
