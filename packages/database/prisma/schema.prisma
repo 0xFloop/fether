@@ -12,35 +12,43 @@ datasource db {
 }
 
 model User {
-  id                   String   @id @default(uuid())
-  githubId             Int?     @unique
-  githubInstallationId String?
-  email                String?  @unique
-  username             String   @unique
+  id                   String  @id @default(uuid())
+  email                String? @unique
+  username             String  @unique
   passwordHash         String?
-  apiKey               String?
-  apiKeys              ApiKeys? @relation(fields: [apiKey], references: [key])
+  githubId             Int?    @unique
+  githubInstallationId String? @unique
 
   createdAt DateTime @db.Date
-  updatedAt DateTime @db.Date
+  updatedAt DateTime @updatedAt @db.Date
 
-  @@index([apiKey], name: "ApiKey")
+  ApiKey     ApiKey?
+  Repository Repository?
 }
 
-model ApiKeys {
-  key                  String   @id @unique @default(uuid())
-  githubId             Int?     @unique
-  githubInstallationId String?  @unique
-  repoName             String?
-  contractAddress      String?
-  contractAbi          String?  @db.Text
-  keyTier              KeyTier
-  expires              DateTime
-  createdAt            DateTime @db.Date
-  updatedAt            DateTime @db.Date
-  User                 User[]
+model ApiKey {
+  key            String   @id @unique @default(uuid())
+  userId         String   @unique
+  associatedUser User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  keyTier        KeyTier
+  expires        DateTime
+  createdAt      DateTime @db.Date
+  updatedAt      DateTime @db.Date
 
-  @@index([githubId], name: "GithubId")
+  @@index([userId], name: "UserId")
+}
+
+model Repository {
+  id              String   @id @unique @default(uuid())
+  name            String
+  userId          String   @unique
+  associatedUser  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  contractAddress String?
+  contractAbi     String?  @db.Text
+  createdAt       DateTime @db.Date
+  updatedAt       DateTime @db.Date
+
+  @@index([userId], name: "UserId")
 }
 
 enum KeyTier {

@@ -1,12 +1,12 @@
-import { ApiKeys } from "database";
+import { ApiKey } from "database";
 import { PrismaClient } from "database";
 const db = new PrismaClient();
 
 export async function validateSender(
   apiKey: string
-): Promise<{ success: boolean; apiKeyData?: ApiKeys }> {
+): Promise<{ success: boolean; apiKeyData?: ApiKey }> {
   try {
-    let apiKeyData = await db.apiKeys.findUnique({ where: { key: apiKey } });
+    let apiKeyData = await db.apiKey.findUnique({ where: { key: apiKey } });
     if (apiKeyData) {
       return { success: true, apiKeyData };
     }

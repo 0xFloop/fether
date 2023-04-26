@@ -14,18 +14,16 @@ export const action = async ({ request }: ActionArgs) => {
     if (!userData) {
       return redirect("/alpha/dashboard");
     } else {
-      const newKey = await db.apiKeys.create({
+      await db.apiKey.create({
         data: {
           keyTier: KeyTier.FREE,
+          userId: userData.id,
           expires: new Date(Date.now() + 60 * 60 * 24 * 30),
           createdAt: new Date(),
           updatedAt: new Date(),
         },
       });
-      const updateUser = await db.user.update({
-        where: { id: userId as string },
-        data: { apiKey: newKey.key },
-      });
+
       return redirect("/alpha/dashboard");
     }
   }
