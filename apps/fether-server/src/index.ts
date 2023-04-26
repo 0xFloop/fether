@@ -61,7 +61,7 @@ app.post("/payload", jsonParser, async (req, res) => {
     const octokit = await octo.getInstallationOctokit(req.body.installation.id);
     //needs to plan for if there are multiple commits in a push with sol files changed
     let repoApiKeyData = await db.apiKeys.findUnique({
-      where: { githubInstallationId: req.body.installation.id },
+      where: { githubInstallationId: req.body.installation.id.toString() },
     });
     if (repoApiKeyData) {
       for (let i = 0; i < req.body.commits.length; i++) {
