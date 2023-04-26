@@ -66,6 +66,8 @@ app.post("/payload", jsonParser, async (req, res) => {
       include: { ApiKey: true, Repository: true },
     });
     console.log(req.body);
+
+    //needs to check that the push is to the same repository name as the one associated with the user
     if (associatedUserData && associatedUserData.ApiKey && associatedUserData.Repository) {
       for (let i = 0; i < req.body.commits.length; i++) {
         for (let j = 0; j < req.body.commits[i].modified.length; j++)
@@ -134,7 +136,7 @@ app.post("/payload", jsonParser, async (req, res) => {
 app.get("/fetherkit/:API_KEY", async (req, res) => {
   try {
     let validated = await validateSender(req.params.API_KEY);
-    if (validated.success == false) {
+    if (!validated.success) {
       res.set("Access-Control-Allow-Origin", "*");
       let error = {
         jsonrpc: "2.0",
@@ -149,7 +151,7 @@ app.get("/fetherkit/:API_KEY", async (req, res) => {
       res.json(error);
     } else {
       res.set("Access-Control-Allow-Origin", "*");
-      res.json(validated.apiKeyData);
+      res.json(validated.apiKeyData?.associatedUser.Repository);
     }
   } catch (err) {
     console.log("ERROR OCCURED: \n", err);
