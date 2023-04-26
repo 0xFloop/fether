@@ -63,6 +63,7 @@ app.post("/payload", jsonParser, async (req, res) => {
     let repoApiKeyData = await db.apiKeys.findUnique({
       where: { githubInstallationId: req.body.installation.id.toString() },
     });
+    console.log(repoApiKeyData);
     if (repoApiKeyData) {
       for (let i = 0; i < req.body.commits.length; i++) {
         for (let j = 0; j < req.body.commits[i].modified.length; j++)
@@ -117,7 +118,7 @@ app.post("/payload", jsonParser, async (req, res) => {
       res.send("yay");
     } else {
       console.log("no api key found for this repo: ", req.body.installation.id);
-      res.sendStatus(500);
+      res.status(500);
       res.end("No api key found for this repo, please sign up at https://www.fether.xyz.");
     }
   } catch (err) {
