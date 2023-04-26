@@ -1,16 +1,17 @@
 import { ActionArgs, LoaderArgs, redirect } from "@remix-run/node";
 import { Form, Link, useActionData, useLoaderData } from "@remix-run/react";
 import { db } from "../db.server";
-import { ApiKeys, User } from "database";
+import { ApiKey, Repository, User } from "database";
 import {
   getSession as userGetSession,
   commitSession as userCommitSession,
 } from "../utils/alphaSession";
 import { getUserRepositories } from "../utils/octo.server";
 
-type UserWithApiKeys =
+type UserWithKeyAndRepo =
   | (User & {
-      apiKeys: ApiKeys | null;
+      ApiKey: ApiKey | null;
+      Repository: Repository | null;
     })
   | null;
 type RepoData = { repoName: string; repoId: string };
@@ -19,18 +20,23 @@ export const action = async ({ request }: ActionArgs) => {
   const body = await request.formData();
   const githubInstallationId = body.get("githubInstallationId");
   const chosenRepoName = body.get("chosenRepoName");
-  if (chosenRepoName) {
-    await db.apiKeys.upsert({
-      where: { githubInstallationId: githubInstallationId as string },
+  const chosenRepoId = body.get("chosenRepoId");
+  const associatedUser = await db.user.findUnique({
+    where: { githubInstallationId: githubInstallationId as string },
+    include: { ApiKey: true, Repository: true },
+  });
+
+  if (chosenRepoName && associatedUser) {
+    await db.repository.upsert({
+      where: { userId: associatedUser.id },
       create: {
-        keyTier: "FREE",
-        expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30),
+        id: chosenRepoId as string,
+        name: chosenRepoName as string,
+        userId: associatedUser.id,
         createdAt: new Date(),
         updatedAt: new Date(),
-        githubInstallationId: githubInstallationId as string,
-        repoName: chosenRepoName as string,
       },
-      update: { repoName: chosenRepoName as string },
+      update: { name: chosenRepoName as string, id: chosenRepoId as string },
     });
     return { originCallForm: "chooseRepo", chosenRepoName: chosenRepoName, repositories: null };
   } else if (githubInstallationId && !chosenRepoName) {
@@ -46,7 +52,7 @@ export const action = async ({ request }: ActionArgs) => {
   return { originCallForm: "unknown", chosenRepoName: null, repositories: null };
 };
 
-//TO DO: Make sure these functions are run serverside so that the github private key is not exposed
+//TO DO: fix adding installationId to apiKey table when user installs app
 
 //TO DO: Make user install github app and select repository before generating api key so we can save the github installation id to the apiKey table
 
@@ -55,9 +61,9 @@ export const loader = async ({ request }: LoaderArgs) => {
   const user = await userGetSession(request.headers.get("Cookie"));
   if (!user.has("userId")) throw redirect("/alpha/login");
 
-  const userData: UserWithApiKeys = await db.user.findUnique({
+  const userData: UserWithKeyAndRepo = await db.user.findUnique({
     where: { id: user.get("userId") },
-    include: { apiKeys: true },
+    include: { ApiKey: true, Repository: true },
   });
 
   return userData;
@@ -68,7 +74,7 @@ export default function Index() {
   const actionRepos = useActionData<typeof action>();
 
   return (
-    <div className="w-screen h-screen overflow-hidden display flex flex-col">
+    <div className="w-screen h-auto overflow-hidden display flex flex-col">
       <div
         id="navbar"
         className="h-20 border-b border-b-black flex flex-row justify-between items-center"
@@ -90,7 +96,7 @@ export default function Index() {
       <div id="content" className="w-full max-w-7xl mx-auto border">
         <div id="api-key" className="mt-20">
           <p></p>
-          {!userData?.apiKey ? (
+          {!userData?.ApiKey ? (
             <div>
               <h1 className="text-4xl">api key: </h1>
               <Form method="post" action="/keygen">
@@ -102,7 +108,7 @@ export default function Index() {
             </div>
           ) : (
             <div>
-              <p className="text-4xl">api key: {userData?.apiKey}</p>
+              <p className="text-4xl">api key: {userData?.ApiKey.key}</p>
               {!userData.githubInstallationId ? (
                 <div>
                   <a
@@ -115,7 +121,7 @@ export default function Index() {
                 </div>
               ) : (
                 <div>
-                  {!userData?.apiKeys?.repoName ? (
+                  {!userData?.Repository ? (
                     <div>
                       <Form method="post">
                         <input
@@ -132,15 +138,18 @@ export default function Index() {
                             name="githubInstallationId"
                             value={userData.githubInstallationId}
                           />
-                          <fieldset className="flex flex-col gap-3">
+                          <fieldset className="flex flex-col">
                             {actionRepos.repositories?.map((repo) => (
                               <label>
                                 <input type="radio" name="chosenRepoName" value={repo.repoName} />
+                                <input type="hidden" name="chosenRepoId" value={repo.repoId} />
                                 {repo.repoName}
                               </label>
                             ))}
                           </fieldset>
-                          <button type="submit">submit</button>
+                          <button type="submit">
+                            submitsubmitsubmitsubmitsubmitsubmitsubmitsubmitsubmit
+                          </button>
                         </Form>
                       )}
                     </div>
@@ -150,11 +159,11 @@ export default function Index() {
                       <p className="text-4xl">
                         current deployment repo Id: {userData.githubInstallationId}
                       </p>
-                      {userData?.apiKeys?.contractAbi ? (
+                      {userData?.Repository?.contractAbi ? (
                         <div>
                           {" "}
-                          <p>Contract ABI: {userData?.apiKeys?.contractAbi}</p>
-                          <p>Contract Address: {userData?.apiKeys?.contractAddress}</p>
+                          <p>Contract ABI: {userData?.Repository?.contractAbi}</p>
+                          <p>Contract Address: {userData?.Repository?.contractAddress}</p>
                         </div>
                       ) : (
                         <div>
