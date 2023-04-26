@@ -1,13 +1,9 @@
-import { ActionArgs, LoaderArgs, redirect } from "@remix-run/node";
+import { LoaderArgs, redirect } from "@remix-run/node";
 import { db } from "../db.server";
-import { KeyTier } from "database";
 import {
   getSession as userGetSession,
   commitSession as userCommitSession,
 } from "../utils/alphaSession";
-import { useSubmit } from "@remix-run/react";
-
-export const action = async ({ request }: ActionArgs) => {};
 
 async function handleAuthentication(
   code: string
