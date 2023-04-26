@@ -13,7 +13,7 @@ export const loader = async ({ request, params }: LoaderArgs) => {
   const url = new URL(request.url);
   if (url.pathname === "/alpha" || url.pathname === "/alpha/") {
     if (user.has("userId")) throw redirect("/alpha/dashboard");
-    else if (session.has("alphaKey")) throw redirect("/alpha/signup");
+    else if (session.has("alphaKey")) throw redirect("/alpha/login");
     else throw redirect("/");
   }
   return "success";

@@ -25,7 +25,7 @@ async function handleAuthentication(
       client_id: "1755f9594459f4e4030c",
       client_secret: "7054d91280bf03b0594900df18efb860b43d5909",
       code,
-      redirect_uri: "https://442a94caf4b9.ngrok.app/gh-callback",
+      redirect_uri: "http://localhost:3000/gh-callback",
     }),
   };
   await fetch(url, options)
