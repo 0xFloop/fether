@@ -30,7 +30,7 @@ model User {
 model ApiKeys {
   key                  String   @id @unique @default(uuid())
   githubId             Int?     @unique
-  githubInstallationId String?
+  githubInstallationId String?  @unique
   contractAddress      String?
   contractAbi          String?  @db.Text
   keyTier              KeyTier
