@@ -12,13 +12,14 @@ datasource db {
 }
 
 model User {
-  id           String   @id @default(uuid())
-  githubId     Int?     @unique
-  email        String?  @unique
-  username     String   @unique
-  passwordHash String?
-  apiKey       String?
-  apiKeys      ApiKeys? @relation(fields: [apiKey], references: [key])
+  id                   String   @id @default(uuid())
+  githubId             Int?     @unique
+  githubInstallationId String?
+  email                String?  @unique
+  username             String   @unique
+  passwordHash         String?
+  apiKey               String?
+  apiKeys              ApiKeys? @relation(fields: [apiKey], references: [key])
 
   createdAt DateTime @db.Date
   updatedAt DateTime @db.Date
@@ -27,15 +28,16 @@ model User {
 }
 
 model ApiKeys {
-  key             String   @id @unique @default(uuid())
-  githubId        Int?     @unique
-  contractAddress String?
-  contractAbi     String?  @db.Text
-  keyTier         KeyTier
-  expires         DateTime
-  createdAt       DateTime @db.Date
-  updatedAt       DateTime @db.Date
-  User            User[]
+  key                  String   @id @unique @default(uuid())
+  githubId             Int?     @unique
+  githubInstallationId String?
+  contractAddress      String?
+  contractAbi          String?  @db.Text
+  keyTier              KeyTier
+  expires              DateTime
+  createdAt            DateTime @db.Date
+  updatedAt            DateTime @db.Date
+  User                 User[]
 
   @@index([githubId], name: "GithubId")
 }
