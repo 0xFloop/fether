@@ -67,7 +67,7 @@ app.post("/payload", jsonParser, async (req, res) => {
     });
     console.log(req.body);
 
-    //needs to check that the push is to the same repository name as the one associated with the user
+    //needs to check that  the push is to the same repository name as the one associated with the user
     if (associatedUserData && associatedUserData.ApiKey && associatedUserData.Repository) {
       for (let i = 0; i < req.body.commits.length; i++) {
         for (let j = 0; j < req.body.commits[i].modified.length; j++)
