@@ -15,18 +15,20 @@ type UserWithKeyAndRepo =
     })
   | null;
 type RepoData = { repoName: string; repoId: string };
-//fix adding installationId to apiKey table
+
 export const action = async ({ request }: ActionArgs) => {
   const body = await request.formData();
   const githubInstallationId = body.get("githubInstallationId");
-  const chosenRepoName = body.get("chosenRepoName");
-  const chosenRepoId = body.get("chosenRepoId");
+  const chosenRepoData = body.get("chosenRepoData");
   const associatedUser = await db.user.findUnique({
     where: { githubInstallationId: githubInstallationId as string },
     include: { ApiKey: true, Repository: true },
   });
-
-  if (chosenRepoName && associatedUser) {
+  if (chosenRepoData && associatedUser) {
+    const chosenRepoName = chosenRepoData.toString().split(",")[0];
+    const chosenRepoId = chosenRepoData.toString().split(",")[1];
+    console.log("chosenRepoName: ", chosenRepoName);
+    console.log("chosenRepoId: ", chosenRepoId);
     await db.repository.upsert({
       where: { userId: associatedUser.id },
       create: {
@@ -39,7 +41,7 @@ export const action = async ({ request }: ActionArgs) => {
       update: { name: chosenRepoName as string, id: chosenRepoId as string },
     });
     return { originCallForm: "chooseRepo", chosenRepoName: chosenRepoName, repositories: null };
-  } else if (githubInstallationId && !chosenRepoName) {
+  } else if (githubInstallationId && !chosenRepoData) {
     const repositories = await getUserRepositories(githubInstallationId as string);
     const repoArray = repositories.data.repositories;
     const repoObjArray: RepoData[] = [];
@@ -141,9 +143,12 @@ export default function Index() {
                           <fieldset className="flex flex-col">
                             {actionRepos.repositories?.map((repo) => (
                               <label>
-                                <input type="radio" name="chosenRepoName" value={repo.repoName} />
-                                <input type="hidden" name="chosenRepoId" value={repo.repoId} />
-                                {repo.repoName}
+                                <input
+                                  type="radio"
+                                  name="chosenRepoData"
+                                  value={[repo.repoName, repo.repoId]}
+                                />
+                                {repo.repoName} {repo.repoId}
                               </label>
                             ))}
                           </fieldset>
