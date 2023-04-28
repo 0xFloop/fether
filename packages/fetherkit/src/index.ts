@@ -5,6 +5,7 @@ import { AbiFunction } from "abitype";
 export default class Fether {
   chain: Chain;
   key: string;
+  methods: { [key: string]: string };
   abi: Narrow<
     | {
         inputs: never[];
@@ -50,6 +51,7 @@ export default class Fether {
     };
     this.address = "0x";
     this.abi = [];
+    this.methods = {};
   }
   async init() {
     let data = await fetch(`https://fether-testing.ngrok.app/fetherkit/${this.key}`).then((res) =>
@@ -58,6 +60,12 @@ export default class Fether {
     const _abi = JSON.parse(data.contractAbi);
 
     this.abi = _abi;
+
+    this.abi.map((method) => {
+      let name = method.name;
+      this.methods[name] = name;
+    });
+
     this.address = data.contractAddress;
   }
 }
