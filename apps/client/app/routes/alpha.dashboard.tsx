@@ -89,111 +89,112 @@ export default function Index() {
           </button>
         </div>
       </div>
-      <div id="content" className="w-full max-w-7xl mx-auto border">
-        <div id="api-key" className="mt-20">
-          <p></p>
-          {!userData?.ApiKey ? (
-            <div>
-              <h1 className="text-4xl">api key: </h1>
-              <Form method="post" action="/keygen">
-                <input type="hidden" name="userId" value={userData?.id} />
-                <button type="submit" className="font-sans text-base ml-4 inline-block">
-                  click here to generate api key
-                </button>
-              </Form>
+      <div id="content" className="w-3/4 max-w-7xl mx-auto pt-20 rounded-lg">
+        {!userData?.ApiKey ? (
+          <div className="text-4xl border-b bg-slate-200 p-5">
+            <h1 className="text-4xl">api key: </h1>
+            <Form method="post" action="/keygen">
+              <input type="hidden" name="userId" value={userData?.id} />
+              <button type="submit" className="font-sans text-base ml-4 inline-block">
+                click here to generate api key
+              </button>
+            </Form>
+          </div>
+        ) : (
+          <div>
+            <div className="text-4xl border-b bg-slate-200 p-5 flex flex-row justify-between rounded-lg">
+              <p>api key:</p> <p>{userData?.ApiKey.key}</p>
             </div>
-          ) : (
-            <div>
-              <p className="text-4xl">api key: {userData?.ApiKey.key}</p>
-              {!userData.githubInstallationId ? (
-                <div>
-                  <a
-                    className="text-4xl"
-                    href="https://github.com/apps/fetherkit/installations/new"
-                    target="_blank"
-                  >
-                    click HERE to add Github FetherKit app
-                  </a>
-                </div>
-              ) : (
-                <div>
-                  {!userData?.Repository ? (
-                    <div>
+            {!userData.githubInstallationId ? (
+              <div>
+                <a
+                  className="text-4xl"
+                  href="https://github.com/apps/fetherkit/installations/new"
+                  target="_blank"
+                >
+                  click HERE to add Github FetherKit app
+                </a>
+              </div>
+            ) : (
+              <div>
+                {!userData?.Repository ? (
+                  <div className="text-4xl border-b bg-slate-200 p-5 flex flex-row justify-between rounded-lg">
+                    <Form method="post">
+                      <input
+                        type="hidden"
+                        name="githubInstallationId"
+                        value={userData.githubInstallationId}
+                      />
+                      <button type="submit">choose repository </button>
+                    </Form>
+                    {actionRepos?.originCallForm == "getRepos" && (
                       <Form method="post">
                         <input
                           type="hidden"
                           name="githubInstallationId"
                           value={userData.githubInstallationId}
                         />
-                        <button type="submit">choose repository </button>
+                        <fieldset className="flex flex-col">
+                          {actionRepos.repositories?.map((repo) => (
+                            <label>
+                              <input
+                                type="radio"
+                                name="chosenRepoData"
+                                value={[repo.repoName, repo.repoId]}
+                              />
+                              {repo.repoName} {repo.repoId}
+                            </label>
+                          ))}
+                        </fieldset>
+                        <button type="submit">submit</button>
                       </Form>
-                      {actionRepos?.originCallForm == "getRepos" && (
-                        <Form method="post">
-                          <input
-                            type="hidden"
-                            name="githubInstallationId"
-                            value={userData.githubInstallationId}
-                          />
-                          <fieldset className="flex flex-col">
-                            {actionRepos.repositories?.map((repo) => (
-                              <label>
-                                <input
-                                  type="radio"
-                                  name="chosenRepoData"
-                                  value={[repo.repoName, repo.repoId]}
-                                />
-                                {repo.repoName} {repo.repoId}
-                              </label>
-                            ))}
-                          </fieldset>
-                          <button type="submit">submit</button>
-                        </Form>
-                      )}
+                    )}
+                  </div>
+                ) : (
+                  <div>
+                    <div className="text-4xl bg-slate-200 p-5 flex flex-row justify-between rounded-lg mt-10">
+                      <p>current deployment repository:</p> <p>{userData.Repository.name}</p>
                     </div>
-                  ) : (
-                    <div>
-                      {" "}
-                      <p className="text-4xl">
-                        current deployment repo: {userData.Repository.name}
-                      </p>
-                      {userData?.Repository?.contractAbi ? (
-                        <div>
-                          Contract ABI Methods:{" "}
-                          <ul>
-                            {JSON.parse(userData?.Repository?.contractAbi).map((method: any) => (
-                              <li>{JSON.stringify(method["name"])}</li>
-                            ))}{" "}
-                          </ul>{" "}
-                          <p>
-                            {/* <pre>
-                              {JSON.stringify(
-                                JSON.parse(userData?.Repository?.contractAbi),
-                                null,
-                                4
-                              )}
-                            </pre> */}
-                          </p>
+                    {userData?.Repository?.contractAbi ? (
+                      <div className="text-4xl flex gap-10 flex-row justify-between rounded-lg mt-10">
+                        <div className="w-2/5">
+                          <div className="flex flex-col gap-2 bg-slate-200 p-5 rounded-lg ">
+                            <p>Contract ABI Methods: </p>
+
+                            <ul className="flex flex-col gap-2">
+                              {JSON.parse(userData?.Repository?.contractAbi).map((method: any) => (
+                                <li className="text-lg">
+                                  {JSON.stringify(method["name"]).replace(/['"]+/g, "")}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
                           <br />
-                          <p>
-                            Last Deployment:{" "}
-                            {new Date(userData?.Repository?.updatedAt).toLocaleString()}
-                          </p>
+                          <div className="flex flex-col gap-2 bg-slate-200 p-5 rounded-lg ">
+                            <p>Last Deployment:</p>
+                            <p className="text-lg">
+                              {new Date(userData?.Repository?.updatedAt).toLocaleString()}
+                            </p>
+                          </div>
                         </div>
-                      ) : (
-                        <div>
-                          <p>Push code to your chosen repository to view deployment details</p>
+                        <div className="flex-1 bg-slate-200 p-5 rounded-lg ">
+                          Recent Transactions:
                         </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-        <div id="github-repo"></div>
-        <div id="analytics"></div>
+                      </div>
+                    ) : (
+                      <div className="text-4xl border-b bg-slate-200 p-5 flex flex-row justify-between rounded-lg mt-10">
+                        <p>Push code to your chosen repository to view deployment details</p>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
       </div>
+      <div id="github-repo"></div>
+      <div id="analytics"></div>
     </div>
   );
 }
