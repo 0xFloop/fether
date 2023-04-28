@@ -18,7 +18,7 @@ const { getSession, commitSession, destroySession } = createCookieSessionStorage
     name: "__session",
     httpOnly: true,
     sameSite: "lax",
-    secrets: ["QOQ27fBvcGbE5Je8"],
+    secrets: [process.env.alphaSessionSecret as string],
     secure: true,
     maxAge: 60 * 60 * 24 * cookieAgeInDays,
   },

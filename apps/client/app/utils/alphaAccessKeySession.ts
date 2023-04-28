@@ -16,7 +16,7 @@ const { getSession, commitSession, destroySession } = createCookieSessionStorage
     name: "__alphakeysession",
     httpOnly: true,
     sameSite: "lax",
-    secrets: ["QOQ27fBvcGbE5Je8"],
+    secrets: [process.env.alphaKeySecret as string],
     secure: true,
   },
 });
