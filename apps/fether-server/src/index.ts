@@ -23,6 +23,7 @@ app.post("/rpc/:API_KEY", jsonParser, async (req, res) => {
   try {
     let reqbody = zodEthereumJsonRpcRequestSchema.parse(req.body);
     console.log(reqbody.method);
+    console.log(req.params.API_KEY);
     let validated = await validateSender(req.params.API_KEY);
 
     if (!validated.success) {
@@ -58,16 +59,15 @@ app.post("/rpc/:API_KEY", jsonParser, async (req, res) => {
 
 app.post("/payload", jsonParser, async (req, res) => {
   try {
-    const octokit = await octo.getInstallationOctokit(req.body.installation.id);
-    //needs to plan for if there are multiple commits in a push with sol files changed
     let installId = req.body.installation.id.toString();
+
+    const octokit = await octo.getInstallationOctokit(installId);
+    //needs to plan for if there are multiple commits in a push with sol files changed
     let associatedUserData = await db.user.findUnique({
       where: { githubInstallationId: installId },
       include: { ApiKey: true, Repository: true },
     });
-    console.log(req.body);
 
-    //needs to check that  the push is to the same repository name as the one associated with the user
     if (
       associatedUserData &&
       associatedUserData.ApiKey &&
@@ -147,7 +147,7 @@ app.get("/fetherkit/:API_KEY", async (req, res) => {
         jsonrpc: "2.0",
         error: {
           code: -32000,
-          message: "Invalid Fether api key. Sign up here https://www.fether.xyz.",
+          message: "FetherKit: Invalid Fether api key. Sign up here https://www.fether.xyz.",
         },
         id: "1",
       };
