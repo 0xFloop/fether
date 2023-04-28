@@ -93,9 +93,9 @@ export const fetherChain: Chain = {
   },
   rpcUrls: {
     default: {
-      http: ["https://fether-testing.ngrok.app/rpc/f14a5945-b030-43b4-8f05-f467a80d3e01"],
+      http: [`https://fether-testing.ngrok.app/rpc/${process.env.API_KEY as string}}`],
     },
-    public: { http: ["https://fether-testing.ngrok.app/rpc/f14a5945-b030-43b4-8f05-f467a80d3e01"] },
+    public: { http: [`https://fether-testing.ngrok.app/rpc/${process.env.API_KEY as string}`] },
   },
   testnet: false,
 };

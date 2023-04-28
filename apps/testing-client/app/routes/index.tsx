@@ -11,7 +11,7 @@ import {
   parseEther,
 } from "viem";
 import Fether from "fetherkit";
-const fether = new Fether("f14a5945-b030-43b4-8f05-f467a80d3e01");
+const fether = new Fether("clh0wliwn00071jekzksh5mwz");
 
 export default function Index() {
   useEffect(() => {
