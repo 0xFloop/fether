@@ -23,7 +23,6 @@ app.post("/rpc/:API_KEY", jsonParser, async (req, res) => {
   try {
     let reqbody = zodEthereumJsonRpcRequestSchema.parse(req.body);
     console.log(reqbody.method);
-    console.log(req.params.API_KEY);
     let validated = await validateSender(req.params.API_KEY);
 
     if (!validated.success) {
