@@ -38,7 +38,7 @@ export const action = async ({ request }: ActionArgs) => {
         createdAt: new Date(),
         updatedAt: new Date(),
       },
-      update: { name: chosenRepoName as string, id: chosenRepoId as string },
+      update: { name: chosenRepoName as string, id: chosenRepoId as string, updatedAt: new Date() },
     });
     return { originCallForm: "chooseRepo", chosenRepoName: chosenRepoName, repositories: null };
   } else if (githubInstallationId && !chosenRepoData) {
@@ -53,10 +53,6 @@ export const action = async ({ request }: ActionArgs) => {
   }
   return { originCallForm: "unknown", chosenRepoName: null, repositories: null };
 };
-
-//TO DO: fix adding installationId to apiKey table when user installs app
-
-//TO DO: Make user install github app and select repository before generating api key so we can save the github installation id to the apiKey table
 
 export const loader = async ({ request }: LoaderArgs) => {
   //validate session cookie
@@ -152,9 +148,7 @@ export default function Index() {
                               </label>
                             ))}
                           </fieldset>
-                          <button type="submit">
-                            submitsubmitsubmitsubmitsubmitsubmitsubmitsubmitsubmit
-                          </button>
+                          <button type="submit">submit</button>
                         </Form>
                       )}
                     </div>
@@ -166,18 +160,26 @@ export default function Index() {
                       </p>
                       {userData?.Repository?.contractAbi ? (
                         <div>
-                          {" "}
+                          Contract ABI Methods:{" "}
+                          <ul>
+                            {JSON.parse(userData?.Repository?.contractAbi).map((method: any) => (
+                              <li>{JSON.stringify(method["name"])}</li>
+                            ))}{" "}
+                          </ul>{" "}
                           <p>
-                            Contract ABI:{" "}
-                            <pre>
+                            {/* <pre>
                               {JSON.stringify(
                                 JSON.parse(userData?.Repository?.contractAbi),
                                 null,
                                 4
                               )}
-                            </pre>
+                            </pre> */}
                           </p>
-                          <p>Contract Address: {userData?.Repository?.contractAddress}</p>
+                          <br />
+                          <p>
+                            Last Deployment:{" "}
+                            {new Date(userData?.Repository?.updatedAt).toLocaleString()}
+                          </p>
                         </div>
                       ) : (
                         <div>
