@@ -35,10 +35,8 @@ export const action = async ({ request }: ActionArgs) => {
         id: chosenRepoId as string,
         name: chosenRepoName as string,
         userId: associatedUser.id,
-        createdAt: new Date(),
-        updatedAt: new Date(),
       },
-      update: { name: chosenRepoName as string, id: chosenRepoId as string, updatedAt: new Date() },
+      update: { name: chosenRepoName as string, id: chosenRepoId as string },
     });
     return { originCallForm: "chooseRepo", chosenRepoName: chosenRepoName, repositories: null };
   } else if (githubInstallationId && !chosenRepoData) {

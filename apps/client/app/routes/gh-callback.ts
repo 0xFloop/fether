@@ -80,8 +80,6 @@ export const loader = async ({ request }: LoaderArgs) => {
       data: {
         githubId: parseInt(githubId as string),
         username: githubUsername as string,
-        createdAt: new Date(),
-        updatedAt: new Date(),
       },
     });
     session.set("userId", newUser.id as string);

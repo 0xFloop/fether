@@ -19,8 +19,6 @@ export const action = async ({ request }: ActionArgs) => {
           keyTier: KeyTier.FREE,
           userId: userData.id,
           expires: new Date(Date.now() + 60 * 60 * 24 * 30),
-          createdAt: new Date(),
-          updatedAt: new Date(),
         },
       });
 

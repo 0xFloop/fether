@@ -19,8 +19,8 @@ model User {
   githubId             Int?    @unique
   githubInstallationId String? @unique
 
-  createdAt DateTime @db.Date
-  updatedAt DateTime @updatedAt @db.Date
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 
   ApiKey     ApiKey?
   Repository Repository?
@@ -32,21 +32,23 @@ model ApiKey {
   associatedUser User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   keyTier        KeyTier
   expires        DateTime
-  createdAt      DateTime @db.Date
-  updatedAt      DateTime @db.Date
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 
   @@index([userId], name: "UserId")
 }
 
 model Repository {
-  id              String   @id @unique @default(uuid())
+  id              String  @id @unique @default(uuid())
   name            String
-  userId          String   @unique
-  associatedUser  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId          String  @unique
+  associatedUser  User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   contractAddress String?
-  contractAbi     String?  @db.Text
-  createdAt       DateTime @db.Date
-  updatedAt       DateTime @db.Date
+  contractAbi     String? @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 
   @@index([userId], name: "UserId")
 }
@@ -61,6 +63,9 @@ model AlphaAccessKeys {
   alphaKey  String         @id @unique @default(uuid())
   keyStatus AlphaKeyStatus @default(UNUSED)
   issuedTo  String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 }
 
 enum AlphaKeyStatus {
