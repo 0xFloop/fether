@@ -92,8 +92,8 @@ export default function Index() {
       </div>
       <div id="content" className="w-3/4 max-w-7xl mx-auto pt-20 rounded-lg">
         {!userData?.ApiKey ? (
-          <div className="text-4xl border-b bg-slate-200 p-5 flex flex-row justify-between rounded-lg">
-            <p>api key:</p>
+          <div className="text-4xl border-b bg-[#F5F5F5] p-5 flex flex-row justify-between rounded-lg">
+            <p>Api Key:</p>
             <Form method="post" action="/keygen">
               <input type="hidden" name="userId" value={userData?.id} />
               <button type="submit">click here to generate api key</button>
@@ -101,11 +101,11 @@ export default function Index() {
           </div>
         ) : (
           <div>
-            <div className="text-4xl border-b bg-slate-200 p-5 flex flex-row justify-between rounded-lg">
-              <p>api key:</p>
+            <div className="text-4xl border-b  bg-[#F5F5F5] p-5 flex flex-row justify-between rounded-lg">
+              <p>Api Key:</p>
               <p className="flex flex-row items-center gap-2">
                 {userData?.ApiKey.key}
-                <button>
+                <button className="transform active:scale-75 transition-transform">
                   <Copy
                     size={30}
                     onClick={() => {
@@ -118,23 +118,23 @@ export default function Index() {
               </p>
             </div>
             {!userData.githubInstallationId ? (
-              <div className="text-4xl bg-slate-200 p-5 flex flex-row justify-between rounded-lg mt-10">
+              <div className="text-4xl  bg-[#F5F5F5] p-5 flex flex-row justify-between rounded-lg mt-10">
                 <a href="https://github.com/apps/fetherkit/installations/new" target="_blank">
-                  click here to add Github FetherKit app
+                  Click to Add Github FetherKit app
                 </a>
               </div>
             ) : (
               <div>
                 {!userData?.Repository ? (
                   <div>
-                    <div className="text-4xl mt-10 border-b bg-slate-200 p-5 flex flex-col justify-between rounded-lg">
+                    <div className="text-4xl mt-10 border-b  bg-[#F5F5F5] p-5 flex flex-col justify-between rounded-lg">
                       <Form method="post">
                         <input
                           type="hidden"
                           name="githubInstallationId"
                           value={userData.githubInstallationId}
                         />
-                        <button type="submit">click to choose repository</button>
+                        <button type="submit">Click to Choose Repository</button>
                       </Form>
                       {actionRepos?.originCallForm == "getRepos" && (
                         <>
@@ -157,7 +157,7 @@ export default function Index() {
                               ))}
                             </fieldset>
                             <br />
-                            <button type="submit">submit</button>
+                            <button type="submit">Submit</button>
                           </Form>
                         </>
                       )}{" "}
@@ -165,13 +165,13 @@ export default function Index() {
                   </div>
                 ) : (
                   <div>
-                    <div className="text-4xl bg-slate-200 p-5 flex flex-row justify-between rounded-lg mt-10">
-                      <p>current deployment repository:</p> <p>{userData.Repository.name}</p>
+                    <div className="text-4xl  bg-[#F5F5F5] p-5 flex flex-row justify-between rounded-lg mt-10">
+                      <p>Current Repository:</p> <p>{userData.Repository.name}</p>
                     </div>
                     {userData?.Repository?.contractAbi ? (
                       <div className="text-4xl flex gap-10 flex-row justify-between rounded-lg mt-10">
                         <div className="w-2/5">
-                          <div className="flex flex-col gap-2 bg-slate-200 p-5 rounded-lg ">
+                          <div className="flex flex-col gap-2  bg-[#F5F5F5] p-5 rounded-lg ">
                             <p>Contract ABI Methods: </p>
 
                             <ul className="flex flex-col gap-2">
@@ -183,19 +183,19 @@ export default function Index() {
                             </ul>
                           </div>
                           <br />
-                          <div className="flex flex-col gap-2 bg-slate-200 p-5 rounded-lg ">
+                          <div className="flex flex-col gap-2  bg-[#F5F5F5] p-5 rounded-lg ">
                             <p>Last Deployment:</p>
                             <p className="text-lg">
                               {new Date(userData?.Repository?.updatedAt).toLocaleString()}
                             </p>
                           </div>
                         </div>
-                        <div className="flex-1 bg-slate-200 p-5 rounded-lg ">
+                        <div className="flex-1  bg-[#F5F5F5] p-5 rounded-lg ">
                           Recent Transactions:
                         </div>
                       </div>
                     ) : (
-                      <div className="text-4xl border-b bg-slate-200 p-5 flex flex-row justify-between rounded-lg mt-10">
+                      <div className="text-4xl border-b  bg-[#F5F5F5] p-5 flex flex-row justify-between rounded-lg mt-10">
                         <p>Push code to your chosen repository to view deployment details</p>
                       </div>
                     )}
