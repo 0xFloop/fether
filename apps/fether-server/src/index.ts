@@ -116,7 +116,11 @@ app.post("/payload", jsonParser, async (req, res) => {
 
             await db.repository.update({
               where: { id: associatedUserData.Repository.id },
-              data: { contractAddress: transaction["contractAddress"], contractAbi: dbAbi },
+              data: {
+                contractAddress: transaction["contractAddress"],
+                contractAbi: dbAbi,
+                updatedAt: new Date(),
+              },
             });
           }
       }
