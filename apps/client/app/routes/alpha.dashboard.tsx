@@ -7,6 +7,7 @@ import {
   commitSession as userCommitSession,
 } from "../utils/alphaSession";
 import { getUserRepositories } from "../utils/octo.server";
+import { Copy } from "lucide-react";
 
 type UserWithKeyAndRepo =
   | (User & {
@@ -91,64 +92,76 @@ export default function Index() {
       </div>
       <div id="content" className="w-3/4 max-w-7xl mx-auto pt-20 rounded-lg">
         {!userData?.ApiKey ? (
-          <div className="text-4xl border-b bg-slate-200 p-5">
-            <h1 className="text-4xl">api key: </h1>
+          <div className="text-4xl border-b bg-slate-200 p-5 flex flex-row justify-between rounded-lg">
+            <p>api key:</p>
             <Form method="post" action="/keygen">
               <input type="hidden" name="userId" value={userData?.id} />
-              <button type="submit" className="font-sans text-base ml-4 inline-block">
-                click here to generate api key
-              </button>
+              <button type="submit">click here to generate api key</button>
             </Form>
           </div>
         ) : (
           <div>
             <div className="text-4xl border-b bg-slate-200 p-5 flex flex-row justify-between rounded-lg">
-              <p>api key:</p> <p>{userData?.ApiKey.key}</p>
+              <p>api key:</p>
+              <p className="flex flex-row items-center gap-2">
+                {userData?.ApiKey.key}
+                <button>
+                  <Copy
+                    size={30}
+                    onClick={() => {
+                      if (userData.ApiKey) {
+                        navigator.clipboard.writeText(userData.ApiKey.key);
+                      }
+                    }}
+                  />
+                </button>
+              </p>
             </div>
             {!userData.githubInstallationId ? (
-              <div>
-                <a
-                  className="text-4xl"
-                  href="https://github.com/apps/fetherkit/installations/new"
-                  target="_blank"
-                >
-                  click HERE to add Github FetherKit app
+              <div className="text-4xl bg-slate-200 p-5 flex flex-row justify-between rounded-lg mt-10">
+                <a href="https://github.com/apps/fetherkit/installations/new" target="_blank">
+                  click here to add Github FetherKit app
                 </a>
               </div>
             ) : (
               <div>
                 {!userData?.Repository ? (
-                  <div className="text-4xl border-b bg-slate-200 p-5 flex flex-row justify-between rounded-lg">
-                    <Form method="post">
-                      <input
-                        type="hidden"
-                        name="githubInstallationId"
-                        value={userData.githubInstallationId}
-                      />
-                      <button type="submit">choose repository </button>
-                    </Form>
-                    {actionRepos?.originCallForm == "getRepos" && (
+                  <div>
+                    <div className="text-4xl mt-10 border-b bg-slate-200 p-5 flex flex-col justify-between rounded-lg">
                       <Form method="post">
                         <input
                           type="hidden"
                           name="githubInstallationId"
                           value={userData.githubInstallationId}
                         />
-                        <fieldset className="flex flex-col">
-                          {actionRepos.repositories?.map((repo) => (
-                            <label>
-                              <input
-                                type="radio"
-                                name="chosenRepoData"
-                                value={[repo.repoName, repo.repoId]}
-                              />
-                              {repo.repoName} {repo.repoId}
-                            </label>
-                          ))}
-                        </fieldset>
-                        <button type="submit">submit</button>
+                        <button type="submit">click to choose repository</button>
                       </Form>
-                    )}
+                      {actionRepos?.originCallForm == "getRepos" && (
+                        <>
+                          <Form method="post" className="mt-10">
+                            <input
+                              type="hidden"
+                              name="githubInstallationId"
+                              value={userData.githubInstallationId}
+                            />
+                            <fieldset className="flex flex-col">
+                              {actionRepos.repositories?.map((repo) => (
+                                <label className="text-xl">
+                                  <input
+                                    type="radio"
+                                    name="chosenRepoData"
+                                    value={[repo.repoName, repo.repoId]}
+                                  />{" "}
+                                  {repo.repoName} {repo.repoId}
+                                </label>
+                              ))}
+                            </fieldset>
+                            <br />
+                            <button type="submit">submit</button>
+                          </Form>
+                        </>
+                      )}{" "}
+                    </div>
                   </div>
                 ) : (
                   <div>
