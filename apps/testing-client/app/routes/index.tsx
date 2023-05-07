@@ -85,7 +85,7 @@ export default function Index() {
         <p>All abi methods listed below</p>
         <ul>
           {fether.abi.map((method) => (
-            <li>{JSON.stringify(method["name"])}</li>
+            <li key={method.name}>{JSON.stringify(method["name"])}</li>
           ))}{" "}
         </ul>
         <button onClick={async () => await sendContractTransaction(70)}>
