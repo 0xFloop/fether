@@ -16,8 +16,9 @@ export async function validateSender(
     });
     if (apiKeyData) {
       return { success: true, apiKeyData };
+    } else {
+      return { success: false, apiKeyData: null };
     }
-    return { success: false, apiKeyData: null };
   } catch (err) {
     throw err;
   }
