@@ -145,6 +145,7 @@ app.post("/payload", jsonParser, async (req, res) => {
 
 app.get("/fetherkit/:API_KEY", async (req, res) => {
   try {
+    console.log("GET REQ FROM FETHERKIT: \n", req.params.API_KEY);
     let validated = await validateSender(req.params.API_KEY);
     if (!validated.success) {
       res.set("Access-Control-Allow-Origin", "*");

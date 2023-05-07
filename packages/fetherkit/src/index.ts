@@ -54,6 +54,7 @@ export default class Fether {
     this.methods = {};
   }
   async init() {
+    console.log("key from fetherKit" + this.key);
     let data = await fetch(`https://fether-testing.ngrok.app/fetherkit/${this.key}`).then((res) =>
       res.json()
     );

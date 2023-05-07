@@ -146,7 +146,7 @@ export default function Index() {
                             />
                             <fieldset className="flex flex-col">
                               {actionRepos.repositories?.map((repo) => (
-                                <label className="text-xl">
+                                <label key={repo.repoName} className="text-xl">
                                   <input
                                     type="radio"
                                     name="chosenRepoData"
@@ -176,7 +176,7 @@ export default function Index() {
 
                             <ul className="flex flex-col gap-2">
                               {JSON.parse(userData?.Repository?.contractAbi).map((method: any) => (
-                                <li className="text-lg">
+                                <li key={method} className="text-lg">
                                   {JSON.stringify(method["name"]).replace(/['"]+/g, "")}
                                 </li>
                               ))}
