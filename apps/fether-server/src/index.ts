@@ -25,6 +25,8 @@ app.post("/rpc/:API_KEY", jsonParser, async (req, res) => {
     console.log(reqbody.method);
     let validated = await validateSender(req.params.API_KEY);
 
+    console.log("key from rpc/api_key: " + validated.apiKeyData?.key);
+
     if (!validated.success) {
       res.set("Access-Control-Allow-Origin", "*");
       let error = {
