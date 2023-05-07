@@ -93,7 +93,7 @@ export const fetherChain: Chain = {
   },
   rpcUrls: {
     default: {
-      http: [`https://fether-testing.ngrok.app/rpc/${process.env.API_KEY as string}}`],
+      http: [`https://fether-testing.ngrok.app/rpc/${process.env.API_KEY as string}`],
     },
     public: { http: [`https://fether-testing.ngrok.app/rpc/${process.env.API_KEY as string}`] },
   },
