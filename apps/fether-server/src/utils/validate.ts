@@ -10,6 +10,7 @@ export async function validateSender(
   apiKey: string
 ): Promise<{ success: boolean; apiKeyData: ApiKeyWithUserWithRepo }> {
   try {
+    console.log("apiKey: ", apiKey);
     let apiKeyData = await db.apiKey.findUnique({
       where: { key: apiKey },
       include: { associatedUser: { include: { Repository: true } } },
