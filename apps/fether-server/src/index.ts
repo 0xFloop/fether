@@ -24,7 +24,6 @@ app.post("/rpc/:API_KEY", jsonParser, async (req, res) => {
     let reqbody = zodEthereumJsonRpcRequestSchema.parse(req.body);
     console.log(reqbody.method);
     let validated = await validateSender(req.params.API_KEY);
-    console.log("validated: ", validated);
 
     if (!validated.success) {
       res.set("Access-Control-Allow-Origin", "*");
@@ -67,6 +66,8 @@ app.post("/payload", jsonParser, async (req, res) => {
       where: { githubInstallationId: installId },
       include: { ApiKey: true, Repository: true },
     });
+
+    console.log(associatedUserData);
 
     if (
       associatedUserData &&
