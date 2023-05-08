@@ -22,11 +22,7 @@ const octo = new Octo({ appId: "302483", privateKey: formattedGithubAppPk });
 app.post("/rpc/:API_KEY", jsonParser, async (req, res) => {
   try {
     let reqbody = zodEthereumJsonRpcRequestSchema.parse(req.body);
-    console.log(reqbody.method);
     let validated = await validateSender(req.params.API_KEY);
-
-    console.log("key from rpc/api_key: " + validated.apiKeyData?.key);
-
     if (!validated.success) {
       res.set("Access-Control-Allow-Origin", "*");
       let error = {
@@ -147,7 +143,6 @@ app.post("/payload", jsonParser, async (req, res) => {
 
 app.get("/fetherkit/:API_KEY", async (req, res) => {
   try {
-    console.log("GET REQ FROM FETHERKIT: \n", req.params.API_KEY);
     let validated = await validateSender(req.params.API_KEY);
     if (!validated.success) {
       res.set("Access-Control-Allow-Origin", "*");
