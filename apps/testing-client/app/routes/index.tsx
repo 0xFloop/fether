@@ -1,7 +1,7 @@
 import { WagmiConfig, createClient, Chain } from "wagmi";
 import { Ethereum } from "@wagmi/core";
 import { ConnectKitProvider, ConnectKitButton, getDefaultClient } from "connectkit";
-import { useEffect, useState } from "react";
+import { SetStateAction, useEffect, useState } from "react";
 import {
   createPublicClient,
   createTestClient,
@@ -42,7 +42,7 @@ export default function Index() {
       abi: fether.abi,
       functionName: "getLeNumber",
     });
-
+    console.log(number);
     setNumber(Number(number));
   };
 
@@ -68,9 +68,13 @@ export default function Index() {
       address: fether.address,
       abi: fether.abi,
       functionName: fether.methods.setLeNumber,
-      args: [70],
+      args: [newNum],
     });
-    await walletClient.writeContract(request);
+    let tx = await walletClient.writeContract(request);
+
+    let txData = await publicClient.getTransactionReceipt({ hash: tx });
+
+    console.log(txData);
   };
 
   return (
@@ -88,7 +92,16 @@ export default function Index() {
             <li key={method.name}>{JSON.stringify(method["name"])}</li>
           ))}{" "}
         </ul>
-        <button onClick={async () => await sendContractTransaction(70)}>
+        <input type="number" id="numInput" placeholder="new button number" />
+        <button
+          onClick={async () => {
+            let newNum = parseInt((document.getElementById("numInput") as HTMLInputElement).value);
+            console.log(newNum);
+            await sendContractTransaction(
+              parseInt((document.getElementById("numInput") as HTMLInputElement).value) ?? 0
+            );
+          }}
+        >
           click to get update number
         </button>
       </ConnectKitProvider>
