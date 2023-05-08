@@ -81,13 +81,15 @@ export default function Index() {
         </Link>
         <div id="nav-links" className="flex flex-row justify-between gap-3 flex-1">
           <a href="/alpha/dashboard">dashboard</a>
-          <a href="/alpha/documentation">documentation</a>
+          <a href="https://docs.fether.xyz" target="_blank">
+            documentation
+          </a>
           <a href="/alpha/contact">contact</a>
         </div>
         <div className="flex-1  pr-8">
-          <button id="signout" className="float-right">
+          <a id="signout" href="/alpha/sign-out" className="float-right">
             signout
-          </button>
+          </a>
         </div>
       </div>
       <div id="content" className="w-3/4 max-w-7xl mx-auto pt-20 rounded-lg">
