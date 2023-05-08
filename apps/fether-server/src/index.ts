@@ -19,6 +19,9 @@ const cors = require("cors");
 app.use(cors());
 const octo = new Octo({ appId: "302483", privateKey: formattedGithubAppPk });
 
+// TODO: add tx tracking to dashboard/db
+// TODO: add multi file support. maybe user chooses what file to deploy?
+
 app.post("/rpc/:API_KEY", jsonParser, async (req, res) => {
   try {
     let reqbody = zodEthereumJsonRpcRequestSchema.parse(req.body);
@@ -65,8 +68,6 @@ app.post("/payload", jsonParser, async (req, res) => {
       include: { ApiKey: true, Repository: true },
     });
 
-    console.log(associatedUserData);
-
     if (
       associatedUserData &&
       associatedUserData.ApiKey &&
@@ -76,7 +77,6 @@ app.post("/payload", jsonParser, async (req, res) => {
       for (let i = 0; i < req.body.commits.length; i++) {
         for (let j = 0; j < req.body.commits[i].modified.length; j++)
           if (req.body.commits[i].modified[j].slice(-3) == "sol") {
-            console.log(req.body.installation.id);
             let modifiedContractPath: string = req.body.commits[i].modified[j];
             console.log("modified contract path: ", modifiedContractPath);
 

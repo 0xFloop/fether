@@ -72,27 +72,7 @@ export default function Index() {
 
   return (
     <div className="w-screen h-auto overflow-hidden display flex flex-col">
-      <div
-        id="navbar"
-        className="h-20 border-b border-b-black flex flex-row justify-between items-center"
-      >
-        <Link to="/" id="logo" className="text-5xl flex-1 pl-8 ">
-          fether
-        </Link>
-        <div id="nav-links" className="flex flex-row justify-between gap-3 flex-1">
-          <a href="/alpha/dashboard">dashboard</a>
-          <a href="https://docs.fether.xyz" target="_blank">
-            documentation
-          </a>
-          <a href="/alpha/contact">contact</a>
-        </div>
-        <div className="flex-1  pr-8">
-          <a id="signout" href="/alpha/sign-out" className="float-right">
-            signout
-          </a>
-        </div>
-      </div>
-      <div id="content" className="w-3/4 max-w-7xl mx-auto pt-20 rounded-lg">
+      <div id="content" className="w-3/4 max-w-7xl mx-auto py-20 rounded-lg">
         {!userData?.ApiKey ? (
           <div className="text-4xl border-b bg-[#F5F5F5] p-5 flex flex-row justify-between rounded-lg">
             <p>Api Key:</p>
@@ -208,8 +188,6 @@ export default function Index() {
           </div>
         )}
       </div>
-      <div id="github-repo"></div>
-      <div id="analytics"></div>
     </div>
   );
 }
