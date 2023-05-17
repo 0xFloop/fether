@@ -1,7 +1,7 @@
 import { ActionArgs, LoaderArgs, redirect } from "@remix-run/node";
 import { Form, Link, useActionData, useLoaderData } from "@remix-run/react";
 import { db } from "../db.server";
-import { ApiKey, Repository, User } from "database";
+import { ApiKey, Repository, User, Transaction } from "database";
 import {
   getSession as userGetSession,
   commitSession as userCommitSession,
@@ -9,14 +9,58 @@ import {
 import { getUserRepositories } from "../utils/octo.server";
 import { Copy } from "lucide-react";
 
-type UserWithKeyAndRepo =
+type UserWithKeyRepoActivity =
   | (User & {
       ApiKey: ApiKey | null;
-      Repository: Repository | null;
+      Repository:
+        | (Repository & {
+            Activity: Transaction[] | null;
+          })
+        | null;
     })
   | null;
-type RepoData = { repoName: string; repoId: string };
 
+type RepoData = { repoName: string; repoId: string };
+var timeSince = function (_date: any) {
+  var date = Date.parse(_date);
+
+  var seconds = Math.floor((new Date() - date) / 1000);
+  var intervalType;
+
+  var interval = Math.floor(seconds / 31536000);
+  if (interval >= 1) {
+    intervalType = "year";
+  } else {
+    interval = Math.floor(seconds / 2592000);
+    if (interval >= 1) {
+      intervalType = "month";
+    } else {
+      interval = Math.floor(seconds / 86400);
+      if (interval >= 1) {
+        intervalType = "day";
+      } else {
+        interval = Math.floor(seconds / 3600);
+        if (interval >= 1) {
+          intervalType = "hour";
+        } else {
+          interval = Math.floor(seconds / 60);
+          if (interval >= 1) {
+            intervalType = "minute";
+          } else {
+            interval = seconds;
+            intervalType = "second";
+          }
+        }
+      }
+    }
+  }
+
+  if (interval > 1 || interval === 0) {
+    intervalType += "s";
+  }
+
+  return interval + " " + intervalType;
+};
 export const action = async ({ request }: ActionArgs) => {
   const body = await request.formData();
   const githubInstallationId = body.get("githubInstallationId");
@@ -58,9 +102,20 @@ export const loader = async ({ request }: LoaderArgs) => {
   const user = await userGetSession(request.headers.get("Cookie"));
   if (!user.has("userId")) throw redirect("/alpha/login");
 
-  const userData: UserWithKeyAndRepo = await db.user.findUnique({
+  const userData: UserWithKeyRepoActivity = await db.user.findUnique({
     where: { id: user.get("userId") },
-    include: { ApiKey: true, Repository: true },
+    include: {
+      ApiKey: true,
+      Repository: {
+        include: {
+          Activity: {
+            orderBy: {
+              timestamp: "desc",
+            },
+          },
+        },
+      },
+    },
   });
 
   return userData;
@@ -172,8 +227,40 @@ export default function Index() {
                             </p>
                           </div>
                         </div>
-                        <div className="flex-1  bg-[#F5F5F5] p-5 rounded-lg ">
-                          Recent Transactions:
+                        <div className="flex-1  bg-[#F5F5F5] p-5 rounded-lg border border-blue-500 ">
+                          <p className="pb-2">Recent Transactions:</p>
+                          <table className="table-fixed w-full">
+                            <thead>
+                              <tr className="text-left">
+                                <th className="text-lg">Tx Hash</th>
+                                <th className="text-lg">Function Name</th>
+                                <th className="text-lg">Timestamp</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {userData?.Repository?.Activity?.map((transaction: any) => (
+                                <tr key={transaction} className="">
+                                  <td>
+                                    <a
+                                      href={`http://localhost:3003/trace/fether/${transaction.txHash}`}
+                                      target="_blank"
+                                      className="text-lg block underline"
+                                    >
+                                      {transaction.txHash.slice(0, 12)}...
+                                    </a>
+                                  </td>
+                                  <td>
+                                    <p className="text-lg">{transaction.functionName}</p>
+                                  </td>
+                                  <td>
+                                    <p className="text-lg">
+                                      {timeSince(transaction.timestamp)} ago
+                                    </p>
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
                         </div>
                       </div>
                     ) : (
