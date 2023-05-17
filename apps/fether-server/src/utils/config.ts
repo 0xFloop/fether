@@ -115,9 +115,11 @@ export const zodContractBuildFileSchema = z.object({
   methodIdentifiers: z.object({}),
 });
 
-export const zodEthereumJsonRpcRequestSchema = z.object({
+export const zodSingleJsonRpcCallSchema = z.object({
   jsonrpc: z.literal("2.0"),
   id: z.union([z.number(), z.string()]),
   method: z.string(),
   params: z.array(z.any()).optional(),
 });
+
+export const zodArrayJsonRpcCallSchema = z.array(zodSingleJsonRpcCallSchema);
