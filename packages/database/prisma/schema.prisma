@@ -47,10 +47,22 @@ model Repository {
   contractAddress String?
   contractAbi     String? @db.Text
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now()) @updatedAt
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @default(now()) @updatedAt
+  Activity  Transaction[]
 
   @@index([userId], name: "UserId")
+}
+
+model Transaction {
+  txHash               String     @id @unique
+  repositoryId         String
+  associatedRepository Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  functionName         String
+
+  timestamp DateTime @default(now())
+
+  @@index([repositoryId], name: "RepositoryId")
 }
 
 enum KeyTier {
