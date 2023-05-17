@@ -6,10 +6,13 @@ import {
   formattedGithubAppPk,
   port,
   zodContractBuildFileSchema,
-  zodEthereumJsonRpcRequestSchema,
+  zodSingleJsonRpcCallSchema,
+  zodArrayJsonRpcCallSchema,
 } from "./utils/config";
 import { adminClient, publicClient, walletClient } from "./utils/viemClients";
 import { PrismaClient } from "database";
+import { type } from "os";
+import { decodeFunctionData, keccak256, parseTransaction } from "viem";
 const db = new PrismaClient();
 
 const app = express();
@@ -20,14 +23,38 @@ app.use(cors());
 const octo = new Octo({ appId: "302483", privateKey: formattedGithubAppPk });
 
 // TODO: add tx tracking to dashboard/db
+
 // TODO: add multi file support. maybe user chooses what file to deploy?
+
+type traceType = {
+  jsonrpc: "2.0";
+  id: string | number;
+  method: string;
+  params?: any[] | undefined;
+};
 
 app.post("/rpc/:API_KEY", jsonParser, async (req, res) => {
   try {
-    let reqbody = zodEthereumJsonRpcRequestSchema.parse(req.body);
+    let reqbodySingle;
+    let reqbodyArray;
+    let isSingleRequest = zodSingleJsonRpcCallSchema.safeParse(req.body);
+    if (isSingleRequest.success) {
+      reqbodySingle = isSingleRequest.data;
+    } else {
+      let isArrayRequest = zodArrayJsonRpcCallSchema.safeParse(req.body);
+      if (!isArrayRequest.success) {
+        return res
+          .set("Access-Control-Allow-Origin", "*")
+          .status(469)
+          .json({ message: "Invalid JSON-RPC request" });
+      } else {
+        console.log(isArrayRequest.data.length);
+        reqbodyArray = isArrayRequest.data;
+      }
+    }
+
     let validated = await validateSender(req.params.API_KEY);
     if (!validated.success) {
-      res.set("Access-Control-Allow-Origin", "*");
       let error = {
         jsonrpc: "2.0",
         error: {
@@ -37,14 +64,56 @@ app.post("/rpc/:API_KEY", jsonParser, async (req, res) => {
         id: "1",
       };
 
-      res.status(500);
-      res.json(error);
+      return res.set("Access-Control-Allow-Origin", "*").status(469).json(error);
     } else {
       let response = await fetch("http://127.0.0.1:8545", {
         method: "POST",
-        body: JSON.stringify(reqbody),
+        body: JSON.stringify(reqbodySingle || reqbodyArray),
         headers: { "Content-Type": "application/json" },
       });
+
+      if (reqbodyArray) {
+        for (let i = 0; i < reqbodyArray.length; i++) {
+          if (
+            reqbodyArray[i].method == "eth_sendTransaction" ||
+            reqbodyArray[i].method == "eth_sendRawTransaction" ||
+            true
+          ) {
+            console.log(reqbodyArray[i].method);
+          }
+        }
+      } else if (reqbodySingle) {
+        if (
+          reqbodySingle.method == "eth_sendRawTransaction" ||
+          reqbodySingle.method == "eth_sendTransaction"
+        ) {
+          console.log(reqbodySingle);
+          if (reqbodySingle?.params) {
+            let abi = JSON.parse(
+              validated.apiKeyData?.associatedUser.Repository?.contractAbi as string
+            );
+            let transaction = parseTransaction(reqbodySingle.params[0]);
+            let hash = keccak256(reqbodySingle.params[0]);
+
+            const { functionName } = decodeFunctionData({
+              abi: abi,
+              data: transaction.data ?? "0x0",
+            });
+            await db.transaction.create({
+              data: {
+                txHash: hash,
+                repositoryId: validated.apiKeyData?.associatedUser.Repository?.id as string,
+                functionName: functionName,
+              },
+            });
+          }
+        }
+      }
+
+      // let txHash = await walletClient.sendTransaction({
+      //   bytecode: byteCode,
+      //   abi: abi,
+      // });
 
       let responseJson = await response.json();
       res.set("Access-Control-Allow-Origin", "*");
@@ -112,6 +181,14 @@ app.post("/payload", jsonParser, async (req, res) => {
 
             const transaction = await publicClient.getTransactionReceipt({
               hash: deployHash,
+            });
+
+            await db.transaction.create({
+              data: {
+                txHash: deployHash,
+                repositoryId: associatedUserData.Repository.id,
+                functionName: "Deployment",
+              },
             });
 
             await db.repository.update({
