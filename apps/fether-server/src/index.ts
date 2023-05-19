@@ -74,19 +74,12 @@ app.post("/rpc/:API_KEY", jsonParser, async (req, res) => {
 
       if (reqbodyArray) {
         for (let i = 0; i < reqbodyArray.length; i++) {
-          if (
-            reqbodyArray[i].method == "eth_sendTransaction" ||
-            reqbodyArray[i].method == "eth_sendRawTransaction" ||
-            true
-          ) {
+          if (reqbodyArray[i].method == "eth_sendRawTransaction") {
             console.log(reqbodyArray[i].method);
           }
         }
       } else if (reqbodySingle) {
-        if (
-          reqbodySingle.method == "eth_sendRawTransaction" ||
-          reqbodySingle.method == "eth_sendTransaction"
-        ) {
+        if (reqbodySingle.method == "eth_sendRawTransaction") {
           console.log(reqbodySingle);
           if (reqbodySingle?.params) {
             let abi = JSON.parse(
@@ -177,6 +170,7 @@ app.post("/payload", jsonParser, async (req, res) => {
               bytecode: byteCode,
               abi: abi,
             });
+
             await new Promise((r) => setTimeout(r, 5500));
 
             const transaction = await publicClient.getTransactionReceipt({

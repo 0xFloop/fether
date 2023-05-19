@@ -11,7 +11,7 @@ import {
   parseEther,
 } from "viem";
 import Fether from "fetherkit";
-const fether = new Fether("clh0wliwn00071jekzksh5mwz");
+const fether = new Fether("clhfj8uev00031jcazeu57018");
 
 export default function Index() {
   useEffect(() => {
@@ -40,7 +40,7 @@ export default function Index() {
     const number = await publicClient.readContract({
       address: fether.address,
       abi: fether.abi,
-      functionName: "getLeNumber",
+      functionName: "getOwensNumber",
     });
     console.log(number);
     setNumber(Number(number));
@@ -67,14 +67,11 @@ export default function Index() {
       account: address,
       address: fether.address,
       abi: fether.abi,
-      functionName: fether.methods.setLeNumber,
+      functionName: fether.methods.setOwensNumber,
       args: [newNum],
     });
     let tx = await walletClient.writeContract(request);
-
-    let txData = await publicClient.getTransactionReceipt({ hash: tx });
-
-    console.log(txData);
+    console.log(tx);
   };
 
   return (

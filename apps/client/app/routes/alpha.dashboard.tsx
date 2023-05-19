@@ -227,7 +227,7 @@ export default function Index() {
                             </p>
                           </div>
                         </div>
-                        <div className="flex-1  bg-[#F5F5F5] p-5 rounded-lg border border-blue-500 ">
+                        <div className="flex-1  bg-[#F5F5F5] p-5 rounded-lg ">
                           <p className="pb-2">Recent Transactions:</p>
                           <table className="table-fixed w-full">
                             <thead>
@@ -242,7 +242,7 @@ export default function Index() {
                                 <tr key={transaction} className="">
                                   <td>
                                     <a
-                                      href={`http://localhost:3003/trace/fether/${transaction.txHash}`}
+                                      href={`http://localhost:3003/${transaction.txHash}`}
                                       target="_blank"
                                       className="text-lg block underline"
                                     >
