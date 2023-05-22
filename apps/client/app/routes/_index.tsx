@@ -5,11 +5,11 @@ import Typewriter from "typewriter-effect";
 import { X } from "lucide-react";
 import { AlphaKeyStatus } from "database";
 import { db } from "../db.server";
-import { getSession, commitSession } from "../utils/alphaAccessKeySession";
+import { getSession, commitSession } from "../utils/alphaAccessKeySession.server";
 import {
   getSession as getUserSession,
   commitSession as commitUserSession,
-} from "../utils/alphaSession";
+} from "../utils/alphaSession.server";
 
 export const loader = async ({ request }: LoaderArgs) => {
   //validate session cookie

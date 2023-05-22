@@ -1,6 +1,6 @@
 import { LoaderArgs, redirect } from "@remix-run/node";
 import { db } from "../db.server";
-import { getSession as userGetSession } from "../utils/alphaSession";
+import { getSession as userGetSession } from "../utils/alphaSession.server";
 
 export const loader = async ({ request }: LoaderArgs) => {
   const url = new URL(request.url);

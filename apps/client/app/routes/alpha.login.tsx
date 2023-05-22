@@ -1,13 +1,11 @@
 import { ActionArgs, LoaderArgs, json, redirect } from "@remix-run/node";
 import { Form, Link, useActionData } from "@remix-run/react";
 import { db } from "../db.server";
-import { getSession, commitSession } from "../utils/alphaAccessKeySession";
+import { getSession, commitSession } from "../utils/alphaAccessKeySession.server";
 import {
   getSession as userGetSession,
   commitSession as userCommitSession,
-} from "../utils/alphaSession";
-import { AlphaKeyStatus, User } from "database";
-import { validateCredentials } from "~/utils/validateUser.server";
+} from "../utils/alphaSession.server";
 
 export const loader = async ({ request }: LoaderArgs) => {
   const session = await getSession(request.headers.get("Cookie"));
@@ -16,30 +14,6 @@ export const loader = async ({ request }: LoaderArgs) => {
   if (user.has("userId")) throw redirect("/alpha/dashboard");
   else return null;
 };
-
-// export async function action({ request }: ActionArgs) {
-//   const session = await userGetSession(request.headers.get("Cookie"));
-//   const form = await request.formData();
-//   const username = form.get("username") as string;
-//   const password = form.get("password") as string;
-//   let userData;
-//   try {
-//     userData = await validateCredentials({ username, password });
-//   } catch (err: unknown) {
-//     if (err instanceof Error) {
-//       return json({ message: err.message });
-//     } else return json({ message: "Unknown error" });
-//   }
-
-//   session.set("userId", userData.id as string);
-
-//   // Login succeeded, send them to the home page.
-//   return redirect("/alpha/dashboard", {
-//     headers: {
-//       "Set-Cookie": await userCommitSession(session),
-//     },
-//   });
-// }
 
 export default function Index() {
   // const data = useActionData<typeof action>();
@@ -57,10 +31,6 @@ export default function Index() {
       <div className="relative left-0 w-full flex flex-col h-full items-center align-middle justify-center">
         <div className="h-auto w-auto relative border-2 border-black rounded p-10">
           <Link to={handleLogin()}>Log in with GitHub</Link>
-
-          {/* {data && (
-            <p className="font-sans text-red-500 text-base mt-4 inline-block">{data.message}</p>
-          )} */}
         </div>
       </div>
     </div>

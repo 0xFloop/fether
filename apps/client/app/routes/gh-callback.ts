@@ -3,7 +3,7 @@ import { db } from "../db.server";
 import {
   getSession as userGetSession,
   commitSession as userCommitSession,
-} from "../utils/alphaSession";
+} from "../utils/alphaSession.server";
 
 async function handleAuthentication(
   code: string
