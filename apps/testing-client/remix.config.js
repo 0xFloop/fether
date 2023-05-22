@@ -6,7 +6,6 @@ module.exports = {
   // so we default back to the standard build output.
   server: process.env.NODE_ENV === "development" ? undefined : "./server.js",
   serverBuildPath: "api/index.js",
-  devServerPort: 3004,
   serverDependenciesToBundle: [
     /^@?connectkit.*/,
     /^@?wagmi.*/,
