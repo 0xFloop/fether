@@ -1,11 +1,11 @@
 import { ActionArgs, LoaderArgs, json, redirect } from "@remix-run/node";
 import { Form, Link, Outlet, useActionData } from "@remix-run/react";
 import { db } from "../db.server";
-import { getSession, commitSession } from "../utils/alphaAccessKeySession";
+import { getSession, commitSession } from "../utils/alphaAccessKeySession.server";
 import {
   getSession as userGetSession,
   commitSession as userCommitSession,
-} from "../utils/alphaSession";
+} from "../utils/alphaSession.server";
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   const session = await getSession(request.headers.get("Cookie"));
@@ -29,13 +29,6 @@ export default function Index() {
         <Link to="/" id="logo" className="text-5xl flex-1 pl-8 ">
           fether
         </Link>
-        <div id="nav-links" className="flex flex-row justify-between gap-3 flex-1">
-          <a href="/alpha/dashboard">dashboard</a>
-          <a href="https://docs.fether.xyz" target="_blank">
-            documentation
-          </a>
-          <a href="/alpha/contact">contact</a>
-        </div>
         <div className="flex-1  pr-8">
           <a id="signout" href="/alpha/sign-out" className="float-right">
             signout
@@ -43,7 +36,16 @@ export default function Index() {
         </div>
       </div>
       <Outlet />
-      <div className="h-80 absolute bottom-0 w-screen bg-black"></div>
+      <div className="h-80 absolute bottom-0 w-screen bg-black flex justify-center align-middle">
+        <div id="nav-links" className="flex flex-row justify-evenly flex-1 text-white items-center">
+          <a href="https://docs.fether.xyz" target="_blank">
+            documentation
+          </a>
+          <a href="https://www.twitter.com/0xFloop" target="_blank">
+            contact
+          </a>
+        </div>
+      </div>
     </div>
   );
 }
