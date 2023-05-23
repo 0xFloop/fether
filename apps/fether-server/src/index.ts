@@ -22,10 +22,6 @@ const cors = require("cors");
 app.use(cors());
 const octo = new Octo({ appId: "302483", privateKey: formattedGithubAppPk });
 
-// TODO: add tx tracking to dashboard/db
-
-// TODO: add multi file support. maybe user chooses what file to deploy?
-
 type traceType = {
   jsonrpc: "2.0";
   id: string | number;
