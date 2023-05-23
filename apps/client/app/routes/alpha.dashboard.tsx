@@ -1,12 +1,9 @@
 import { ActionArgs, LoaderArgs, redirect } from "@remix-run/node";
-import { Form, Link, useActionData, useLoaderData } from "@remix-run/react";
+import { Form, useActionData, useLoaderData } from "@remix-run/react";
 import { db } from "../db.server";
 import { ApiKey, Repository, User, Transaction } from "database";
-import {
-  getSession as userGetSession,
-  commitSession as userCommitSession,
-} from "../utils/alphaSession";
-import { getUserRepositories } from "../utils/octo.server";
+import { getSession as userGetSession } from "../utils/alphaSession.server";
+import { getSolFileNames, getUserRepositories } from "../utils/octo.server";
 import { Copy } from "lucide-react";
 
 type UserWithKeyRepoActivity =
@@ -21,9 +18,13 @@ type UserWithKeyRepoActivity =
   | null;
 
 type RepoData = { repoName: string; repoId: string };
+
+//TODO: Write the deploy contract function upon file selection
+//TODO: MAYBE HAVE TO ALLOW USER TO INPUT THE SOURCE CONTRACTS PATH
+
 var timeSince = function (_date: any) {
   var date = Date.parse(_date);
-
+  //@ts-ignore
   var seconds = Math.floor((new Date() - date) / 1000);
   var intervalType;
 
@@ -63,38 +64,91 @@ var timeSince = function (_date: any) {
 };
 export const action = async ({ request }: ActionArgs) => {
   const body = await request.formData();
+  const formType = body.get("formType");
   const githubInstallationId = body.get("githubInstallationId");
   const chosenRepoData = body.get("chosenRepoData");
   const associatedUser = await db.user.findUnique({
     where: { githubInstallationId: githubInstallationId as string },
     include: { ApiKey: true, Repository: true },
   });
-  if (chosenRepoData && associatedUser) {
-    const chosenRepoName = chosenRepoData.toString().split(",")[0];
-    const chosenRepoId = chosenRepoData.toString().split(",")[1];
-    console.log("chosenRepoName: ", chosenRepoName);
-    console.log("chosenRepoId: ", chosenRepoId);
-    await db.repository.upsert({
-      where: { userId: associatedUser.id },
-      create: {
-        id: chosenRepoId as string,
-        name: chosenRepoName as string,
-        userId: associatedUser.id,
-      },
-      update: { name: chosenRepoName as string, id: chosenRepoId as string },
-    });
-    return { originCallForm: "chooseRepo", chosenRepoName: chosenRepoName, repositories: null };
-  } else if (githubInstallationId && !chosenRepoData) {
-    const repositories = await getUserRepositories(githubInstallationId as string);
-    const repoArray = repositories.data.repositories;
-    const repoObjArray: RepoData[] = [];
-    repoArray.map((repo) => {
-      repoObjArray.push({ repoName: repo.full_name, repoId: repo.id.toString() });
-      console.log("repoName: ", repo.full_name + "; repoId: ", repo.id);
-    });
-    return { originCallForm: "getRepos", chosenRepoName: null, repositories: repoObjArray };
+
+  if (associatedUser) {
+    switch (formType) {
+      case "getAllRepos":
+        console.log("getAllRepos");
+        const repositories = await getUserRepositories(githubInstallationId as string);
+        const repoArray = repositories.data.repositories;
+        const repoObjArray: RepoData[] = [];
+        repoArray.map((repo) => {
+          repoObjArray.push({ repoName: repo.full_name, repoId: repo.id.toString() });
+        });
+        return {
+          originCallForm: "getRepos",
+          chosenRepoName: null,
+          repositories: repoObjArray,
+          solFilesFromChosenRepo: null,
+          chosenFileName: null,
+        };
+
+      case "getChosenRepo":
+        console.log("getChosenRepo");
+        if (chosenRepoData) {
+          const chosenRepoName = chosenRepoData.toString().split(",")[0];
+          const chosenRepoId = chosenRepoData.toString().split(",")[1];
+
+          await db.repository.upsert({
+            where: { userId: associatedUser.id },
+            create: {
+              id: chosenRepoId as string,
+              name: chosenRepoName as string,
+              userId: associatedUser.id,
+            },
+            update: { name: chosenRepoName as string, id: chosenRepoId as string },
+          });
+          return {
+            originCallForm: "chooseRepo",
+            chosenRepoName: chosenRepoName,
+            repositories: null,
+            solFilesFromChosenRepo: null,
+            chosenFileName: null,
+          };
+        }
+
+      case "getFilesOfChosenRepo":
+        console.log("getFilesOfChosenRepo");
+        let fileNameArray: String[] = await getSolFileNames(githubInstallationId as string);
+        return {
+          originCallForm: "getFilesOfChosenRepo",
+          chosenRepoName: null,
+          repositories: null,
+          solFilesFromChosenRepo: fileNameArray,
+          chosenFileName: null,
+        };
+
+      case "chooseFileToTrack":
+        console.log("chooseFileToTrack");
+
+        await db.repository.update({
+          where: { userId: associatedUser.id },
+          data: {
+            filename: body.get("chosenFileName") as string,
+          },
+        });
+
+        await deployContract(githubInstallationId as string);
+
+        return {
+          originCallForm: "chooseFileToTrack",
+          chosenRepoName: null,
+          repositories: null,
+          solFilesFromChosenRepo: null,
+          chosenFileName: body.get("chosenFileName"),
+        };
+
+      default:
+        return;
+    }
   }
-  return { originCallForm: "unknown", chosenRepoName: null, repositories: null };
 };
 
 export const loader = async ({ request }: LoaderArgs) => {
@@ -123,7 +177,7 @@ export const loader = async ({ request }: LoaderArgs) => {
 
 export default function Index() {
   const userData = useLoaderData<typeof loader>();
-  const actionRepos = useActionData<typeof action>();
+  const actionArgs = useActionData<typeof action>();
 
   return (
     <div className="w-screen h-auto overflow-hidden display flex flex-col">
@@ -133,7 +187,8 @@ export default function Index() {
             <p>Api Key:</p>
             <Form method="post" action="/keygen">
               <input type="hidden" name="userId" value={userData?.id} />
-              <button type="submit">click here to generate api key</button>
+              <input type="hidden" name="formType" value="generateApiKey" />
+              <button type="submit">Click here to generate api key</button>
             </Form>
           </div>
         ) : (
@@ -157,7 +212,7 @@ export default function Index() {
             {!userData.githubInstallationId ? (
               <div className="text-4xl  bg-[#F5F5F5] p-5 flex flex-row justify-between rounded-lg mt-10">
                 <a href="https://github.com/apps/fetherkit/installations/new" target="_blank">
-                  Click to Add Github FetherKit app
+                  Click to add github FetherKit app
                 </a>
               </div>
             ) : (
@@ -171,9 +226,10 @@ export default function Index() {
                           name="githubInstallationId"
                           value={userData.githubInstallationId}
                         />
-                        <button type="submit">Click to Choose Repository</button>
+                        <input type="hidden" name="formType" value="getAllRepos" />
+                        <button type="submit">Click to choose repository</button>
                       </Form>
-                      {actionRepos?.originCallForm == "getRepos" && (
+                      {actionArgs?.originCallForm == "getRepos" && (
                         <>
                           <Form method="post" className="mt-10">
                             <input
@@ -181,15 +237,17 @@ export default function Index() {
                               name="githubInstallationId"
                               value={userData.githubInstallationId}
                             />
-                            <fieldset className="flex flex-col">
-                              {actionRepos.repositories?.map((repo) => (
+                            <input type="hidden" name="formType" value="getChosenRepo" />
+
+                            <fieldset className="grid grid-cols-2">
+                              {actionArgs.repositories?.map((repo) => (
                                 <label key={repo.repoName} className="text-xl">
                                   <input
                                     type="radio"
                                     name="chosenRepoData"
                                     value={[repo.repoName, repo.repoId]}
                                   />{" "}
-                                  {repo.repoName} {repo.repoId}
+                                  {repo.repoName}
                                 </label>
                               ))}
                             </fieldset>
@@ -206,66 +264,125 @@ export default function Index() {
                       <p>Current Repository:</p> <p>{userData.Repository.name}</p>
                     </div>
                     {userData?.Repository?.contractAbi ? (
-                      <div className="text-4xl flex gap-10 flex-row justify-between rounded-lg mt-10">
-                        <div className="w-2/5">
-                          <div className="flex flex-col gap-2  bg-[#F5F5F5] p-5 rounded-lg ">
-                            <p>Contract ABI Methods: </p>
+                      <>
+                        <div className="text-4xl  bg-[#F5F5F5] p-5 flex flex-row justify-between rounded-lg mt-10">
+                          <p>Chosen File:</p> <p>{userData.Repository.filename}</p>
+                        </div>
+                        <div className="text-4xl flex gap-10 flex-row justify-between rounded-lg mt-10">
+                          <div className="w-2/5">
+                            <div className="flex flex-col gap-2  bg-[#F5F5F5] p-5 rounded-lg ">
+                              <p>Contract ABI Methods: </p>
 
-                            <ul className="flex flex-col gap-2">
-                              {JSON.parse(userData?.Repository?.contractAbi).map((method: any) => (
-                                <li key={method} className="text-lg">
-                                  {JSON.stringify(method["name"]).replace(/['"]+/g, "")}
-                                </li>
-                              ))}
-                            </ul>
+                              <ul className="flex flex-col gap-2">
+                                {JSON.parse(userData?.Repository?.contractAbi).map(
+                                  (method: any) => (
+                                    <li key={method} className="text-lg">
+                                      {JSON.stringify(method["name"]).replace(/['"]+/g, "")}
+                                    </li>
+                                  )
+                                )}
+                              </ul>
+                            </div>
+                            <br />
+                            <div className="flex flex-col gap-2  bg-[#F5F5F5] p-5 rounded-lg ">
+                              <p>Last Deployment:</p>
+                              <p className="text-lg">
+                                {new Date(userData?.Repository?.updatedAt).toLocaleString()}
+                              </p>
+                            </div>
                           </div>
-                          <br />
-                          <div className="flex flex-col gap-2  bg-[#F5F5F5] p-5 rounded-lg ">
-                            <p>Last Deployment:</p>
-                            <p className="text-lg">
-                              {new Date(userData?.Repository?.updatedAt).toLocaleString()}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="flex-1  bg-[#F5F5F5] p-5 rounded-lg ">
-                          <p className="pb-2">Recent Transactions:</p>
-                          <table className="table-fixed w-full">
-                            <thead>
-                              <tr className="text-left">
-                                <th className="text-lg">Tx Hash</th>
-                                <th className="text-lg">Function Name</th>
-                                <th className="text-lg">Timestamp</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {userData?.Repository?.Activity?.map((transaction: any) => (
-                                <tr key={transaction} className="">
-                                  <td>
-                                    <a
-                                      href={`http://localhost:3003/${transaction.txHash}`}
-                                      target="_blank"
-                                      className="text-lg block underline"
-                                    >
-                                      {transaction.txHash.slice(0, 12)}...
-                                    </a>
-                                  </td>
-                                  <td>
-                                    <p className="text-lg">{transaction.functionName}</p>
-                                  </td>
-                                  <td>
-                                    <p className="text-lg">
-                                      {timeSince(transaction.timestamp)} ago
-                                    </p>
-                                  </td>
+                          <div className="flex-1  bg-[#F5F5F5] p-5 rounded-lg ">
+                            <p className="pb-2">Recent Transactions:</p>
+                            <table className="table-fixed w-full">
+                              <thead>
+                                <tr className="text-left">
+                                  <th className="text-lg">Tx Hash</th>
+                                  <th className="text-lg">Function Name</th>
+                                  <th className="text-lg">Timestamp</th>
                                 </tr>
-                              ))}
-                            </tbody>
-                          </table>
+                              </thead>
+                              <tbody>
+                                {userData?.Repository?.Activity?.map((transaction: any) => (
+                                  <tr key={transaction} className="">
+                                    <td>
+                                      <a
+                                        href={`http://localhost:3003/${transaction.txHash}`}
+                                        target="_blank"
+                                        className="text-lg block underline"
+                                      >
+                                        {transaction.txHash.slice(0, 12)}...
+                                      </a>
+                                    </td>
+                                    <td>
+                                      <p className="text-lg">{transaction.functionName}</p>
+                                    </td>
+                                    <td>
+                                      <p className="text-lg">
+                                        {timeSince(transaction.timestamp)} ago
+                                      </p>
+                                    </td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
                         </div>
-                      </div>
+                      </>
                     ) : (
-                      <div className="text-4xl border-b  bg-[#F5F5F5] p-5 flex flex-row justify-between rounded-lg mt-10">
-                        <p>Push code to your chosen repository to view deployment details</p>
+                      <div className="text-4xl border-b  bg-[#F5F5F5] p-5 flex flex-col justify-between rounded-lg mt-10">
+                        {actionArgs?.originCallForm != "chooseFileToTrack" &&
+                          !userData?.Repository.filename && (
+                            <>
+                              <Form method="post">
+                                <input
+                                  type="hidden"
+                                  name="githubInstallationId"
+                                  value={userData.githubInstallationId}
+                                />
+                                <input type="hidden" name="formType" value="getFilesOfChosenRepo" />
+                                <button type="submit">
+                                  Click to select which solidity file to track
+                                </button>
+                              </Form>
+                              {actionArgs?.originCallForm == "getFilesOfChosenRepo" && (
+                                <>
+                                  <Form method="post" className="mt-10">
+                                    <input
+                                      type="hidden"
+                                      name="githubInstallationId"
+                                      value={userData.githubInstallationId}
+                                    />
+                                    <input
+                                      type="hidden"
+                                      name="formType"
+                                      value="chooseFileToTrack"
+                                    />
+                                    <fieldset className="grid grid-cols-2">
+                                      {actionArgs.solFilesFromChosenRepo?.map((fileName) => (
+                                        <label key={fileName} className="text-xl">
+                                          <input
+                                            type="radio"
+                                            name="chosenFileName"
+                                            value={fileName}
+                                          />{" "}
+                                          {fileName}
+                                        </label>
+                                      ))}
+                                    </fieldset>
+                                    <br />
+                                    <button type="submit">Submit</button>
+                                  </Form>
+                                </>
+                              )}{" "}
+                            </>
+                          )}
+
+                        {(actionArgs?.originCallForm == "chooseFileToTrack" ||
+                          userData?.Repository.filename) && (
+                          <>
+                            <p>Push new file changes for initial deploy</p>
+                          </>
+                        )}
                       </div>
                     )}
                   </div>
