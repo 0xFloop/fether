@@ -44,6 +44,7 @@ model Repository {
   name            String
   userId          String  @unique
   associatedUser  User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  filename        String?
   contractAddress String?
   contractAbi     String? @db.Text
 
