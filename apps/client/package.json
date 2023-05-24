@@ -27,6 +27,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "typewriter-effect": "^2.19.0",
+    "viem": "^0.3.36",
     "zod": "^3.21.4"
   },
   "devDependencies": {
