@@ -141,54 +141,56 @@ app.post("/payload", jsonParser, async (req, res) => {
             let pathArray = modifiedContractPath.split("/");
 
             let fileName = pathArray.pop();
-            pathArray.pop();
 
-            let byteCodePath =
-              pathArray.join("/") + "/out/" + fileName + "/" + fileName?.split(".")[0] + ".json";
+            if (associatedUserData.Repository.filename == fileName) {
+              pathArray.pop();
+              let byteCodePath =
+                pathArray.join("/") + "/out/" + fileName + "/" + fileName?.split(".")[0] + ".json";
 
-            let contentsReq = await octokit.request("GET /repos/{owner}/{repo}/contents/{path}", {
-              owner: "0xfloop",
-              repo: "fether",
-              path: byteCodePath,
-              headers: {
-                "X-GitHub-Api-Version": "2022-11-28",
-                Accept: "application/vnd.github.raw",
-              },
-            });
-            let fileJSON = JSON.parse(contentsReq.data.toString());
-            let validatedJSON = zodContractBuildFileSchema.parse(fileJSON);
+              let contentsReq = await octokit.request("GET /repos/{owner}/{repo}/contents/{path}", {
+                owner: "0xfloop",
+                repo: "fether",
+                path: byteCodePath,
+                headers: {
+                  "X-GitHub-Api-Version": "2022-11-28",
+                  Accept: "application/vnd.github.raw",
+                },
+              });
+              let fileJSON = JSON.parse(contentsReq.data.toString());
+              let validatedJSON = zodContractBuildFileSchema.parse(fileJSON);
 
-            let byteCode = validatedJSON.bytecode.object as `0x${string}`;
-            let abi = Abi.parse(fileJSON.abi);
-            let dbAbi = JSON.stringify(fileJSON.abi);
+              let byteCode = validatedJSON.bytecode.object as `0x${string}`;
+              let abi = Abi.parse(fileJSON.abi);
+              let dbAbi = JSON.stringify(fileJSON.abi);
 
-            let deployHash = await walletClient.deployContract({
-              bytecode: byteCode,
-              abi: abi,
-            });
+              let deployHash = await walletClient.deployContract({
+                bytecode: byteCode,
+                abi: abi,
+              });
 
-            await new Promise((r) => setTimeout(r, 5500));
+              await new Promise((r) => setTimeout(r, 5500));
 
-            const transaction = await publicClient.getTransactionReceipt({
-              hash: deployHash,
-            });
+              const transaction = await publicClient.getTransactionReceipt({
+                hash: deployHash,
+              });
 
-            await db.transaction.create({
-              data: {
-                txHash: deployHash,
-                repositoryId: associatedUserData.Repository.id,
-                functionName: "Deployment",
-              },
-            });
+              await db.transaction.create({
+                data: {
+                  txHash: deployHash,
+                  repositoryId: associatedUserData.Repository.id,
+                  functionName: "Deployment",
+                },
+              });
 
-            await db.repository.update({
-              where: { id: associatedUserData.Repository.id },
-              data: {
-                contractAddress: transaction["contractAddress"],
-                contractAbi: dbAbi,
-                updatedAt: new Date(),
-              },
-            });
+              await db.repository.update({
+                where: { id: associatedUserData.Repository.id },
+                data: {
+                  contractAddress: transaction["contractAddress"],
+                  contractAbi: dbAbi,
+                  updatedAt: new Date(),
+                },
+              });
+            }
           }
       }
 
