@@ -21,7 +21,7 @@ export const getUserRepositories = async (githubInstallationId: string) => {
   return repositories;
 };
 
-export const getSolFileNames = async (githubInstallationId: string): Promise<String[]> => {
+export const getSolFileNames = async (githubInstallationId: string): Promise<string[]> => {
   const octokit = await octo.getInstallationOctokit(parseInt(githubInstallationId));
 
   let repoData = await db.user.findUnique({
@@ -32,7 +32,7 @@ export const getSolFileNames = async (githubInstallationId: string): Promise<Str
   let ownerName = repoData?.Repository?.name.split("/")[0];
   let repoName = repoData?.Repository?.name.split("/")[1];
 
-  let fileNames: String[] = [];
+  let fileNames: string[] = [];
 
   if (!ownerName || !repoName) throw new Error("No owner or repo name found");
 
