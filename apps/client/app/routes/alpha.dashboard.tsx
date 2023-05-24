@@ -5,6 +5,7 @@ import { ApiKey, Repository, User, Transaction } from "database";
 import { getSession as userGetSession } from "../utils/alphaSession.server";
 import { getSolFileNames, getUserRepositories } from "../utils/octo.server";
 import { Copy } from "lucide-react";
+import { deployContract } from "~/utils/deployContract.server";
 
 type UserWithKeyRepoActivity =
   | (User & {
@@ -116,7 +117,7 @@ export const action = async ({ request }: ActionArgs) => {
 
       case "getFilesOfChosenRepo":
         console.log("getFilesOfChosenRepo");
-        let fileNameArray: String[] = await getSolFileNames(githubInstallationId as string);
+        let fileNameArray: string[] = await getSolFileNames(githubInstallationId as string);
         return {
           originCallForm: "getFilesOfChosenRepo",
           chosenRepoName: null,
@@ -135,8 +136,6 @@ export const action = async ({ request }: ActionArgs) => {
           },
         });
 
-        await deployContract(githubInstallationId as string);
-
         return {
           originCallForm: "chooseFileToTrack",
           chosenRepoName: null,
@@ -145,9 +144,24 @@ export const action = async ({ request }: ActionArgs) => {
           chosenFileName: body.get("chosenFileName"),
         };
 
+      case "deployContract":
+        console.log("deployContract");
+
+        await deployContract(githubInstallationId as string);
+
+        return {
+          originCallForm: "deployContract",
+          chosenRepoName: null,
+          repositories: null,
+          solFilesFromChosenRepo: null,
+          chosenFileName: null,
+        };
+
       default:
         return;
     }
+  } else {
+    console.log("user not found");
   }
 };
 
@@ -261,72 +275,87 @@ export default function Index() {
                 ) : (
                   <div>
                     <div className="text-4xl  bg-[#F5F5F5] p-5 flex flex-row justify-between rounded-lg mt-10">
-                      <p>Current Repository:</p> <p>{userData.Repository.name}</p>
+                      <p>Repository:</p> <p>{userData.Repository.name}</p>
                     </div>
-                    {userData?.Repository?.contractAbi ? (
+                    {userData?.Repository?.filename ? (
                       <>
                         <div className="text-4xl  bg-[#F5F5F5] p-5 flex flex-row justify-between rounded-lg mt-10">
-                          <p>Chosen File:</p> <p>{userData.Repository.filename}</p>
+                          <p>Contract:</p> <p>{userData.Repository.filename}</p>
                         </div>
-                        <div className="text-4xl flex gap-10 flex-row justify-between rounded-lg mt-10">
-                          <div className="w-2/5">
-                            <div className="flex flex-col gap-2  bg-[#F5F5F5] p-5 rounded-lg ">
-                              <p>Contract ABI Methods: </p>
 
-                              <ul className="flex flex-col gap-2">
-                                {JSON.parse(userData?.Repository?.contractAbi).map(
-                                  (method: any) => (
-                                    <li key={method} className="text-lg">
-                                      {JSON.stringify(method["name"]).replace(/['"]+/g, "")}
-                                    </li>
-                                  )
-                                )}
-                              </ul>
+                        {userData?.Repository?.contractAbi ? (
+                          <div className="text-4xl flex gap-10 flex-row justify-between rounded-lg mt-10">
+                            <div className="w-2/5">
+                              <div className="flex flex-col gap-2  bg-[#F5F5F5] p-5 rounded-lg ">
+                                <p>Contract ABI Methods: </p>
+
+                                <ul className="flex flex-col gap-2">
+                                  {JSON.parse(userData?.Repository?.contractAbi).map(
+                                    (method: any) => (
+                                      <li key={method} className="text-lg">
+                                        {JSON.stringify(method["name"]).replace(/['"]+/g, "")}
+                                      </li>
+                                    )
+                                  )}
+                                </ul>
+                              </div>
+                              <br />
+                              <div className="flex flex-col gap-2  bg-[#F5F5F5] p-5 rounded-lg ">
+                                <p>Last Deployment:</p>
+                                <p className="text-lg">
+                                  {new Date(userData?.Repository?.updatedAt).toLocaleString()}
+                                </p>
+                              </div>
                             </div>
-                            <br />
-                            <div className="flex flex-col gap-2  bg-[#F5F5F5] p-5 rounded-lg ">
-                              <p>Last Deployment:</p>
-                              <p className="text-lg">
-                                {new Date(userData?.Repository?.updatedAt).toLocaleString()}
-                              </p>
-                            </div>
-                          </div>
-                          <div className="flex-1  bg-[#F5F5F5] p-5 rounded-lg ">
-                            <p className="pb-2">Recent Transactions:</p>
-                            <table className="table-fixed w-full">
-                              <thead>
-                                <tr className="text-left">
-                                  <th className="text-lg">Tx Hash</th>
-                                  <th className="text-lg">Function Name</th>
-                                  <th className="text-lg">Timestamp</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                {userData?.Repository?.Activity?.map((transaction: any) => (
-                                  <tr key={transaction} className="">
-                                    <td>
-                                      <a
-                                        href={`http://localhost:3003/${transaction.txHash}`}
-                                        target="_blank"
-                                        className="text-lg block underline"
-                                      >
-                                        {transaction.txHash.slice(0, 12)}...
-                                      </a>
-                                    </td>
-                                    <td>
-                                      <p className="text-lg">{transaction.functionName}</p>
-                                    </td>
-                                    <td>
-                                      <p className="text-lg">
-                                        {timeSince(transaction.timestamp)} ago
-                                      </p>
-                                    </td>
+                            <div className="flex-1  bg-[#F5F5F5] p-5 rounded-lg ">
+                              <p className="pb-2">Recent Transactions:</p>
+                              <table className="table-fixed w-full">
+                                <thead>
+                                  <tr className="text-left">
+                                    <th className="text-lg">Tx Hash</th>
+                                    <th className="text-lg">Function Name</th>
+                                    <th className="text-lg">Timestamp</th>
                                   </tr>
-                                ))}
-                              </tbody>
-                            </table>
+                                </thead>
+                                <tbody>
+                                  {userData?.Repository?.Activity?.map((transaction: any) => (
+                                    <tr key={transaction} className="">
+                                      <td>
+                                        <a
+                                          href={`http://localhost:3003/${transaction.txHash}`}
+                                          target="_blank"
+                                          className="text-lg block underline"
+                                        >
+                                          {transaction.txHash.slice(0, 12)}...
+                                        </a>
+                                      </td>
+                                      <td>
+                                        <p className="text-lg">{transaction.functionName}</p>
+                                      </td>
+                                      <td>
+                                        <p className="text-lg">
+                                          {timeSince(transaction.timestamp)} ago
+                                        </p>
+                                      </td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>
                           </div>
-                        </div>
+                        ) : (
+                          <div className="text-4xl  bg-[#F5F5F5] p-5 flex flex-row justify-between rounded-lg mt-10">
+                            <Form method="post">
+                              <input
+                                type="hidden"
+                                name="githubInstallationId"
+                                value={userData.githubInstallationId}
+                              />
+                              <input type="hidden" name="formType" value="deployContract" />
+                              <button type="submit">Click here to deploy your contract</button>
+                            </Form>
+                          </div>
+                        )}
                       </>
                     ) : (
                       <div className="text-4xl border-b  bg-[#F5F5F5] p-5 flex flex-col justify-between rounded-lg mt-10">
@@ -359,12 +388,12 @@ export default function Index() {
                                     />
                                     <fieldset className="grid grid-cols-2">
                                       {actionArgs.solFilesFromChosenRepo?.map((fileName) => (
-                                        <label key={fileName} className="text-xl">
+                                        <label className="text-xl">
                                           <input
                                             type="radio"
                                             name="chosenFileName"
                                             value={fileName}
-                                          />{" "}
+                                          />
                                           {fileName}
                                         </label>
                                       ))}
@@ -373,16 +402,9 @@ export default function Index() {
                                     <button type="submit">Submit</button>
                                   </Form>
                                 </>
-                              )}{" "}
+                              )}
                             </>
                           )}
-
-                        {(actionArgs?.originCallForm == "chooseFileToTrack" ||
-                          userData?.Repository.filename) && (
-                          <>
-                            <p>Push new file changes for initial deploy</p>
-                          </>
-                        )}
                       </div>
                     )}
                   </div>
