@@ -26,6 +26,7 @@ importers:
       '@types/react-dom': ^18.0.8
       '@types/react-typical': ^0.1.0
       '@vercel/node': ^2.7.0
+      abitype: ^0.7.1
       bcryptjs: ^2.4.3
       concurrently: ^7.6.0
       database: workspace:*
@@ -45,6 +46,7 @@ importers:
       '@remix-run/react': 1.14.1_biqbaboplfbrettd7655fr4n2y
       '@remix-run/vercel': 1.14.1_@vercel+node@2.9.12
       '@vercel/node': 2.9.12
+      abitype: 0.7.1_wnc3eutrhvkpx2b7oumqzgx5he
       bcryptjs: 2.4.3
       database: link:../../packages/database
       isbot: 3.6.10

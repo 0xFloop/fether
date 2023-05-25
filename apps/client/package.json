@@ -19,6 +19,7 @@
     "@remix-run/react": "^1.8.0",
     "@remix-run/vercel": "^1.8.0",
     "@vercel/node": "^2.7.0",
+    "abitype": "^0.7.1",
     "bcryptjs": "^2.4.3",
     "database": "workspace:*",
     "isbot": "latest",
