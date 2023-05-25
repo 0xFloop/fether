@@ -29,6 +29,8 @@ type traceType = {
   params?: any[] | undefined;
 };
 
+//TODO: USE SOURCE PATH IN DB FOR DEPLOYMENT BYTECODE
+
 app.post("/rpc/:API_KEY", jsonParser, async (req, res) => {
   try {
     let reqbodySingle;
@@ -88,13 +90,18 @@ app.post("/rpc/:API_KEY", jsonParser, async (req, res) => {
               abi: abi,
               data: transaction.data ?? "0x0",
             });
-            await db.transaction.create({
-              data: {
-                txHash: hash,
-                repositoryId: validated.apiKeyData?.associatedUser.Repository?.id as string,
-                functionName: functionName,
-              },
-            });
+
+            try {
+              await db.transaction.create({
+                data: {
+                  txHash: hash,
+                  repositoryId: validated.apiKeyData?.associatedUser.Repository?.id as string,
+                  functionName: functionName,
+                },
+              });
+            } catch (error) {
+              console.log("error: ", error);
+            }
           }
         }
       }
@@ -139,23 +146,30 @@ app.post("/payload", jsonParser, async (req, res) => {
             console.log("modified contract path: ", modifiedContractPath);
 
             let pathArray = modifiedContractPath.split("/");
+            console.log("pathArray: ", pathArray);
 
             let fileName = pathArray.pop();
 
             if (associatedUserData.Repository.filename == fileName) {
-              pathArray.pop();
+              let rootDir = associatedUserData.Repository.foundryRootDir;
+              let fileName = associatedUserData.Repository.filename;
+
+              let userName = associatedUserData.Repository.name.split("/")[0];
+              let repoName = associatedUserData.Repository.name.split("/")[1];
+
               let byteCodePath =
-                pathArray.join("/") + "/out/" + fileName + "/" + fileName?.split(".")[0] + ".json";
+                rootDir + "/out/" + fileName + "/" + fileName?.split(".")[0] + ".json";
 
               let contentsReq = await octokit.request("GET /repos/{owner}/{repo}/contents/{path}", {
-                owner: "0xfloop",
-                repo: "fether",
+                owner: userName,
+                repo: repoName,
                 path: byteCodePath,
                 headers: {
                   "X-GitHub-Api-Version": "2022-11-28",
                   Accept: "application/vnd.github.raw",
                 },
               });
+
               let fileJSON = JSON.parse(contentsReq.data.toString());
               let validatedJSON = zodContractBuildFileSchema.parse(fileJSON);
 
