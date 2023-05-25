@@ -1,6 +1,6 @@
 import { App as Octo } from "octokit";
 import { db } from "~/db.server";
-import { z } from "zod";
+import { set, z } from "zod";
 
 function getGithubPk() {
   const githubAppPk = process.env.appPK as string;
@@ -21,7 +21,64 @@ export const getUserRepositories = async (githubInstallationId: string) => {
   return repositories;
 };
 
-export const getSolFileNames = async (githubInstallationId: string): Promise<string[]> => {
+export const getRootDir = async (githubInstallationId: string): Promise<string> => {
+  const octokit = await octo.getInstallationOctokit(parseInt(githubInstallationId));
+
+  let repoData = await db.user.findUnique({
+    where: { githubInstallationId },
+    include: { Repository: true },
+  });
+
+  let ownerName = repoData?.Repository?.name.split("/")[0];
+  let repoName = repoData?.Repository?.name.split("/")[1];
+
+  if (!ownerName || !repoName) throw new Error("No owner or repo name found");
+
+  let repoRootFolder = await octokit.request("GET /repos/{owner}/{repo}/contents/", {
+    owner: ownerName,
+    repo: repoName,
+    headers: {
+      "X-GitHub-Api-Version": "2022-11-28",
+      Accept: "application/vnd.github.raw",
+    },
+  });
+
+  for (let i = 0; i < repoRootFolder.data.length; i++) {
+    if (repoRootFolder.data[i].type == "dir" && repoRootFolder.data[i].name == "apps") {
+      let appsFolder = await octokit.request("GET /repos/{owner}/{repo}/contents/{path}", {
+        owner: ownerName,
+        repo: repoName,
+        path: repoRootFolder.data[i].path,
+        headers: {
+          "X-GitHub-Api-Version": "2022-11-28",
+          Accept: "application/vnd.github.raw",
+        },
+      });
+      let zodAppsFolderArray = zodArrayOfGithubFiles.safeParse(appsFolder.data);
+
+      if (!zodAppsFolderArray.success) throw new Error("No solidity src folder found");
+
+      for (let j = 0; j < zodAppsFolderArray.data.length; j++) {
+        if (
+          zodAppsFolderArray.data[j].type == "dir" &&
+          zodAppsFolderArray.data[j].name == "solidity"
+        ) {
+          await db.repository.update({
+            where: { id: repoData?.Repository?.id },
+            data: { foundryRootDir: zodAppsFolderArray.data[j].path },
+          });
+          return zodAppsFolderArray.data[j].path;
+        }
+      }
+    }
+  }
+  return "";
+};
+
+export const getSolFileNames = async (
+  githubInstallationId: string,
+  foundryRootDir: string
+): Promise<string[]> => {
   const octokit = await octo.getInstallationOctokit(parseInt(githubInstallationId));
 
   let repoData = await db.user.findUnique({
@@ -39,7 +96,7 @@ export const getSolFileNames = async (githubInstallationId: string): Promise<str
   let contractSrcFolder = await octokit.request("GET /repos/{owner}/{repo}/contents/{path}", {
     owner: ownerName,
     repo: repoName,
-    path: "/apps/solidity/src",
+    path: foundryRootDir + "/src",
     headers: {
       "X-GitHub-Api-Version": "2022-11-28",
       Accept: "application/vnd.github.raw",
@@ -60,5 +117,21 @@ export const getSolFileNames = async (githubInstallationId: string): Promise<str
 export const zodArrayOfGithubFiles = z.array(
   z.object({
     name: z.string(),
+    type: z.string(),
+    path: z.string(),
   })
 );
+export const zodContractBuildFileSchema = z.object({
+  abi: z.array(z.object({})),
+  bytecode: z.object({
+    object: z.string().startsWith("0x"),
+    linkReferences: z.object({}),
+    sourceMap: z.string(),
+  }),
+  deployedBytecode: z.object({
+    object: z.string().startsWith("0x"),
+    linkReferences: z.object({}),
+    sourceMap: z.string(),
+  }),
+  methodIdentifiers: z.object({}),
+});

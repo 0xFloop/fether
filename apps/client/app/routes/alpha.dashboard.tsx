@@ -3,7 +3,7 @@ import { Form, useActionData, useLoaderData } from "@remix-run/react";
 import { db } from "../db.server";
 import { ApiKey, Repository, User, Transaction } from "database";
 import { getSession as userGetSession } from "../utils/alphaSession.server";
-import { getFileRoot, getSolFileNames, getUserRepositories } from "../utils/octo.server";
+import { getRootDir, getSolFileNames, getUserRepositories } from "../utils/octo.server";
 import { Copy } from "lucide-react";
 import { deployContract } from "~/utils/viem.server";
 import { Abi, AbiFunction } from "abitype";
@@ -117,11 +117,11 @@ export const action = async ({ request }: ActionArgs) => {
         }
 
       case "getFilesOfChosenRepo":
-        let foundryFileRoot = await getFileRoot(githubInstallationId as string);
+        let foundryRootDir = await getRootDir(githubInstallationId as string);
 
         let fileNameArray: string[] = await getSolFileNames(
           githubInstallationId as string,
-          foundryFileRoot as string
+          foundryRootDir as string
         );
         return {
           originCallForm: "getFilesOfChosenRepo",
