@@ -3,9 +3,10 @@ import { Form, useActionData, useLoaderData } from "@remix-run/react";
 import { db } from "../db.server";
 import { ApiKey, Repository, User, Transaction } from "database";
 import { getSession as userGetSession } from "../utils/alphaSession.server";
-import { getSolFileNames, getUserRepositories } from "../utils/octo.server";
+import { getFileRoot, getSolFileNames, getUserRepositories } from "../utils/octo.server";
 import { Copy } from "lucide-react";
-import { deployContract } from "~/utils/deployContract.server";
+import { deployContract } from "~/utils/viem.server";
+import { Abi, AbiFunction } from "abitype";
 
 type UserWithKeyRepoActivity =
   | (User & {
@@ -116,8 +117,12 @@ export const action = async ({ request }: ActionArgs) => {
         }
 
       case "getFilesOfChosenRepo":
-        console.log("getFilesOfChosenRepo");
-        let fileNameArray: string[] = await getSolFileNames(githubInstallationId as string);
+        let foundryFileRoot = await getFileRoot(githubInstallationId as string);
+
+        let fileNameArray: string[] = await getSolFileNames(
+          githubInstallationId as string,
+          foundryFileRoot as string
+        );
         return {
           originCallForm: "getFilesOfChosenRepo",
           chosenRepoName: null,
@@ -291,9 +296,17 @@ export default function Index() {
 
                                 <ul className="flex flex-col gap-2">
                                   {JSON.parse(userData?.Repository?.contractAbi).map(
-                                    (method: any) => (
-                                      <li key={method} className="text-lg">
+                                    (method: AbiFunction, i: number) => (
+                                      <li key={i} className="text-lg">
                                         {JSON.stringify(method["name"]).replace(/['"]+/g, "")}
+                                        {method.inputs.length > 0 && (
+                                          <>
+                                            {method.inputs.map((input) => (
+                                              <input type="text" placeholder={input.name} />
+                                            ))}
+                                            <button>Call</button>
+                                          </>
+                                        )}
                                       </li>
                                     )
                                   )}
@@ -308,8 +321,25 @@ export default function Index() {
                               </div>
                             </div>
                             <div className="flex-1  bg-[#F5F5F5] p-5 rounded-lg ">
-                              <p className="pb-2">Recent Transactions:</p>
-                              <table className="table-fixed w-full">
+                              <div className="flex flex-row justify-between items-center">
+                                <p className="pb-2">Recent Transactions:</p>
+
+                                <Form method="post">
+                                  <input
+                                    type="hidden"
+                                    name="githubInstallationId"
+                                    value={userData.githubInstallationId}
+                                  />
+                                  <input type="hidden" name="formType" value="deployContract" />
+                                  <button
+                                    type="submit"
+                                    className="text-xl border-2 border-black py-2 px-4"
+                                  >
+                                    Redeploy
+                                  </button>
+                                </Form>
+                              </div>
+                              <table className="table-fixed w-full mt-5">
                                 <thead>
                                   <tr className="text-left">
                                     <th className="text-lg">Tx Hash</th>
