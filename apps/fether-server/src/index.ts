@@ -29,8 +29,6 @@ type traceType = {
   params?: any[] | undefined;
 };
 
-//TODO: USE SOURCE PATH IN DB FOR DEPLOYMENT BYTECODE
-
 app.post("/rpc/:API_KEY", jsonParser, async (req, res) => {
   try {
     let reqbodySingle;

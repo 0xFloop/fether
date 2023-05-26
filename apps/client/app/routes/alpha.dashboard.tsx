@@ -6,7 +6,9 @@ import { getSession as userGetSession } from "../utils/alphaSession.server";
 import { getRootDir, getSolFileNames, getUserRepositories } from "../utils/octo.server";
 import { Copy } from "lucide-react";
 import { deployContract } from "~/utils/viem.server";
-import { Abi, AbiFunction } from "abitype";
+import { Abi, AbiFunction } from "abitype/zod";
+import { AbiFunction as AbiFunctionType } from "abitype";
+import { Chain, createPublicClient, http } from "viem";
 
 type UserWithKeyRepoActivity =
   | (User & {
@@ -21,8 +23,8 @@ type UserWithKeyRepoActivity =
 
 type RepoData = { repoName: string; repoId: string };
 
-//TODO: Write the deploy contract function upon file selection
-//TODO: MAYBE HAVE TO ALLOW USER TO INPUT THE SOURCE CONTRACTS PATH
+//TODO: MAYBE break this big ol action into many other action routes
+//TODO: FINISH callContractFunction() AND THE FUNCTIONS SECTION
 
 var timeSince = function (_date: any) {
   var date = Date.parse(_date);
@@ -64,6 +66,60 @@ var timeSince = function (_date: any) {
 
   return interval + " " + intervalType;
 };
+function fetherChainFromKey(apikey: string): Chain {
+  return {
+    id: 696969,
+    name: "Fether",
+    network: "fether",
+    nativeCurrency: {
+      decimals: 18,
+      name: "Fether",
+      symbol: "FEth",
+    },
+    rpcUrls: {
+      default: {
+        http: [`https://fether-testing.ngrok.app/rpc/${apikey}`],
+      },
+      public: { http: [`https://fether-testing.ngrok.app/rpc/${apikey}`] },
+    },
+    testnet: false,
+  };
+}
+const callContractFunction = async (
+  methodString: AbiFunctionType,
+  contractAbi: string,
+  contractAddress: `0x${string}`,
+  args: any[],
+  apiKey: string
+) => {
+  console.log("here");
+  let parsedAbi = Abi.parse(JSON.parse(contractAbi));
+  console.log("here2");
+  let method = AbiFunction.parse(methodString);
+  console.log("here3");
+
+  let fetherChainFromApiKey = fetherChainFromKey(apiKey);
+  console.log("here4");
+
+  if (method.stateMutability === "view" || method.stateMutability === "pure") {
+    const publicClient = createPublicClient({
+      chain: fetherChainFromApiKey,
+      transport: http(),
+    });
+    console.log("here5");
+    console.log(contractAddress);
+
+    let returnValue = await publicClient.readContract({
+      address: contractAddress,
+      abi: parsedAbi,
+      functionName: method.name,
+    });
+    return returnValue;
+  } else {
+    return "";
+  }
+};
+
 export const action = async ({ request }: ActionArgs) => {
   const body = await request.formData();
   const formType = body.get("formType");
@@ -292,21 +348,43 @@ export default function Index() {
                           <div className="text-4xl flex gap-10 flex-row justify-between rounded-lg mt-10">
                             <div className="w-2/5">
                               <div className="flex flex-col gap-2  bg-[#F5F5F5] p-5 rounded-lg ">
-                                <p>Contract ABI Methods: </p>
+                                <p>Functions: </p>
 
-                                <ul className="flex flex-col gap-2">
+                                <ul className="flex flex-col gap-2 mt-5">
                                   {JSON.parse(userData?.Repository?.contractAbi).map(
-                                    (method: AbiFunction, i: number) => (
+                                    (method: AbiFunctionType, i: number) => (
                                       <li key={i} className="text-lg">
-                                        {JSON.stringify(method["name"]).replace(/['"]+/g, "")}
-                                        {method.inputs.length > 0 && (
-                                          <>
-                                            {method.inputs.map((input) => (
-                                              <input type="text" placeholder={input.name} />
-                                            ))}
-                                            <button>Call</button>
-                                          </>
-                                        )}
+                                        <div className="flex items-center flex-row justify-between">
+                                          {JSON.stringify(method["name"]).replace(/['"]+/g, "")}
+                                          {method.inputs.length > 0 && (
+                                            <>
+                                              {method.inputs.map((input) => (
+                                                <input
+                                                  key={input.name}
+                                                  className="bg-transparent w-1/3 rounded-lg"
+                                                  type="text"
+                                                  placeholder={input.name}
+                                                />
+                                              ))}
+                                            </>
+                                          )}
+                                          <button
+                                            onClick={async () => {
+                                              console.log("FDHKJFSDKFHLDSFJKLHSDFJK");
+                                              await callContractFunction(
+                                                method,
+                                                userData?.Repository?.contractAbi as string,
+                                                userData?.Repository
+                                                  ?.contractAddress as `0x${string}`,
+                                                [],
+                                                userData?.ApiKey?.key as string
+                                              );
+                                            }}
+                                            className="text-white bg-black py-2 px-4 border rounded-lg"
+                                          >
+                                            Call
+                                          </button>
+                                        </div>
                                       </li>
                                     )
                                   )}
@@ -333,7 +411,7 @@ export default function Index() {
                                   <input type="hidden" name="formType" value="deployContract" />
                                   <button
                                     type="submit"
-                                    className="text-xl border-2 border-black py-2 px-4"
+                                    className="text-xl  text-white bg-black py-2 px-4 rounded-lg"
                                   >
                                     Redeploy
                                   </button>
@@ -418,7 +496,7 @@ export default function Index() {
                                     />
                                     <fieldset className="grid grid-cols-2">
                                       {actionArgs.solFilesFromChosenRepo?.map((fileName) => (
-                                        <label className="text-xl">
+                                        <label key={fileName} className="text-xl">
                                           <input
                                             type="radio"
                                             name="chosenFileName"
