@@ -3,13 +3,14 @@ import { Chain, createPublicClient, createTestClient, createWalletClient, http }
 import { privateKeyToAccount } from "viem/accounts";
 import { App as Octo } from "octokit";
 import { zodContractBuildFileSchema } from "./octo.server";
-import { Abi } from "abitype/zod";
+import { Abi, AbiParameter } from "abitype/zod";
 
 function getGithubPk() {
   const githubAppPk = process.env.appPK as string;
   const formattedGithubAppPk = githubAppPk.replace(/\\n/g, "\n");
   return formattedGithubAppPk;
 }
+
 const octo = new Octo({ appId: "302483", privateKey: getGithubPk() });
 
 export const fetherChain: Chain = {
