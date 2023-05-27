@@ -6,9 +6,9 @@ import { getSession as userGetSession } from "../utils/alphaSession.server";
 import { getRootDir, getSolFileNames, getUserRepositories } from "../utils/octo.server";
 import { Copy } from "lucide-react";
 import { deployContract } from "~/utils/viem.server";
-import { Abi, AbiFunction } from "abitype/zod";
 import { AbiFunction as AbiFunctionType } from "abitype";
-import { Chain, createPublicClient, http } from "viem";
+import { useState } from "react";
+import { ContractReturn, callContractFunction, timeSince } from "~/utils/helpers";
 
 type UserWithKeyRepoActivity =
   | (User & {
@@ -24,101 +24,6 @@ type UserWithKeyRepoActivity =
 type RepoData = { repoName: string; repoId: string };
 
 //TODO: MAYBE break this big ol action into many other action routes
-//TODO: FINISH callContractFunction() AND THE FUNCTIONS SECTION
-
-var timeSince = function (_date: any) {
-  var date = Date.parse(_date);
-  //@ts-ignore
-  var seconds = Math.floor((new Date() - date) / 1000);
-  var intervalType;
-
-  var interval = Math.floor(seconds / 31536000);
-  if (interval >= 1) {
-    intervalType = "year";
-  } else {
-    interval = Math.floor(seconds / 2592000);
-    if (interval >= 1) {
-      intervalType = "month";
-    } else {
-      interval = Math.floor(seconds / 86400);
-      if (interval >= 1) {
-        intervalType = "day";
-      } else {
-        interval = Math.floor(seconds / 3600);
-        if (interval >= 1) {
-          intervalType = "hour";
-        } else {
-          interval = Math.floor(seconds / 60);
-          if (interval >= 1) {
-            intervalType = "minute";
-          } else {
-            interval = seconds;
-            intervalType = "second";
-          }
-        }
-      }
-    }
-  }
-
-  if (interval > 1 || interval === 0) {
-    intervalType += "s";
-  }
-
-  return interval + " " + intervalType;
-};
-function fetherChainFromKey(apikey: string): Chain {
-  return {
-    id: 696969,
-    name: "Fether",
-    network: "fether",
-    nativeCurrency: {
-      decimals: 18,
-      name: "Fether",
-      symbol: "FEth",
-    },
-    rpcUrls: {
-      default: {
-        http: [`https://fether-testing.ngrok.app/rpc/${apikey}`],
-      },
-      public: { http: [`https://fether-testing.ngrok.app/rpc/${apikey}`] },
-    },
-    testnet: false,
-  };
-}
-const callContractFunction = async (
-  methodString: AbiFunctionType,
-  contractAbi: string,
-  contractAddress: `0x${string}`,
-  args: any[],
-  apiKey: string
-) => {
-  console.log("here");
-  let parsedAbi = Abi.parse(JSON.parse(contractAbi));
-  console.log("here2");
-  let method = AbiFunction.parse(methodString);
-  console.log("here3");
-
-  let fetherChainFromApiKey = fetherChainFromKey(apiKey);
-  console.log("here4");
-
-  if (method.stateMutability === "view" || method.stateMutability === "pure") {
-    const publicClient = createPublicClient({
-      chain: fetherChainFromApiKey,
-      transport: http(),
-    });
-    console.log("here5");
-    console.log(contractAddress);
-
-    let returnValue = await publicClient.readContract({
-      address: contractAddress,
-      abi: parsedAbi,
-      functionName: method.name,
-    });
-    return returnValue;
-  } else {
-    return "";
-  }
-};
 
 export const action = async ({ request }: ActionArgs) => {
   const body = await request.formData();
@@ -254,6 +159,11 @@ export default function Index() {
   const userData = useLoaderData<typeof loader>();
   const actionArgs = useActionData<typeof action>();
 
+  const [functionReturn, setFunctionReturn] = useState<ContractReturn>({
+    methodName: "",
+    returnItems: [],
+  });
+
   return (
     <div className="w-screen h-auto overflow-hidden display flex flex-col">
       <div id="content" className="w-3/4 max-w-7xl mx-auto py-20 rounded-lg">
@@ -356,6 +266,7 @@ export default function Index() {
                                       <li key={i} className="text-lg">
                                         <div className="flex items-center flex-row justify-between">
                                           {JSON.stringify(method["name"]).replace(/['"]+/g, "")}
+
                                           {method.inputs.length > 0 && (
                                             <>
                                               {method.inputs.map((input) => (
@@ -370,8 +281,7 @@ export default function Index() {
                                           )}
                                           <button
                                             onClick={async () => {
-                                              console.log("FDHKJFSDKFHLDSFJKLHSDFJK");
-                                              await callContractFunction(
+                                              let returnedData = await callContractFunction(
                                                 method,
                                                 userData?.Repository?.contractAbi as string,
                                                 userData?.Repository
@@ -379,12 +289,34 @@ export default function Index() {
                                                 [],
                                                 userData?.ApiKey?.key as string
                                               );
+                                              setFunctionReturn(returnedData);
                                             }}
                                             className="text-white bg-black py-2 px-4 border rounded-lg"
                                           >
                                             Call
                                           </button>
                                         </div>
+                                        {functionReturn.methodName == method.name &&
+                                          method.outputs.length > 0 && (
+                                            <>
+                                              <p>Returned:</p>
+                                              {method.outputs.map((output, index) => (
+                                                <div
+                                                  key={index}
+                                                  className="bg-transparent w-1/3 rounded-lg flex flex-row"
+                                                >
+                                                  <p>
+                                                    &nbsp;&nbsp;
+                                                    {functionReturn.returnItems[index].name}:{" "}
+                                                  </p>
+                                                  <p>
+                                                    &nbsp;&nbsp;
+                                                    {functionReturn.returnItems[index].value}
+                                                  </p>
+                                                </div>
+                                              ))}
+                                            </>
+                                          )}
                                       </li>
                                     )
                                   )}
@@ -426,8 +358,8 @@ export default function Index() {
                                   </tr>
                                 </thead>
                                 <tbody>
-                                  {userData?.Repository?.Activity?.map((transaction: any) => (
-                                    <tr key={transaction} className="">
+                                  {userData?.Repository?.Activity?.map((transaction: any, i) => (
+                                    <tr key={i} className="">
                                       <td>
                                         <a
                                           href={`http://localhost:3003/${transaction.txHash}`}
@@ -495,8 +427,8 @@ export default function Index() {
                                       value="chooseFileToTrack"
                                     />
                                     <fieldset className="grid grid-cols-2">
-                                      {actionArgs.solFilesFromChosenRepo?.map((fileName) => (
-                                        <label key={fileName} className="text-xl">
+                                      {actionArgs.solFilesFromChosenRepo?.map((fileName, i) => (
+                                        <label key={i} className="text-xl">
                                           <input
                                             type="radio"
                                             name="chosenFileName"
