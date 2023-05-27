@@ -17,11 +17,15 @@ contract Counter {
         letter = newString;
     }
 
-    function getLeNumber() public view returns (uint256) {
+    function getLeNumber() public view returns (uint256 _number) {
         return number;
     }
 
-    function getNumberAndLetter() public view returns (string memory, uint256) {
+    function getNumberAndLetter()
+        public
+        view
+        returns (string memory _letter, uint256 _number)
+    {
         return (letter, number);
     }
 
