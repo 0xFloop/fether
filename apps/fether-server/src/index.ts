@@ -190,7 +190,7 @@ app.post("/payload", jsonParser, async (req, res) => {
                 data: {
                   txHash: deployHash,
                   repositoryId: associatedUserData.Repository.id,
-                  functionName: "Deployment",
+                  functionName: "GitHub Deployment",
                 },
               });
 

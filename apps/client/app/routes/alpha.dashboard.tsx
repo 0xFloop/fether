@@ -159,6 +159,19 @@ export default function Index() {
   const userData = useLoaderData<typeof loader>();
   const actionArgs = useActionData<typeof action>();
 
+  let deployStatus = "Deploy";
+
+  if (userData?.Repository?.Activity) {
+    let activity = userData.Repository.Activity;
+
+    for (let i = 0; i < activity.length; i++) {
+      if (activity[i].functionName.includes("Deployment")) {
+        deployStatus = "Redeploy";
+        break;
+      }
+    }
+  }
+
   const [functionReturn, setFunctionReturn] = useState<ContractReturn>({
     methodName: "",
     returnItems: [],
@@ -345,7 +358,7 @@ export default function Index() {
                                     type="submit"
                                     className="text-xl  text-white bg-black py-2 px-4 rounded-lg"
                                   >
-                                    Redeploy
+                                    {deployStatus}
                                   </button>
                                 </Form>
                               </div>

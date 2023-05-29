@@ -78,8 +78,6 @@ export const deployContract = async (githubInstallationId: string) => {
 
   let byteCodePath = rootDir + "/out/" + fileName + "/" + fileName?.split(".")[0] + ".json";
 
-  console.log(byteCodePath);
-
   let contentsReq = await octokit.request("GET /repos/{owner}/{repo}/contents/{path}", {
     owner: userName,
     repo: repoName,
@@ -104,11 +102,12 @@ export const deployContract = async (githubInstallationId: string) => {
     hash: deployHash,
   });
 
-  let functionName = "Deployment";
+  let functionName = "User Deployment";
   let activity = repoData.Repository.Activity;
   for (let i = 0; i < activity.length; i++) {
-    if (activity[i].functionName === "Deployment") {
-      functionName = "Redeploy";
+    if (activity[i].functionName.includes("Deployment")) {
+      functionName = "User Redeploy";
+      break;
     }
   }
 
