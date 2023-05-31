@@ -1,7 +1,8 @@
 import { Abi, AbiFunction } from "abitype/zod";
-import { Chain, createPublicClient, http } from "viem";
+import { Chain, createPublicClient, createWalletClient, custom, http } from "viem";
 import { AbiFunction as AbiFunctionType } from "abitype";
 import { z } from "zod";
+import { Ethereum } from "@wagmi/core";
 
 export type ContractReturnItem = {
   name: string;
@@ -51,7 +52,28 @@ export const callContractFunction = async (
     }
     return { returnItems, methodName: method.name };
   } else {
-    return { returnItems: [], methodName: method.name };
+    let walletClient = createWalletClient({
+      chain: fetherChainFromApiKey,
+      transport: custom(window.ethereum as Ethereum),
+    });
+
+    const [address] = await walletClient.getAddresses();
+    const publicClient = createPublicClient({
+      chain: fetherChainFromApiKey,
+      transport: http(),
+    });
+
+    const { request } = await publicClient.simulateContract({
+      account: address,
+      address: contractAddress,
+      abi: parsedAbi,
+      functionName: method.name,
+      args: args,
+    });
+
+    let tx = await walletClient.writeContract(request);
+
+    return { returnItems: [{ name: "numbuh", value: 4 }], methodName: method.name };
   }
 };
 
