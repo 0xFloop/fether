@@ -40,7 +40,7 @@ export default function Index() {
     const number = await publicClient.readContract({
       address: fether.address,
       abi: fether.abi,
-      functionName: "getOwensNumber",
+      functionName: "getLeNumber",
     });
     console.log(number);
     setNumber(Number(number));
@@ -67,7 +67,7 @@ export default function Index() {
       account: address,
       address: fether.address,
       abi: fether.abi,
-      functionName: fether.methods.setOwensNumber,
+      functionName: fether.methods.setLeNumber,
       args: [newNum],
     });
     let tx = await walletClient.writeContract(request);
