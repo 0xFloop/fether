@@ -4,11 +4,12 @@ import { db } from "../db.server";
 import { ApiKey, Repository, User, Transaction } from "database";
 import { getSession as userGetSession } from "../utils/alphaSession.server";
 import { getRootDir, getSolFileNames, getUserRepositories } from "../utils/octo.server";
-import { Copy } from "lucide-react";
+import { ChevronDown, Copy } from "lucide-react";
 import { deployContract } from "~/utils/viem.server";
 import { AbiFunction as AbiFunctionType } from "abitype";
 import { useState } from "react";
 import { ContractReturn, callContractFunction, timeSince } from "~/utils/helpers";
+import * as Accordion from "@radix-ui/react-accordion";
 
 type UserWithKeyRepoActivity =
   | (User & {
@@ -155,6 +156,11 @@ export const loader = async ({ request }: LoaderArgs) => {
   return userData;
 };
 
+const getFunctionArgs = (abiFunction: AbiFunctionType): [] => {
+  console.log(abiFunction);
+  return [4];
+};
+
 export default function Index() {
   const userData = useLoaderData<typeof loader>();
   const actionArgs = useActionData<typeof action>();
@@ -253,7 +259,7 @@ export default function Index() {
                             <button type="submit">Submit</button>
                           </Form>
                         </>
-                      )}{" "}
+                      )}
                     </div>
                   </div>
                 ) : (
@@ -274,63 +280,183 @@ export default function Index() {
                                 <p>Functions: </p>
 
                                 <ul className="flex flex-col gap-2 mt-5">
+                                  <p className="text-2xl border-b border-b-black">Read</p>
+                                  <div className="py-2">
+                                    {JSON.parse(userData?.Repository?.contractAbi).map(
+                                      (method: AbiFunctionType, i: number) => (
+                                        <>
+                                          {(method.stateMutability == "view" ||
+                                            method.stateMutability == "pure") && (
+                                            <li key={i} className="text-lg py-1">
+                                              <div className="flex flex-row justify-between items-center">
+                                                {JSON.stringify(method["name"]).replace(
+                                                  /['"]+/g,
+                                                  ""
+                                                )}
+                                                <button
+                                                  onClick={async () => {
+                                                    let returnedData = await callContractFunction(
+                                                      method,
+                                                      userData?.Repository?.contractAbi as string,
+                                                      userData?.Repository
+                                                        ?.contractAddress as `0x${string}`,
+                                                      getFunctionArgs(method),
+                                                      userData?.ApiKey?.key as string
+                                                    );
+                                                    setFunctionReturn(returnedData);
+                                                  }}
+                                                  className="text-white bg-black py-2 px-4 border rounded-lg"
+                                                >
+                                                  Call
+                                                </button>
+                                              </div>
+                                              {functionReturn.methodName == method.name &&
+                                                method.outputs.length > 0 && (
+                                                  <>
+                                                    <p>Returned:</p>
+                                                    {method.outputs.map((output, index) => (
+                                                      <div
+                                                        key={index}
+                                                        className="bg-transparent w-1/3 rounded-lg flex flex-row"
+                                                      >
+                                                        <p>
+                                                          &nbsp;&nbsp;
+                                                          {
+                                                            functionReturn.returnItems[index].name
+                                                          }:{" "}
+                                                        </p>
+                                                        <p>
+                                                          &nbsp;&nbsp;
+                                                          {functionReturn.returnItems[index].value}
+                                                        </p>
+                                                      </div>
+                                                    ))}
+                                                  </>
+                                                )}
+                                            </li>
+                                          )}
+                                        </>
+                                      )
+                                    )}
+                                  </div>
+                                  <p className="text-2xl border-b border-b-black">Write</p>
+
                                   {JSON.parse(userData?.Repository?.contractAbi).map(
                                     (method: AbiFunctionType, i: number) => (
-                                      <li key={i} className="text-lg">
-                                        <div className="flex items-center flex-row justify-between">
-                                          {JSON.stringify(method["name"]).replace(/['"]+/g, "")}
-
-                                          {method.inputs.length > 0 && (
+                                      <>
+                                        {!(
+                                          method.stateMutability == "view" ||
+                                          method.stateMutability == "pure"
+                                        ) && (
+                                          <li key={i} className="text-lg">
                                             <>
-                                              {method.inputs.map((input) => (
-                                                <input
-                                                  key={input.name}
-                                                  className="bg-transparent w-1/3 rounded-lg"
-                                                  type="text"
-                                                  placeholder={input.name}
-                                                />
-                                              ))}
-                                            </>
-                                          )}
-                                          <button
-                                            onClick={async () => {
-                                              let returnedData = await callContractFunction(
-                                                method,
-                                                userData?.Repository?.contractAbi as string,
-                                                userData?.Repository
-                                                  ?.contractAddress as `0x${string}`,
-                                                [],
-                                                userData?.ApiKey?.key as string
-                                              );
-                                              setFunctionReturn(returnedData);
-                                            }}
-                                            className="text-white bg-black py-2 px-4 border rounded-lg"
-                                          >
-                                            Call
-                                          </button>
-                                        </div>
-                                        {functionReturn.methodName == method.name &&
-                                          method.outputs.length > 0 && (
-                                            <>
-                                              <p>Returned:</p>
-                                              {method.outputs.map((output, index) => (
-                                                <div
-                                                  key={index}
-                                                  className="bg-transparent w-1/3 rounded-lg flex flex-row"
+                                              <Accordion.Root
+                                                type="multiple"
+                                                className="w-full relative py-2"
+                                              >
+                                                <Accordion.Item
+                                                  key={method.name}
+                                                  value={method.name as string}
+                                                  className=""
                                                 >
-                                                  <p>
-                                                    &nbsp;&nbsp;
-                                                    {functionReturn.returnItems[index].name}:{" "}
-                                                  </p>
-                                                  <p>
-                                                    &nbsp;&nbsp;
-                                                    {functionReturn.returnItems[index].value}
-                                                  </p>
-                                                </div>
-                                              ))}
+                                                  {method.inputs.length > 0 ? (
+                                                    <Accordion.Trigger className="group">
+                                                      <p>{method.name}</p>
+                                                      <div className="absolute  right-0 top-0  transition-transform group-data-[state=open]:rotate-180">
+                                                        <ChevronDown
+                                                          size={40}
+                                                          strokeWidth={1.25}
+                                                          strokeLinecap="round"
+                                                          className="w-16"
+                                                        />
+                                                      </div>
+                                                    </Accordion.Trigger>
+                                                  ) : (
+                                                    <div className="flex flex-row justify-between items-center">
+                                                      <p>{method.name}</p>
+                                                      <button
+                                                        onClick={async () => {
+                                                          let returnedData =
+                                                            await callContractFunction(
+                                                              method,
+                                                              userData?.Repository
+                                                                ?.contractAbi as string,
+                                                              userData?.Repository
+                                                                ?.contractAddress as `0x${string}`,
+                                                              getFunctionArgs(method),
+                                                              userData?.ApiKey?.key as string
+                                                            );
+                                                          setFunctionReturn(returnedData);
+                                                        }}
+                                                        className="text-white bg-black py-2 px-4 border rounded-lg"
+                                                      >
+                                                        Call
+                                                      </button>
+                                                    </div>
+                                                  )}
+                                                  {method.inputs.length > 0 && (
+                                                    <Accordion.Content>
+                                                      <div className="flex flex-row justify-between mt-4">
+                                                        <div className="flex flex-col mt-2 gap-2">
+                                                          {method.inputs.map((input) => (
+                                                            <input
+                                                              key={input.name}
+                                                              className="bg-transparent rounded-lg"
+                                                              type="text"
+                                                              placeholder={`${input.type}: ${input.name}`}
+                                                            />
+                                                          ))}{" "}
+                                                        </div>
+                                                        <button
+                                                          onClick={async () => {
+                                                            let returnedData =
+                                                              await callContractFunction(
+                                                                method,
+                                                                userData?.Repository
+                                                                  ?.contractAbi as string,
+                                                                userData?.Repository
+                                                                  ?.contractAddress as `0x${string}`,
+                                                                getFunctionArgs(method),
+                                                                userData?.ApiKey?.key as string
+                                                              );
+                                                            setFunctionReturn(returnedData);
+                                                          }}
+                                                          className="text-white bg-black py-2 px-4 border rounded-lg"
+                                                        >
+                                                          Call
+                                                        </button>
+                                                      </div>
+                                                    </Accordion.Content>
+                                                  )}
+                                                </Accordion.Item>
+                                              </Accordion.Root>
                                             </>
-                                          )}
-                                      </li>
+                                            {functionReturn.methodName == method.name &&
+                                              method.outputs.length > 0 && (
+                                                <>
+                                                  <p>Returned:</p>
+                                                  {method.outputs.map((output, index) => (
+                                                    <div
+                                                      key={index}
+                                                      className="bg-transparent w-1/3 rounded-lg flex flex-row"
+                                                    >
+                                                      <p>
+                                                        &nbsp;&nbsp;
+                                                        {
+                                                          functionReturn.returnItems[index].name
+                                                        }:{" "}
+                                                      </p>
+                                                      <p>
+                                                        &nbsp;&nbsp;
+                                                        {functionReturn.returnItems[index].value}
+                                                      </p>
+                                                    </div>
+                                                  ))}
+                                                </>
+                                              )}
+                                          </li>
+                                        )}
+                                      </>
                                     )
                                   )}
                                 </ul>
