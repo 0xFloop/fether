@@ -112,8 +112,6 @@ export const action = async ({ request }: ActionArgs) => {
         };
 
       case "deployContract":
-        console.log("deployContract");
-
         await deployContract(githubInstallationId as string);
 
         return {
@@ -156,9 +154,19 @@ export const loader = async ({ request }: LoaderArgs) => {
   return userData;
 };
 
-const getFunctionArgs = (abiFunction: AbiFunctionType): [] => {
-  console.log(abiFunction);
-  return [4];
+const getFunctionArgsFromInput = (abiFunction: AbiFunctionType): any[] => {
+  let args = [];
+  for (let i = 0; i < abiFunction.inputs.length; i++) {
+    const inputElement = document.getElementById(
+      `${abiFunction.name}-${abiFunction.inputs[0].name}`
+    ) as HTMLInputElement;
+
+    const val = inputElement.value;
+
+    args.push(val);
+  }
+
+  return args;
 };
 
 export default function Index() {
@@ -300,7 +308,7 @@ export default function Index() {
                                                       userData?.Repository?.contractAbi as string,
                                                       userData?.Repository
                                                         ?.contractAddress as `0x${string}`,
-                                                      getFunctionArgs(method),
+                                                      getFunctionArgsFromInput(method),
                                                       userData?.ApiKey?.key as string
                                                     );
                                                     setFunctionReturn(returnedData);
@@ -383,7 +391,7 @@ export default function Index() {
                                                                 ?.contractAbi as string,
                                                               userData?.Repository
                                                                 ?.contractAddress as `0x${string}`,
-                                                              getFunctionArgs(method),
+                                                              getFunctionArgsFromInput(method),
                                                               userData?.ApiKey?.key as string
                                                             );
                                                           setFunctionReturn(returnedData);
@@ -401,6 +409,7 @@ export default function Index() {
                                                           {method.inputs.map((input) => (
                                                             <input
                                                               key={input.name}
+                                                              id={`${method.name}-${input.name}`}
                                                               className="bg-transparent rounded-lg"
                                                               type="text"
                                                               placeholder={`${input.type}: ${input.name}`}
@@ -416,7 +425,7 @@ export default function Index() {
                                                                   ?.contractAbi as string,
                                                                 userData?.Repository
                                                                   ?.contractAddress as `0x${string}`,
-                                                                getFunctionArgs(method),
+                                                                getFunctionArgsFromInput(method),
                                                                 userData?.ApiKey?.key as string
                                                               );
                                                             setFunctionReturn(returnedData);
