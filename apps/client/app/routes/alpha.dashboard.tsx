@@ -1,4 +1,4 @@
-import { ActionArgs, LoaderArgs, redirect } from "@remix-run/node";
+import { ActionArgs, LinksFunction, LoaderArgs, redirect } from "@remix-run/node";
 import { Form, useActionData, useLoaderData } from "@remix-run/react";
 import { db } from "../db.server";
 import { ApiKey, Repository, User, Transaction } from "database";
@@ -10,6 +10,18 @@ import { AbiFunction as AbiFunctionType } from "abitype";
 import { useState } from "react";
 import { ContractReturn, callContractFunction, timeSince } from "~/utils/helpers";
 import * as Accordion from "@radix-ui/react-accordion";
+import {
+  darkTheme,
+  getDefaultWallets,
+  midnightTheme,
+  RainbowKitProvider,
+} from "@rainbow-me/rainbowkit";
+import { WagmiConfig, createConfig, configureChains, Chain } from "wagmi";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { publicProvider } from "wagmi/providers/public";
+import rainbowStylesUrl from "@rainbow-me/rainbowkit/styles.css";
+
+export const links: LinksFunction = () => [{ rel: "stylesheet", href: rainbowStylesUrl }];
 
 type UserWithKeyRepoActivity =
   | (User & {
@@ -173,6 +185,36 @@ export default function Index() {
   const userData = useLoaderData<typeof loader>();
   const actionArgs = useActionData<typeof action>();
 
+  const fetherChain: Chain = {
+    id: 696969,
+    name: "Fether",
+    network: "fether",
+    nativeCurrency: {
+      decimals: 18,
+      name: "Fether",
+      symbol: "FEth",
+    },
+    rpcUrls: {
+      default: {
+        http: [`https://fether-testing.ngrok.app/rpc/${userData?.ApiKey?.key as string}`],
+      },
+      public: { http: [`https://fether-testing.ngrok.app/rpc/${userData?.ApiKey?.key as string}`] },
+    },
+    testnet: false,
+  };
+
+  const { chains, publicClient } = configureChains([fetherChain], [publicProvider()]);
+
+  const { connectors } = getDefaultWallets({
+    appName: "Fether",
+    chains,
+  });
+  const wagmiConfig = createConfig({
+    autoConnect: true,
+    connectors,
+    publicClient,
+  });
+
   let deployStatus = "Deploy";
 
   if (userData?.Repository?.Activity) {
@@ -192,296 +234,377 @@ export default function Index() {
   });
 
   return (
-    <div className="w-screen h-auto overflow-hidden display flex flex-col">
-      <div id="content" className="w-3/4 max-w-7xl mx-auto py-20 rounded-lg">
-        {!userData?.ApiKey ? (
-          <div className="text-4xl border-b bg-[#F5F5F5] p-5 flex flex-row justify-between rounded-lg">
-            <p>Api Key:</p>
-            <Form method="post" action="/keygen">
-              <input type="hidden" name="userId" value={userData?.id} />
-              <input type="hidden" name="formType" value="generateApiKey" />
-              <button type="submit">Click here to generate api key</button>
-            </Form>
-          </div>
-        ) : (
-          <div>
-            <div className="text-4xl border-b  bg-[#F5F5F5] p-5 flex flex-row justify-between rounded-lg">
-              <p>Api Key:</p>
-              <p className="flex flex-row items-center gap-2">
-                {userData?.ApiKey.key}
-                <button className="transform active:scale-75 transition-transform">
-                  <Copy
-                    size={30}
-                    onClick={() => {
-                      if (userData.ApiKey) {
-                        navigator.clipboard.writeText(userData.ApiKey.key);
-                      }
-                    }}
-                  />
-                </button>
-              </p>
-            </div>
-            {!userData.githubInstallationId ? (
-              <div className="text-4xl  bg-[#F5F5F5] p-5 flex flex-row justify-between rounded-lg mt-10">
-                <a href="https://github.com/apps/fetherkit/installations/new" target="_blank">
-                  Click to add github FetherKit app
-                </a>
+    <WagmiConfig config={wagmiConfig}>
+      <RainbowKitProvider
+        chains={chains}
+        theme={midnightTheme({
+          accentColor: "#000000",
+        })}
+      >
+        <div className="w-screen h-auto overflow-hidden display flex flex-col">
+          <div id="content" className="w-3/4 max-w-7xl mx-auto py-20 rounded-lg">
+            {!userData?.ApiKey ? (
+              <div className="text-4xl border-b bg-[#F5F5F5] p-5 flex flex-row justify-between rounded-lg">
+                <p>Api Key:</p>
+                <Form method="post" action="/keygen">
+                  <input type="hidden" name="userId" value={userData?.id} />
+                  <input type="hidden" name="formType" value="generateApiKey" />
+                  <button type="submit">Click here to generate api key</button>
+                </Form>
               </div>
             ) : (
               <div>
-                {!userData?.Repository ? (
+                <div className="text-4xl border-b  bg-[#F5F5F5] p-5 flex flex-row justify-between rounded-lg">
+                  <p>Api Key:</p>
+                  <p className="flex flex-row items-center gap-2">
+                    {userData?.ApiKey.key}
+                    <button className="transform active:scale-75 transition-transform">
+                      <Copy
+                        size={30}
+                        onClick={() => {
+                          if (userData.ApiKey) {
+                            navigator.clipboard.writeText(userData.ApiKey.key);
+                          }
+                        }}
+                      />
+                    </button>
+                  </p>
+                </div>
+                {!userData.githubInstallationId ? (
+                  <div className="text-4xl  bg-[#F5F5F5] p-5 flex flex-row justify-between rounded-lg mt-10">
+                    <a href="https://github.com/apps/fetherkit/installations/new" target="_blank">
+                      Click to add github FetherKit app
+                    </a>
+                  </div>
+                ) : (
                   <div>
-                    <div className="text-4xl mt-10 border-b  bg-[#F5F5F5] p-5 flex flex-col justify-between rounded-lg">
-                      <Form method="post">
-                        <input
-                          type="hidden"
-                          name="githubInstallationId"
-                          value={userData.githubInstallationId}
-                        />
-                        <input type="hidden" name="formType" value="getAllRepos" />
-                        <button type="submit">Click to choose repository</button>
-                      </Form>
-                      {actionArgs?.originCallForm == "getRepos" && (
-                        <>
-                          <Form method="post" className="mt-10">
+                    {!userData?.Repository ? (
+                      <div>
+                        <div className="text-4xl mt-10 border-b  bg-[#F5F5F5] p-5 flex flex-col justify-between rounded-lg">
+                          <Form method="post">
                             <input
                               type="hidden"
                               name="githubInstallationId"
                               value={userData.githubInstallationId}
                             />
-                            <input type="hidden" name="formType" value="getChosenRepo" />
-
-                            <fieldset className="grid grid-cols-2">
-                              {actionArgs.repositories?.map((repo) => (
-                                <label key={repo.repoName} className="text-xl">
-                                  <input
-                                    type="radio"
-                                    name="chosenRepoData"
-                                    value={[repo.repoName, repo.repoId]}
-                                  />{" "}
-                                  {repo.repoName}
-                                </label>
-                              ))}
-                            </fieldset>
-                            <br />
-                            <button type="submit">Submit</button>
+                            <input type="hidden" name="formType" value="getAllRepos" />
+                            <button type="submit">Click to choose repository</button>
                           </Form>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                ) : (
-                  <div>
-                    <div className="text-4xl  bg-[#F5F5F5] p-5 flex flex-row justify-between rounded-lg mt-10">
-                      <p>Repository:</p> <p>{userData.Repository.name}</p>
-                    </div>
-                    {userData?.Repository?.filename ? (
-                      <>
-                        <div className="text-4xl  bg-[#F5F5F5] p-5 flex flex-row justify-between rounded-lg mt-10">
-                          <p>Contract:</p> <p>{userData.Repository.filename}</p>
+                          {actionArgs?.originCallForm == "getRepos" && (
+                            <>
+                              <Form method="post" className="mt-10">
+                                <input
+                                  type="hidden"
+                                  name="githubInstallationId"
+                                  value={userData.githubInstallationId}
+                                />
+                                <input type="hidden" name="formType" value="getChosenRepo" />
+
+                                <fieldset className="grid grid-cols-2">
+                                  {actionArgs.repositories?.map((repo) => (
+                                    <label key={repo.repoName} className="text-xl">
+                                      <input
+                                        type="radio"
+                                        name="chosenRepoData"
+                                        value={[repo.repoName, repo.repoId]}
+                                      />{" "}
+                                      {repo.repoName}
+                                    </label>
+                                  ))}
+                                </fieldset>
+                                <br />
+                                <button type="submit">Submit</button>
+                              </Form>
+                            </>
+                          )}
                         </div>
-
-                        {userData?.Repository?.contractAbi ? (
-                          <div className="text-4xl flex gap-10 flex-row justify-between rounded-lg mt-10">
-                            <div className="w-2/5">
-                              <div className="flex flex-col gap-2  bg-[#F5F5F5] p-5 rounded-lg ">
-                                <p>Functions: </p>
-
-                                <ul className="flex flex-col gap-2 mt-5">
-                                  <p className="text-2xl border-b border-b-black">Read</p>
-                                  <div className="py-2">
-                                    {JSON.parse(userData?.Repository?.contractAbi).map(
-                                      (method: AbiFunctionType, i: number) => (
-                                        <>
-                                          {(method.stateMutability == "view" ||
-                                            method.stateMutability == "pure") && (
-                                            <li key={i} className="text-lg py-1">
-                                              <div className="flex flex-row justify-between items-center">
-                                                {JSON.stringify(method["name"]).replace(
-                                                  /['"]+/g,
-                                                  ""
-                                                )}
-                                                <button
-                                                  onClick={async () => {
-                                                    let returnedData = await callContractFunction(
-                                                      method,
-                                                      userData?.Repository?.contractAbi as string,
-                                                      userData?.Repository
-                                                        ?.contractAddress as `0x${string}`,
-                                                      getFunctionArgsFromInput(method),
-                                                      userData?.ApiKey?.key as string
-                                                    );
-                                                    setFunctionReturn(returnedData);
-                                                  }}
-                                                  className="text-white bg-black py-2 px-4 border rounded-lg"
-                                                >
-                                                  Call
-                                                </button>
-                                              </div>
-                                              {functionReturn.methodName == method.name &&
-                                                method.outputs.length > 0 && (
-                                                  <>
-                                                    <p>Returned:</p>
-                                                    {method.outputs.map((output, index) => (
-                                                      <div
-                                                        key={index}
-                                                        className="bg-transparent w-1/3 rounded-lg flex flex-row"
-                                                      >
-                                                        <p>
-                                                          &nbsp;&nbsp;
-                                                          {
-                                                            functionReturn.returnItems[index].name
-                                                          }:{" "}
-                                                        </p>
-                                                        <p>
-                                                          &nbsp;&nbsp;
-                                                          {functionReturn.returnItems[index].value}
-                                                        </p>
-                                                      </div>
-                                                    ))}
-                                                  </>
-                                                )}
-                                            </li>
-                                          )}
-                                        </>
-                                      )
-                                    )}
-                                  </div>
-                                  <p className="text-2xl border-b border-b-black">Write</p>
-
-                                  {JSON.parse(userData?.Repository?.contractAbi).map(
-                                    (method: AbiFunctionType, i: number) => (
-                                      <>
-                                        {!(
-                                          method.stateMutability == "view" ||
-                                          method.stateMutability == "pure"
-                                        ) && (
-                                          <li key={i} className="text-lg">
-                                            <>
-                                              <Accordion.Root
-                                                type="multiple"
-                                                className="w-full relative py-2"
-                                              >
-                                                <Accordion.Item
-                                                  key={method.name}
-                                                  value={method.name as string}
-                                                  className=""
-                                                >
-                                                  {method.inputs.length > 0 ? (
-                                                    <Accordion.Trigger className="group">
-                                                      <p>{method.name}</p>
-                                                      <div className="absolute  right-0 top-0  transition-transform group-data-[state=open]:rotate-180">
-                                                        <ChevronDown
-                                                          size={40}
-                                                          strokeWidth={1.25}
-                                                          strokeLinecap="round"
-                                                          className="w-16"
-                                                        />
-                                                      </div>
-                                                    </Accordion.Trigger>
-                                                  ) : (
-                                                    <div className="flex flex-row justify-between items-center">
-                                                      <p>{method.name}</p>
-                                                      <button
-                                                        onClick={async () => {
-                                                          let returnedData =
-                                                            await callContractFunction(
-                                                              method,
-                                                              userData?.Repository
-                                                                ?.contractAbi as string,
-                                                              userData?.Repository
-                                                                ?.contractAddress as `0x${string}`,
-                                                              getFunctionArgsFromInput(method),
-                                                              userData?.ApiKey?.key as string
-                                                            );
-                                                          setFunctionReturn(returnedData);
-                                                        }}
-                                                        className="text-white bg-black py-2 px-4 border rounded-lg"
-                                                      >
-                                                        Call
-                                                      </button>
-                                                    </div>
-                                                  )}
-                                                  {method.inputs.length > 0 && (
-                                                    <Accordion.Content>
-                                                      <div className="flex flex-row justify-between mt-4">
-                                                        <div className="flex flex-col mt-2 gap-2">
-                                                          {method.inputs.map((input) => (
-                                                            <input
-                                                              key={input.name}
-                                                              id={`${method.name}-${input.name}`}
-                                                              className="bg-transparent rounded-lg"
-                                                              type="text"
-                                                              placeholder={`${input.type}: ${input.name}`}
-                                                            />
-                                                          ))}{" "}
-                                                        </div>
-                                                        <button
-                                                          onClick={async () => {
-                                                            let returnedData =
-                                                              await callContractFunction(
-                                                                method,
-                                                                userData?.Repository
-                                                                  ?.contractAbi as string,
-                                                                userData?.Repository
-                                                                  ?.contractAddress as `0x${string}`,
-                                                                getFunctionArgsFromInput(method),
-                                                                userData?.ApiKey?.key as string
-                                                              );
-                                                            setFunctionReturn(returnedData);
-                                                          }}
-                                                          className="text-white bg-black py-2 px-4 border rounded-lg"
-                                                        >
-                                                          Call
-                                                        </button>
-                                                      </div>
-                                                    </Accordion.Content>
-                                                  )}
-                                                </Accordion.Item>
-                                              </Accordion.Root>
-                                            </>
-                                            {functionReturn.methodName == method.name &&
-                                              method.outputs.length > 0 && (
-                                                <>
-                                                  <p>Returned:</p>
-                                                  {method.outputs.map((output, index) => (
-                                                    <div
-                                                      key={index}
-                                                      className="bg-transparent w-1/3 rounded-lg flex flex-row"
-                                                    >
-                                                      <p>
-                                                        &nbsp;&nbsp;
-                                                        {
-                                                          functionReturn.returnItems[index].name
-                                                        }:{" "}
-                                                      </p>
-                                                      <p>
-                                                        &nbsp;&nbsp;
-                                                        {functionReturn.returnItems[index].value}
-                                                      </p>
-                                                    </div>
-                                                  ))}
-                                                </>
-                                              )}
-                                          </li>
-                                        )}
-                                      </>
-                                    )
-                                  )}
-                                </ul>
-                              </div>
-                              <br />
-                              <div className="flex flex-col gap-2  bg-[#F5F5F5] p-5 rounded-lg ">
-                                <p>Last Deployment:</p>
-                                <p className="text-lg">
-                                  {new Date(userData?.Repository?.updatedAt).toLocaleString()}
-                                </p>
-                              </div>
+                      </div>
+                    ) : (
+                      <div>
+                        <div className="text-4xl  bg-[#F5F5F5] p-5 flex flex-row justify-between rounded-lg mt-10">
+                          <p>Repository:</p> <p>{userData.Repository.name}</p>
+                        </div>
+                        {userData?.Repository?.filename ? (
+                          <>
+                            <div className="text-4xl  bg-[#F5F5F5] p-5 flex flex-row justify-between rounded-lg mt-10">
+                              <p>Contract:</p> <p>{userData.Repository.filename}</p>
                             </div>
-                            <div className="flex-1  bg-[#F5F5F5] p-5 rounded-lg ">
-                              <div className="flex flex-row justify-between items-center">
-                                <p className="pb-2">Recent Transactions:</p>
 
+                            {userData?.Repository?.contractAbi ? (
+                              <div className="text-4xl flex gap-10 flex-row justify-between rounded-lg mt-10">
+                                <div className="w-2/5">
+                                  <div className="flex flex-col gap-2  bg-[#F5F5F5] p-5 rounded-lg ">
+                                    <div className="flex flex-row justify-between">
+                                      <p>Functions: </p>
+                                      <div className=" bg-black py-1 px-2 text-lg rounded-lg">
+                                        <ConnectButton
+                                          label="Connect"
+                                          showBalance={false}
+                                          chainStatus="none"
+                                          accountStatus="address"
+                                        />
+                                      </div>
+                                    </div>
+
+                                    <ul className="flex flex-col gap-2 mt-5">
+                                      <p className="text-2xl border-b border-b-black">Read</p>
+                                      <div className="py-2">
+                                        {JSON.parse(userData?.Repository?.contractAbi).map(
+                                          (method: AbiFunctionType, i: number) => (
+                                            <>
+                                              {(method.stateMutability == "view" ||
+                                                method.stateMutability == "pure") && (
+                                                <li key={i} className="text-lg py-1">
+                                                  <div className="flex flex-row justify-between items-center">
+                                                    {JSON.stringify(method["name"]).replace(
+                                                      /['"]+/g,
+                                                      ""
+                                                    )}
+                                                    <button
+                                                      onClick={async () => {
+                                                        let returnedData =
+                                                          await callContractFunction(
+                                                            method,
+                                                            userData?.Repository
+                                                              ?.contractAbi as string,
+                                                            userData?.Repository
+                                                              ?.contractAddress as `0x${string}`,
+                                                            getFunctionArgsFromInput(method),
+                                                            userData?.ApiKey?.key as string
+                                                          );
+                                                        setFunctionReturn(returnedData);
+                                                      }}
+                                                      className="text-white bg-black py-2 px-4 border rounded-lg"
+                                                    >
+                                                      Call
+                                                    </button>
+                                                  </div>
+                                                  {functionReturn.methodName == method.name &&
+                                                    method.outputs.length > 0 && (
+                                                      <>
+                                                        <p>Returned:</p>
+                                                        {method.outputs.map((output, index) => (
+                                                          <div
+                                                            key={index}
+                                                            className="bg-transparent w-1/3 rounded-lg flex flex-row"
+                                                          >
+                                                            <p>
+                                                              &nbsp;&nbsp;
+                                                              {
+                                                                functionReturn.returnItems[index]
+                                                                  .name
+                                                              }
+                                                              :{" "}
+                                                            </p>
+                                                            <p>
+                                                              &nbsp;&nbsp;
+                                                              {
+                                                                functionReturn.returnItems[index]
+                                                                  .value
+                                                              }
+                                                            </p>
+                                                          </div>
+                                                        ))}
+                                                      </>
+                                                    )}
+                                                </li>
+                                              )}
+                                            </>
+                                          )
+                                        )}
+                                      </div>
+                                      <p className="text-2xl border-b border-b-black">Write</p>
+
+                                      {JSON.parse(userData?.Repository?.contractAbi).map(
+                                        (method: AbiFunctionType, i: number) => (
+                                          <>
+                                            {!(
+                                              method.stateMutability == "view" ||
+                                              method.stateMutability == "pure"
+                                            ) && (
+                                              <li key={i} className="text-lg">
+                                                <>
+                                                  <Accordion.Root
+                                                    type="multiple"
+                                                    className="w-full relative py-2"
+                                                  >
+                                                    <Accordion.Item
+                                                      key={method.name}
+                                                      value={method.name as string}
+                                                      className=""
+                                                    >
+                                                      {method.inputs.length > 0 ? (
+                                                        <Accordion.Trigger className="group">
+                                                          <p>{method.name}</p>
+                                                          <div className="absolute  right-0 top-0  transition-transform group-data-[state=open]:rotate-180">
+                                                            <ChevronDown
+                                                              size={40}
+                                                              strokeWidth={1.25}
+                                                              strokeLinecap="round"
+                                                              className="w-16"
+                                                            />
+                                                          </div>
+                                                        </Accordion.Trigger>
+                                                      ) : (
+                                                        <div className="flex flex-row justify-between items-center">
+                                                          <p>{method.name}</p>
+                                                          <button
+                                                            onClick={async () => {
+                                                              let returnedData =
+                                                                await callContractFunction(
+                                                                  method,
+                                                                  userData?.Repository
+                                                                    ?.contractAbi as string,
+                                                                  userData?.Repository
+                                                                    ?.contractAddress as `0x${string}`,
+                                                                  getFunctionArgsFromInput(method),
+                                                                  userData?.ApiKey?.key as string
+                                                                );
+                                                              setFunctionReturn(returnedData);
+                                                            }}
+                                                            className="text-white bg-black py-2 px-4 border rounded-lg"
+                                                          >
+                                                            Call
+                                                          </button>
+                                                        </div>
+                                                      )}
+                                                      {method.inputs.length > 0 && (
+                                                        <Accordion.Content>
+                                                          <div className="flex flex-row justify-between mt-4">
+                                                            <div className="flex flex-col mt-2 gap-2">
+                                                              {method.inputs.map((input) => (
+                                                                <input
+                                                                  key={input.name}
+                                                                  id={`${method.name}-${input.name}`}
+                                                                  className="bg-transparent rounded-lg"
+                                                                  type="text"
+                                                                  placeholder={`${input.type}: ${input.name}`}
+                                                                />
+                                                              ))}{" "}
+                                                            </div>
+                                                            <button
+                                                              onClick={async () => {
+                                                                let returnedData =
+                                                                  await callContractFunction(
+                                                                    method,
+                                                                    userData?.Repository
+                                                                      ?.contractAbi as string,
+                                                                    userData?.Repository
+                                                                      ?.contractAddress as `0x${string}`,
+                                                                    getFunctionArgsFromInput(
+                                                                      method
+                                                                    ),
+                                                                    userData?.ApiKey?.key as string
+                                                                  );
+                                                                setFunctionReturn(returnedData);
+                                                              }}
+                                                              className="text-white bg-black py-2 px-4 border rounded-lg"
+                                                            >
+                                                              Call
+                                                            </button>
+                                                          </div>
+                                                        </Accordion.Content>
+                                                      )}
+                                                    </Accordion.Item>
+                                                  </Accordion.Root>
+                                                </>
+                                                {functionReturn.methodName == method.name &&
+                                                  method.outputs.length > 0 && (
+                                                    <>
+                                                      <p>Returned:</p>
+                                                      {method.outputs.map((output, index) => (
+                                                        <div
+                                                          key={index}
+                                                          className="bg-transparent w-1/3 rounded-lg flex flex-row"
+                                                        >
+                                                          <p>
+                                                            &nbsp;&nbsp;
+                                                            {functionReturn.returnItems[index].name}
+                                                            :{" "}
+                                                          </p>
+                                                          <p>
+                                                            &nbsp;&nbsp;
+                                                            {
+                                                              functionReturn.returnItems[index]
+                                                                .value
+                                                            }
+                                                          </p>
+                                                        </div>
+                                                      ))}
+                                                    </>
+                                                  )}
+                                              </li>
+                                            )}
+                                          </>
+                                        )
+                                      )}
+                                    </ul>
+                                  </div>
+                                  <br />
+                                  <div className="flex flex-col gap-2  bg-[#F5F5F5] p-5 rounded-lg ">
+                                    <p>Last Deployment:</p>
+                                    <p className="text-lg">
+                                      {new Date(userData?.Repository?.updatedAt).toLocaleString()}
+                                    </p>
+                                  </div>
+                                </div>
+                                <div className="flex-1  bg-[#F5F5F5] p-5 rounded-lg ">
+                                  <div className="flex flex-row justify-between items-center">
+                                    <p className="pb-2">Recent Transactions:</p>
+
+                                    <Form method="post">
+                                      <input
+                                        type="hidden"
+                                        name="githubInstallationId"
+                                        value={userData.githubInstallationId}
+                                      />
+                                      <input type="hidden" name="formType" value="deployContract" />
+                                      <button
+                                        type="submit"
+                                        className="text-xl  text-white bg-black py-2 px-4 rounded-lg"
+                                      >
+                                        {deployStatus}
+                                      </button>
+                                    </Form>
+                                  </div>
+                                  <table className="table-fixed w-full mt-5">
+                                    <thead>
+                                      <tr className="text-left">
+                                        <th className="text-lg">Tx Hash</th>
+                                        <th className="text-lg">Function Name</th>
+                                        <th className="text-lg">Timestamp</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                      {userData?.Repository?.Activity?.map(
+                                        (transaction: any, i) => (
+                                          <tr key={i} className="">
+                                            <td>
+                                              <a
+                                                href={`http://localhost:3003/${transaction.txHash}`}
+                                                target="_blank"
+                                                className="text-lg block underline"
+                                              >
+                                                {transaction.txHash.slice(0, 12)}...
+                                              </a>
+                                            </td>
+                                            <td>
+                                              <p className="text-lg">{transaction.functionName}</p>
+                                            </td>
+                                            <td>
+                                              <p className="text-lg">
+                                                {timeSince(transaction.timestamp)} ago
+                                              </p>
+                                            </td>
+                                          </tr>
+                                        )
+                                      )}
+                                    </tbody>
+                                  </table>
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="text-4xl  bg-[#F5F5F5] p-5 flex flex-row justify-between rounded-lg mt-10">
                                 <Form method="post">
                                   <input
                                     type="hidden"
@@ -489,81 +612,17 @@ export default function Index() {
                                     value={userData.githubInstallationId}
                                   />
                                   <input type="hidden" name="formType" value="deployContract" />
-                                  <button
-                                    type="submit"
-                                    className="text-xl  text-white bg-black py-2 px-4 rounded-lg"
-                                  >
-                                    {deployStatus}
-                                  </button>
+                                  <button type="submit">Click here to deploy your contract</button>
                                 </Form>
                               </div>
-                              <table className="table-fixed w-full mt-5">
-                                <thead>
-                                  <tr className="text-left">
-                                    <th className="text-lg">Tx Hash</th>
-                                    <th className="text-lg">Function Name</th>
-                                    <th className="text-lg">Timestamp</th>
-                                  </tr>
-                                </thead>
-                                <tbody>
-                                  {userData?.Repository?.Activity?.map((transaction: any, i) => (
-                                    <tr key={i} className="">
-                                      <td>
-                                        <a
-                                          href={`http://localhost:3003/${transaction.txHash}`}
-                                          target="_blank"
-                                          className="text-lg block underline"
-                                        >
-                                          {transaction.txHash.slice(0, 12)}...
-                                        </a>
-                                      </td>
-                                      <td>
-                                        <p className="text-lg">{transaction.functionName}</p>
-                                      </td>
-                                      <td>
-                                        <p className="text-lg">
-                                          {timeSince(transaction.timestamp)} ago
-                                        </p>
-                                      </td>
-                                    </tr>
-                                  ))}
-                                </tbody>
-                              </table>
-                            </div>
-                          </div>
+                            )}
+                          </>
                         ) : (
-                          <div className="text-4xl  bg-[#F5F5F5] p-5 flex flex-row justify-between rounded-lg mt-10">
-                            <Form method="post">
-                              <input
-                                type="hidden"
-                                name="githubInstallationId"
-                                value={userData.githubInstallationId}
-                              />
-                              <input type="hidden" name="formType" value="deployContract" />
-                              <button type="submit">Click here to deploy your contract</button>
-                            </Form>
-                          </div>
-                        )}
-                      </>
-                    ) : (
-                      <div className="text-4xl border-b  bg-[#F5F5F5] p-5 flex flex-col justify-between rounded-lg mt-10">
-                        {actionArgs?.originCallForm != "chooseFileToTrack" &&
-                          !userData?.Repository.filename && (
-                            <>
-                              <Form method="post">
-                                <input
-                                  type="hidden"
-                                  name="githubInstallationId"
-                                  value={userData.githubInstallationId}
-                                />
-                                <input type="hidden" name="formType" value="getFilesOfChosenRepo" />
-                                <button type="submit">
-                                  Click to select which solidity file to track
-                                </button>
-                              </Form>
-                              {actionArgs?.originCallForm == "getFilesOfChosenRepo" && (
+                          <div className="text-4xl border-b  bg-[#F5F5F5] p-5 flex flex-col justify-between rounded-lg mt-10">
+                            {actionArgs?.originCallForm != "chooseFileToTrack" &&
+                              !userData?.Repository.filename && (
                                 <>
-                                  <Form method="post" className="mt-10">
+                                  <Form method="post">
                                     <input
                                       type="hidden"
                                       name="githubInstallationId"
@@ -572,27 +631,46 @@ export default function Index() {
                                     <input
                                       type="hidden"
                                       name="formType"
-                                      value="chooseFileToTrack"
+                                      value="getFilesOfChosenRepo"
                                     />
-                                    <fieldset className="grid grid-cols-2">
-                                      {actionArgs.solFilesFromChosenRepo?.map((fileName, i) => (
-                                        <label key={i} className="text-xl">
-                                          <input
-                                            type="radio"
-                                            name="chosenFileName"
-                                            value={fileName}
-                                          />
-                                          {fileName}
-                                        </label>
-                                      ))}
-                                    </fieldset>
-                                    <br />
-                                    <button type="submit">Submit</button>
+                                    <button type="submit">
+                                      Click to select which solidity file to track
+                                    </button>
                                   </Form>
+                                  {actionArgs?.originCallForm == "getFilesOfChosenRepo" && (
+                                    <>
+                                      <Form method="post" className="mt-10">
+                                        <input
+                                          type="hidden"
+                                          name="githubInstallationId"
+                                          value={userData.githubInstallationId}
+                                        />
+                                        <input
+                                          type="hidden"
+                                          name="formType"
+                                          value="chooseFileToTrack"
+                                        />
+                                        <fieldset className="grid grid-cols-2">
+                                          {actionArgs.solFilesFromChosenRepo?.map((fileName, i) => (
+                                            <label key={i} className="text-xl">
+                                              <input
+                                                type="radio"
+                                                name="chosenFileName"
+                                                value={fileName}
+                                              />
+                                              {fileName}
+                                            </label>
+                                          ))}
+                                        </fieldset>
+                                        <br />
+                                        <button type="submit">Submit</button>
+                                      </Form>
+                                    </>
+                                  )}
                                 </>
                               )}
-                            </>
-                          )}
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
@@ -600,8 +678,8 @@ export default function Index() {
               </div>
             )}
           </div>
-        )}
-      </div>
-    </div>
+        </div>
+      </RainbowKitProvider>
+    </WagmiConfig>
   );
 }
