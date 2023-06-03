@@ -158,7 +158,7 @@ const getFunctionArgsFromInput = (abiFunction: AbiFunctionType): any[] => {
   let args = [];
   for (let i = 0; i < abiFunction.inputs.length; i++) {
     const inputElement = document.getElementById(
-      `${abiFunction.name}-${abiFunction.inputs[0].name}`
+      `${abiFunction.name}-${abiFunction.inputs[i].name}`
     ) as HTMLInputElement;
 
     const val = inputElement.value;
