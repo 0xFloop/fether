@@ -849,8 +849,8 @@
       }
     },
     "src/Counter.sol": {
-      "lastModificationDate": 1685161914650,
-      "contentHash": "79707f48dd685efee8b9764fc61c27d6",
+      "lastModificationDate": 1685297791686,
+      "contentHash": "7395bc059b08d0fa85af1194f883627f",
       "sourceName": "src/Counter.sol",
       "solcConfig": {
         "settings": {
@@ -889,8 +889,8 @@
       }
     },
     "src/SecretKeeper.sol": {
-      "lastModificationDate": 1685161739738,
-      "contentHash": "e4dc7ea2fba9cdea72509f2745a9834b",
+      "lastModificationDate": 1685821925162,
+      "contentHash": "32fbdf170eb80d61de897ae86aee088b",
       "sourceName": "src/SecretKeeper.sol",
       "solcConfig": {
         "settings": {
@@ -923,8 +923,8 @@
       "imports": [],
       "versionRequirement": "^0.8.13",
       "artifacts": {
-        "TestContract": {
-          "0.8.17+commit.8df45f5f.Darwin.appleclang": "SecretKeeper.sol/TestContract.json"
+        "SecretKeeper": {
+          "0.8.17+commit.8df45f5f.Darwin.appleclang": "SecretKeeper.sol/SecretKeeper.json"
         }
       }
     },
