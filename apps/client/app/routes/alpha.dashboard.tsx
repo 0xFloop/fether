@@ -10,16 +10,22 @@ import { AbiFunction as AbiFunctionType } from "abitype";
 import { useState } from "react";
 import { ContractReturn, callContractFunction, timeSince } from "~/utils/helpers";
 import * as Accordion from "@radix-ui/react-accordion";
+import { ConnectKitProvider, ConnectKitButton, getDefaultConfig } from "connectkit";
+
 import {
-  darkTheme,
-  getDefaultWallets,
-  midnightTheme,
-  RainbowKitProvider,
-} from "@rainbow-me/rainbowkit";
-import { WagmiConfig, createConfig, configureChains, Chain } from "wagmi";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
+  WagmiConfig,
+  createConfig,
+  configureChains,
+  Chain,
+  useAccount,
+  useDisconnect,
+  useConnect,
+} from "wagmi";
 import { publicProvider } from "wagmi/providers/public";
 import rainbowStylesUrl from "@rainbow-me/rainbowkit/styles.css";
+
+//TODO: USE THE CONNECTED WALLET NOT FORCED INJECTED WALLET
+//TODO: ADD SETTING AND USING THE DEPLOYER ADDRESS
 
 export const links: LinksFunction = () => [{ rel: "stylesheet", href: rainbowStylesUrl }];
 
@@ -205,15 +211,18 @@ export default function Index() {
 
   const { chains, publicClient } = configureChains([fetherChain], [publicProvider()]);
 
-  const { connectors } = getDefaultWallets({
-    appName: "Fether",
-    chains,
-  });
-  const wagmiConfig = createConfig({
-    autoConnect: true,
-    connectors,
-    publicClient,
-  });
+  const config = createConfig(
+    getDefaultConfig({
+      alchemyId: "NOTNEEDED", // or infuraId
+      walletConnectProjectId: "NOTNEEDED",
+      chains,
+      // Required
+      appName: "Fether",
+
+      // Optional
+      appUrl: "https://fether.xyz", // your app's url
+    })
+  );
 
   let deployStatus = "Deploy";
 
@@ -233,14 +242,11 @@ export default function Index() {
     returnItems: [],
   });
 
+  const { address, isConnecting, isDisconnected, isConnected } = useAccount();
+
   return (
-    <WagmiConfig config={wagmiConfig}>
-      <RainbowKitProvider
-        chains={chains}
-        theme={midnightTheme({
-          accentColor: "#000000",
-        })}
-      >
+    <WagmiConfig config={config}>
+      <ConnectKitProvider>
         <div className="w-screen h-auto overflow-hidden display flex flex-col">
           {!userData?.Repository?.contractAbi ? (
             <div id="content" className="w-3/4 max-w-7xl mx-auto py-20 rounded-lg">
@@ -412,10 +418,11 @@ export default function Index() {
                 <div className="w-2/5">
                   <div className="flex flex-col rounded-lg">
                     <div className="text-xl gap-2 bg-[#F5F5F5] p-5 flex flex-col rounded-lg">
+                      <p className="pb-2 text-4xl">Details:</p>
                       <div className="flex flex-row justify-between rounded-lg">
                         <p className="text-2xl ">Api Key:</p>
                         <p className="flex flex-row items-center gap-2">
-                          {userData?.ApiKey?.key.slice(0, 10)}...
+                          {userData?.ApiKey?.key.slice(0, 10)}••••
                           {userData?.ApiKey?.key.slice(20)}
                           <button className="transform active:scale-75 transition-transform">
                             <Copy
@@ -432,23 +439,40 @@ export default function Index() {
                       <div className="flex flex-row justify-between rounded-lg">
                         <p className="text-2xl">Repository:</p>
                         <div className="flex flex-row items-center">
-                          <p>{userData.Repository.name} &nbsp;</p> <Edit size={20} />
+                          <p>{userData.Repository.name} &nbsp;</p>{" "}
+                          <button>
+                            <Edit
+                              className="transform active:scale-75 transition-transform"
+                              size={20}
+                            />
+                          </button>
                         </div>
                       </div>
                       <div className="flex flex-row justify-between rounded-lg">
                         <p className="text-2xl">Contract:</p>{" "}
                         <div className="flex flex-row items-center">
-                          <p>{userData.Repository.filename} &nbsp;</p> <Edit size={20} />
+                          <p>{userData.Repository.filename} &nbsp;</p>{" "}
+                          <button>
+                            <Edit
+                              className="transform active:scale-75 transition-transform"
+                              size={20}
+                            />
+                          </button>
                         </div>
                       </div>
                       <div className="flex flex-row justify-between rounded-lg">
                         <p className="text-2xl">Deployer Address: </p>
                         <div className="flex flex-row items-center">
                           <p>
-                            {userData?.Repository?.contractAddress?.slice(0, 8)}...
+                            {userData?.Repository?.contractAddress?.slice(0, 8)}••••
                             {userData?.Repository?.contractAddress?.slice(37)} &nbsp;{" "}
                           </p>
-                          <Edit size={20} />
+                          <button>
+                            <Edit
+                              className="transform active:scale-75 transition-transform"
+                              size={20}
+                            />
+                          </button>
                         </div>
                       </div>
                       <div className="flex flex-row justify-between rounded-lg">
@@ -460,13 +484,29 @@ export default function Index() {
                     <div className="flex flex-col bg-[#F5F5F5] p-5 rounded-lg">
                       <div className="flex flex-row justify-between">
                         <p>Functions: </p>
-                        <div className=" bg-black py-1 px-2 text-lg rounded-lg">
-                          <ConnectButton
-                            label="Connect"
-                            showBalance={false}
-                            chainStatus="none"
-                            accountStatus="address"
-                          />
+                        <div className="text-lg">
+                          <ConnectKitButton.Custom>
+                            {({
+                              isConnected,
+                              isConnecting,
+                              show,
+                              hide,
+                              address,
+                              ensName,
+                              chain,
+                            }) => {
+                              return (
+                                <button
+                                  onClick={show}
+                                  className="text-white bg-black py-2 px-4 border rounded-lg"
+                                >
+                                  {isConnected
+                                    ? `${address?.slice(0, 7)}••••${address?.slice(37)}`
+                                    : "Connect"}
+                                </button>
+                              );
+                            }}
+                          </ConnectKitButton.Custom>
                         </div>
                       </div>
                       <ul className="flex flex-col gap-2 pt-5 bg-[#F5F5F5] rounded-lg">
@@ -524,6 +564,8 @@ export default function Index() {
                           )}
                         </div>
                         <p className="text-2xl border-b border-b-black">Write</p>
+
+                        {(isConnected || address) && <div>TESTING USE ACCOUNT</div>}
 
                         {JSON.parse(userData?.Repository?.contractAbi).map(
                           (method: AbiFunctionType, i: number) => (
@@ -644,7 +686,7 @@ export default function Index() {
 
                 <div className="flex-1  bg-[#F5F5F5] p-5 rounded-lg ">
                   <div className="flex flex-row justify-between items-center">
-                    <p className="pb-2">Recent Transactions:</p>
+                    <p className="pb-2">Transactions:</p>
 
                     <Form method="post">
                       <input
@@ -696,7 +738,7 @@ export default function Index() {
             </div>
           )}
         </div>
-      </RainbowKitProvider>
+      </ConnectKitProvider>
     </WagmiConfig>
   );
 }
