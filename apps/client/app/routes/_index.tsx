@@ -89,12 +89,6 @@ export default function Index() {
                   Submit
                 </button>
               </Form>
-              <p className="mt-4">
-                Already have fether account?{" "}
-                <Link to="/alpha/login" className="border-b border-black">
-                  Login
-                </Link>
-              </p>
 
               {data && (
                 <p className="font-sans text-red-500 text-base mt-4 inline-block">{data.message}</p>
