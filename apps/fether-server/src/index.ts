@@ -110,13 +110,11 @@ app.post("/rpc/:API_KEY", jsonParser, async (req, res) => {
       // });
 
       let responseJson = await response.json();
-      res.set("Access-Control-Allow-Origin", "*");
-      res.send(responseJson);
+      res.set("Access-Control-Allow-Origin", "*").send(responseJson);
     }
   } catch (err) {
     console.log("ERROR OCCURED: \n", err);
-    res.sendStatus(500);
-    res.end(err);
+    res.set("Access-Control-Allow-Origin", "*").status(500).end(err);
   }
 });
 
@@ -125,7 +123,7 @@ app.post("/payload", jsonParser, async (req, res) => {
     let installId = req.body.installation.id.toString();
 
     const octokit = await octo.getInstallationOctokit(installId);
-    //needs to plan for if there are multiple commits in a push with sol files changed
+
     let associatedUserData = await db.user.findUnique({
       where: { githubInstallationId: installId },
       include: { ApiKey: true, Repository: true },
