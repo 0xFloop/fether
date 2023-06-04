@@ -22,12 +22,9 @@ import {
   useConnect,
 } from "wagmi";
 import { publicProvider } from "wagmi/providers/public";
-import rainbowStylesUrl from "@rainbow-me/rainbowkit/styles.css";
 
 //TODO: USE THE CONNECTED WALLET NOT FORCED INJECTED WALLET
 //TODO: ADD SETTING AND USING THE DEPLOYER ADDRESS
-
-export const links: LinksFunction = () => [{ rel: "stylesheet", href: rainbowStylesUrl }];
 
 type UserWithKeyRepoActivity =
   | (User & {
@@ -565,8 +562,6 @@ export default function Index() {
                         </div>
                         <p className="text-2xl border-b border-b-black">Write</p>
 
-                        {(isConnected || address) && <div>TESTING USE ACCOUNT</div>}
-
                         {JSON.parse(userData?.Repository?.contractAbi).map(
                           (method: AbiFunctionType, i: number) => (
                             <>
@@ -601,17 +596,23 @@ export default function Index() {
                                             <p>{method.name}</p>
                                             <button
                                               onClick={async () => {
-                                                let returnedData = await callContractFunction(
-                                                  method,
-                                                  userData?.Repository?.contractAbi as string,
-                                                  userData?.Repository
-                                                    ?.contractAddress as `0x${string}`,
-                                                  getFunctionArgsFromInput(method),
-                                                  userData?.ApiKey?.key as string
-                                                );
-                                                setFunctionReturn(returnedData);
+                                                if (isConnected || address) {
+                                                  let returnedData = await callContractFunction(
+                                                    method,
+                                                    userData?.Repository?.contractAbi as string,
+                                                    userData?.Repository
+                                                      ?.contractAddress as `0x${string}`,
+                                                    getFunctionArgsFromInput(method),
+                                                    userData?.ApiKey?.key as string
+                                                  );
+                                                  setFunctionReturn(returnedData);
+                                                }
                                               }}
-                                              className="text-white bg-black py-2 px-4 border rounded-lg"
+                                              className={
+                                                isConnected || address
+                                                  ? "text-white bg-black py-2 px-4 border rounded-lg"
+                                                  : "text-white bg-[#eeeeee] py-2 px-4 border rounded-lg"
+                                              }
                                             >
                                               Call
                                             </button>
@@ -633,17 +634,23 @@ export default function Index() {
                                               </div>
                                               <button
                                                 onClick={async () => {
-                                                  let returnedData = await callContractFunction(
-                                                    method,
-                                                    userData?.Repository?.contractAbi as string,
-                                                    userData?.Repository
-                                                      ?.contractAddress as `0x${string}`,
-                                                    getFunctionArgsFromInput(method),
-                                                    userData?.ApiKey?.key as string
-                                                  );
-                                                  setFunctionReturn(returnedData);
+                                                  if (isConnected || address) {
+                                                    let returnedData = await callContractFunction(
+                                                      method,
+                                                      userData?.Repository?.contractAbi as string,
+                                                      userData?.Repository
+                                                        ?.contractAddress as `0x${string}`,
+                                                      getFunctionArgsFromInput(method),
+                                                      userData?.ApiKey?.key as string
+                                                    );
+                                                    setFunctionReturn(returnedData);
+                                                  }
                                                 }}
-                                                className="text-white bg-black py-2 px-4 border rounded-lg"
+                                                className={
+                                                  isConnected || address
+                                                    ? "text-white bg-black py-2 px-4 border rounded-lg"
+                                                    : "text-white bg-[#eeeeee] py-2 px-4 border rounded-lg"
+                                                }
                                               >
                                                 Call
                                               </button>
