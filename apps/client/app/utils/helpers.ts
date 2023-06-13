@@ -55,6 +55,7 @@ export const callContractFunction = async (
   } else {
     let walletClient = createWalletClient({
       chain: fetherChainFromApiKey,
+      // @ts-ignore
       transport: custom(window.ethereum),
     });
 
