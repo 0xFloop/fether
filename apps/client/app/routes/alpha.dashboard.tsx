@@ -20,10 +20,12 @@ import {
   useAccount,
   useDisconnect,
   useConnect,
+  useBalance,
 } from "wagmi";
 import { publicProvider } from "wagmi/providers/public";
 
 //TODO: USE THE CONNECTED WALLET NOT FORCED INJECTED WALLET
+//TODO: ADD A WAY TO FUND WALLET IF IT IS EMPTY
 //TODO: ADD SETTING AND USING THE DEPLOYER ADDRESS
 
 type UserWithKeyRepoActivity =
@@ -221,6 +223,7 @@ export default function Index() {
   const actionArgs = useActionData<typeof action>();
   const navigation = useNavigation();
   const [copied, setCopied] = useState(false);
+  const [functionCalled, setFunctionCalled] = useState<string | null>(null);
 
   const fetherChain: Chain = {
     id: 696969,
@@ -274,6 +277,12 @@ export default function Index() {
   });
 
   const { address, isConnecting, isDisconnected, isConnected } = useAccount();
+  // const { data, isError, isLoading } = useBalance({
+  //   address: "0xA0Cf798816D4b9b9866b5330EEa46a18382f251e",
+  //   onSettled(data, error) {
+  //     console.log("Settled", { data, error });
+  //   },
+  // });
 
   return (
     <WagmiConfig config={config}>
@@ -699,6 +708,9 @@ export default function Index() {
                           </ConnectKitButton.Custom>
                         </div>
                       </div>
+                      {/* <div>
+                        Balance: {data?.formatted} {data?.symbol}
+                      </div>{" "} */}
                       <ul className="flex flex-col gap-2 pt-5 bg-[#F5F5F5] rounded-lg">
                         <p className="text-2xl border-b border-b-black">Read</p>
                         <div className="py-2">
@@ -712,6 +724,8 @@ export default function Index() {
                                       {JSON.stringify(method["name"]).replace(/['"]+/g, "")}
                                       <button
                                         onClick={async () => {
+                                          setFunctionCalled(method.name);
+
                                           let returnedData = await callContractFunction(
                                             method,
                                             userData?.Repository?.contractAbi as string,
@@ -719,11 +733,23 @@ export default function Index() {
                                             getFunctionArgsFromInput(method),
                                             userData?.ApiKey?.key as string
                                           );
+                                          setFunctionCalled(null);
+
                                           setFunctionReturn(returnedData);
                                         }}
                                         className="text-white bg-black py-2 px-4 border rounded-lg"
                                       >
-                                        Call
+                                        {functionCalled == method.name ? (
+                                          <div className="flex flex-row items-center">
+                                            <p>Calling</p>{" "}
+                                            <div className="animate-spin ml-2">
+                                              {" "}
+                                              <Loader size={20} />
+                                            </div>
+                                          </div>
+                                        ) : (
+                                          <>Call</>
+                                        )}
                                       </button>
                                     </div>
                                     {functionReturn.methodName == method.name &&
@@ -790,21 +816,38 @@ export default function Index() {
                                             <button
                                               onClick={async () => {
                                                 if (isConnected || address) {
-                                                  let returnedData = await callContractFunction(
-                                                    method,
-                                                    userData?.Repository?.contractAbi as string,
-                                                    userData?.Repository
-                                                      ?.contractAddress as `0x${string}`,
-                                                    getFunctionArgsFromInput(method),
-                                                    userData?.ApiKey?.key as string
-                                                  );
-                                                  setFunctionReturn(returnedData);
+                                                  setFunctionCalled(method.name);
+                                                  try {
+                                                    let returnedData = await callContractFunction(
+                                                      method,
+                                                      userData?.Repository?.contractAbi as string,
+                                                      userData?.Repository
+                                                        ?.contractAddress as `0x${string}`,
+                                                      getFunctionArgsFromInput(method),
+                                                      userData?.ApiKey?.key as string
+                                                    );
+                                                    setFunctionCalled(null);
+
+                                                    setFunctionReturn(returnedData);
+                                                  } catch (error) {
+                                                    setFunctionCalled(null);
+                                                  }
                                                 }
                                               }}
                                               className="text-white bg-black py-2 px-4 border rounded-lg disabled:bg-[#cbcbcb]"
                                               disabled={!(isConnected || address)}
                                             >
-                                              Call
+                                              {functionCalled == method.name ? (
+                                                <div className="flex flex-row items-center">
+                                                  <p>Calling</p>{" "}
+                                                  <div className="animate-spin ml-2">
+                                                    {" "}
+                                                    <Loader size={20} />
+                                                  </div>
+                                                </div>
+                                              ) : (
+                                                <>Call</>
+                                              )}
                                             </button>
                                           </div>
                                         )}
@@ -825,21 +868,38 @@ export default function Index() {
                                               <button
                                                 onClick={async () => {
                                                   if (isConnected || address) {
-                                                    let returnedData = await callContractFunction(
-                                                      method,
-                                                      userData?.Repository?.contractAbi as string,
-                                                      userData?.Repository
-                                                        ?.contractAddress as `0x${string}`,
-                                                      getFunctionArgsFromInput(method),
-                                                      userData?.ApiKey?.key as string
-                                                    );
-                                                    setFunctionReturn(returnedData);
+                                                    setFunctionCalled(method.name);
+                                                    try {
+                                                      let returnedData = await callContractFunction(
+                                                        method,
+                                                        userData?.Repository?.contractAbi as string,
+                                                        userData?.Repository
+                                                          ?.contractAddress as `0x${string}`,
+                                                        getFunctionArgsFromInput(method),
+                                                        userData?.ApiKey?.key as string
+                                                      );
+                                                      setFunctionCalled(null);
+
+                                                      setFunctionReturn(returnedData);
+                                                    } catch (error) {
+                                                      setFunctionCalled(null);
+                                                    }
                                                   }
                                                 }}
                                                 className="text-white bg-black py-2 px-4 border rounded-lg disabled:bg-[#cbcbcb]"
                                                 disabled={!(isConnected || address)}
                                               >
-                                                Call
+                                                {functionCalled == method.name ? (
+                                                  <div className="flex flex-row items-center">
+                                                    <p>Calling</p>{" "}
+                                                    <div className="animate-spin ml-2">
+                                                      {" "}
+                                                      <Loader size={20} />
+                                                    </div>
+                                                  </div>
+                                                ) : (
+                                                  <>Call</>
+                                                )}
                                               </button>
                                             </div>
                                           </Accordion.Content>
@@ -889,11 +949,23 @@ export default function Index() {
                         value={userData.githubInstallationId?.toString() as string}
                       />
                       <input type="hidden" name="formType" value="deployContract" />
+
                       <button
-                        type="submit"
                         className="text-xl  text-white bg-black py-2 px-4 rounded-lg"
+                        type="submit"
                       >
-                        {deployStatus}
+                        {navigation.state == "submitting" &&
+                        navigation.formData.get("formType") == "deployContract" ? (
+                          <div className="flex flex-row items-center">
+                            <p>Deploying</p>{" "}
+                            <div className="animate-spin ml-2">
+                              {" "}
+                              <Loader size={20} />
+                            </div>
+                          </div>
+                        ) : (
+                          <p>{deployStatus}</p>
+                        )}
                       </button>
                     </Form>
                   </div>
