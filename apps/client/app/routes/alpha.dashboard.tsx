@@ -1,14 +1,14 @@
 import { ActionArgs, LinksFunction, LoaderArgs, redirect } from "@remix-run/node";
-import { Form, useActionData, useLoaderData } from "@remix-run/react";
+import { Form, useActionData, useLoaderData, useNavigation, useTransition } from "@remix-run/react";
 import { db } from "../db.server";
 import { ApiKey, Repository, User, Transaction } from "database";
 import { getSession as userGetSession } from "../utils/alphaSession.server";
 import { getRootDir, getSolFileNames, getUserRepositories } from "../utils/octo.server";
-import { ChevronDown, Copy, Edit } from "lucide-react";
+import { Loader, X, ChevronDown, Copy, Edit, CheckCircle } from "lucide-react";
 import { deployContract } from "~/utils/viem.server";
 import { AbiFunction as AbiFunctionType } from "abitype";
 import { useState } from "react";
-import { ContractReturn, callContractFunction, timeSince } from "~/utils/helpers";
+import { ContractReturn, callContractFunction, timeSince, sleep } from "~/utils/helpers";
 import * as Accordion from "@radix-ui/react-accordion";
 import { ConnectKitProvider, ConnectKitButton, getDefaultConfig } from "connectkit";
 
@@ -61,6 +61,7 @@ export const action = async ({ request }: ActionArgs) => {
         repoArray.map((repo) => {
           repoObjArray.push({ repoName: repo.full_name, repoId: repo.id.toString() });
         });
+
         return {
           originCallForm: "getRepos",
           chosenRepoName: null,
@@ -82,7 +83,17 @@ export const action = async ({ request }: ActionArgs) => {
               name: chosenRepoName as string,
               userId: associatedUser.id,
             },
-            update: { name: chosenRepoName as string, id: chosenRepoId as string },
+            update: {
+              name: chosenRepoName as string,
+              id: chosenRepoId as string,
+              contractAbi: null,
+              contractAddress: null,
+              filename: null,
+              foundryRootDir: null,
+            },
+          });
+          await db.transaction.deleteMany({
+            where: { repositoryId: associatedUser.Repository?.id as string },
           });
           return {
             originCallForm: "chooseRepo",
@@ -115,7 +126,12 @@ export const action = async ({ request }: ActionArgs) => {
           where: { userId: associatedUser.id },
           data: {
             filename: body.get("chosenFileName") as string,
+            contractAbi: null,
+            contractAddress: null,
           },
+        });
+        await db.transaction.deleteMany({
+          where: { repositoryId: associatedUser.Repository?.id as string },
         });
 
         return {
@@ -131,6 +147,14 @@ export const action = async ({ request }: ActionArgs) => {
 
         return {
           originCallForm: "deployContract",
+          chosenRepoName: null,
+          repositories: null,
+          solFilesFromChosenRepo: null,
+          chosenFileName: null,
+        };
+      case "clearActionArgs":
+        return {
+          originCallForm: "",
           chosenRepoName: null,
           repositories: null,
           solFilesFromChosenRepo: null,
@@ -185,8 +209,18 @@ const getFunctionArgsFromInput = (abiFunction: AbiFunctionType): any[] => {
 };
 
 export default function Index() {
+  const animateCopy = async () => {
+    if (userData?.ApiKey) {
+      navigator.clipboard.writeText(userData.ApiKey.key);
+      setCopied(true);
+      await sleep(2000);
+      setCopied(false);
+    }
+  };
   const userData = useLoaderData<typeof loader>();
   const actionArgs = useActionData<typeof action>();
+  const navigation = useNavigation();
+  const [copied, setCopied] = useState(false);
 
   const fetherChain: Chain = {
     id: 696969,
@@ -210,8 +244,8 @@ export default function Index() {
 
   const config = createConfig(
     getDefaultConfig({
-      alchemyId: "NOTNEEDED", // or infuraId
-      walletConnectProjectId: "NOTNEEDED",
+      alchemyId: "r8ilH_ju-8gNnskLhLGNGtIYpVwaIvOO", // or infuraId
+      walletConnectProjectId: "42490798ad26dff0d5bfc67ee7abf1fb",
       chains,
       // Required
       appName: "Fether",
@@ -263,14 +297,16 @@ export default function Index() {
                     <p className="flex flex-row items-center gap-2">
                       {userData?.ApiKey.key}
                       <button className="transform active:scale-75 transition-transform">
-                        <Copy
-                          size={30}
-                          onClick={() => {
-                            if (userData.ApiKey) {
-                              navigator.clipboard.writeText(userData.ApiKey.key);
-                            }
-                          }}
-                        />
+                        {copied ? (
+                          <CheckCircle />
+                        ) : (
+                          <Copy
+                            size={20}
+                            onClick={() => {
+                              animateCopy();
+                            }}
+                          />
+                        )}
                       </button>
                     </p>
                   </div>
@@ -317,7 +353,17 @@ export default function Index() {
                                     ))}
                                   </fieldset>
                                   <br />
-                                  <button type="submit">Submit</button>
+                                  <button
+                                    type="submit"
+                                    className="text-white bg-black py-2 px-4 border rounded-lg"
+                                  >
+                                    {navigation.state == "submitting" &&
+                                    navigation.formData.get("formType") == "getChosenRepo" ? (
+                                      <p>Submitting....</p>
+                                    ) : (
+                                      <p>Submit</p>
+                                    )}
+                                  </button>
                                 </Form>
                               </>
                             )}
@@ -394,7 +440,18 @@ export default function Index() {
                                             )}
                                           </fieldset>
                                           <br />
-                                          <button type="submit">Submit</button>
+                                          <button
+                                            type="submit"
+                                            className="text-white bg-black py-2 px-4 border rounded-lg"
+                                          >
+                                            {navigation.state == "submitting" &&
+                                            navigation.formData.get("formType") ==
+                                              "chooseFileToTrack" ? (
+                                              <p>Submitting....</p>
+                                            ) : (
+                                              <p>Submit</p>
+                                            )}
+                                          </button>
                                         </Form>
                                       </>
                                     )}
@@ -422,14 +479,16 @@ export default function Index() {
                           {userData?.ApiKey?.key.slice(0, 10)}••••
                           {userData?.ApiKey?.key.slice(20)}
                           <button className="transform active:scale-75 transition-transform">
-                            <Copy
-                              size={20}
-                              onClick={() => {
-                                if (userData.ApiKey) {
-                                  navigator.clipboard.writeText(userData.ApiKey.key);
-                                }
-                              }}
-                            />
+                            {copied ? (
+                              <CheckCircle size={20} />
+                            ) : (
+                              <Copy
+                                size={20}
+                                onClick={() => {
+                                  animateCopy();
+                                }}
+                              />
+                            )}
                           </button>
                         </p>
                       </div>
@@ -437,28 +496,162 @@ export default function Index() {
                         <p className="text-2xl">Repository:</p>
                         <div className="flex flex-row items-center">
                           <p>{userData.Repository.name} &nbsp;</p>{" "}
-                          <button>
-                            <Edit
-                              className="transform active:scale-75 transition-transform"
-                              size={20}
+                          <Form method="post">
+                            <input
+                              type="hidden"
+                              name="githubInstallationId"
+                              value={userData.githubInstallationId as string}
                             />
-                          </button>
+                            <input type="hidden" name="formType" value="getAllRepos" />
+                            <button type="submit">
+                              {navigation.state == "submitting" &&
+                              navigation.formData.get("formType") == "getAllRepos" ? (
+                                <div className="animate-spin">
+                                  <Loader size={20} />
+                                </div>
+                              ) : (
+                                <Edit
+                                  className="transform active:scale-75 transition-transform"
+                                  size={20}
+                                />
+                              )}
+                            </button>
+                          </Form>
                         </div>
+                        {actionArgs?.originCallForm == "getRepos" && (
+                          <div className="absolute left-1/4 w-1/2 p-5 z-10 bg-white border border-black rounded-lg">
+                            <div className="w-full justify-between flex flex-row">
+                              <p className="text-2xl">Choose Repository:</p>
+                              <Form method="post">
+                                <input
+                                  type="hidden"
+                                  name="githubInstallationId"
+                                  value={userData.githubInstallationId as string}
+                                />
+                                <input type="hidden" name="formType" value="clearActionArgs" />
+                                <button type="submit">
+                                  <X />
+                                </button>
+                              </Form>
+                            </div>
+                            <Form method="post" className="mt-5">
+                              <input
+                                type="hidden"
+                                name="githubInstallationId"
+                                value={userData.githubInstallationId as string}
+                              />
+                              <input type="hidden" name="formType" value="getChosenRepo" />
+
+                              <fieldset className="grid grid-cols-2">
+                                {actionArgs.repositories?.map((repo) => (
+                                  <label key={repo.repoName} className="text-xl">
+                                    <input
+                                      type="radio"
+                                      name="chosenRepoData"
+                                      value={[repo.repoName, repo.repoId]}
+                                    />{" "}
+                                    {repo.repoName}
+                                  </label>
+                                ))}
+                              </fieldset>
+                              <br />
+
+                              <button
+                                type="submit"
+                                className="text-white bg-black py-2 px-4 border rounded-lg"
+                              >
+                                {navigation.state == "submitting" &&
+                                navigation.formData.get("formType") == "getChosenRepo" ? (
+                                  <p>Submitting....</p>
+                                ) : (
+                                  <p>Submit</p>
+                                )}
+                              </button>
+                            </Form>
+                          </div>
+                        )}
                       </div>
                       <div className="flex flex-row justify-between rounded-lg">
-                        <p className="text-2xl">Contract:</p>{" "}
+                        <p className="text-2xl">Contract:</p>
                         <div className="flex flex-row items-center">
                           <p>{userData.Repository.filename} &nbsp;</p>{" "}
-                          <button>
-                            <Edit
-                              className="transform active:scale-75 transition-transform"
-                              size={20}
-                            />
-                          </button>
+                          <div>
+                            <Form method="post">
+                              <input
+                                type="hidden"
+                                name="githubInstallationId"
+                                value={userData.githubInstallationId as string}
+                              />
+                              <input type="hidden" name="formType" value="getFilesOfChosenRepo" />
+                              <button type="submit">
+                                {navigation.state == "submitting" &&
+                                navigation.formData.get("formType") == "getFilesOfChosenRepo" ? (
+                                  <div className="animate-spin">
+                                    <Loader size={20} />
+                                  </div>
+                                ) : (
+                                  <Edit
+                                    className="transform active:scale-75 transition-transform"
+                                    size={20}
+                                  />
+                                )}
+                              </button>
+                            </Form>
+                            {actionArgs?.originCallForm == "getFilesOfChosenRepo" && (
+                              <div className="absolute left-1/4 w-1/2 p-5 z-10 bg-white border border-black rounded-lg">
+                                <div className="w-full justify-between flex flex-row">
+                                  <p className="text-2xl">Choose File To Track:</p>
+                                  <Form method="post">
+                                    <input
+                                      type="hidden"
+                                      name="githubInstallationId"
+                                      value={userData.githubInstallationId as string}
+                                    />
+                                    <input type="hidden" name="formType" value="clearActionArgs" />
+                                    <button type="submit">
+                                      <X />
+                                    </button>
+                                  </Form>
+                                </div>
+                                <Form method="post" className="mt-10">
+                                  <input
+                                    type="hidden"
+                                    name="githubInstallationId"
+                                    value={userData.githubInstallationId as string}
+                                  />
+                                  <input type="hidden" name="formType" value="chooseFileToTrack" />
+                                  <fieldset className="grid grid-cols-2">
+                                    {actionArgs.solFilesFromChosenRepo?.map((fileName, i) => (
+                                      <label key={i} className="text-xl">
+                                        <input
+                                          type="radio"
+                                          name="chosenFileName"
+                                          value={fileName}
+                                        />{" "}
+                                        {fileName}
+                                      </label>
+                                    ))}
+                                  </fieldset>
+                                  <br />
+                                  <button
+                                    type="submit"
+                                    className="text-white bg-black py-2 px-4 border rounded-lg"
+                                  >
+                                    {navigation.state == "submitting" &&
+                                    navigation.formData.get("formType") == "chooseFileToTrack" ? (
+                                      <p>Submitting....</p>
+                                    ) : (
+                                      <p>Submit</p>
+                                    )}
+                                  </button>
+                                </Form>
+                              </div>
+                            )}
+                          </div>
                         </div>
                       </div>
                       <div className="flex flex-row justify-between rounded-lg">
-                        <p className="text-2xl">Deployer Address: </p>
+                        <p className="text-2xl">Deployer: </p>
                         <div className="flex flex-row items-center">
                           <p>
                             {userData?.Repository?.contractAddress?.slice(0, 8)}••••
@@ -608,11 +801,8 @@ export default function Index() {
                                                   setFunctionReturn(returnedData);
                                                 }
                                               }}
-                                              className={
-                                                isConnected || address
-                                                  ? "text-white bg-black py-2 px-4 border rounded-lg"
-                                                  : "text-white bg-[#eeeeee] py-2 px-4 border rounded-lg"
-                                              }
+                                              className="text-white bg-black py-2 px-4 border rounded-lg disabled:bg-[#cbcbcb]"
+                                              disabled={!(isConnected || address)}
                                             >
                                               Call
                                             </button>
@@ -646,11 +836,8 @@ export default function Index() {
                                                     setFunctionReturn(returnedData);
                                                   }
                                                 }}
-                                                className={
-                                                  isConnected || address
-                                                    ? "text-white bg-black py-2 px-4 border rounded-lg"
-                                                    : "text-white bg-[#eeeeee] py-2 px-4 border rounded-lg"
-                                                }
+                                                className="text-white bg-black py-2 px-4 border rounded-lg disabled:bg-[#cbcbcb]"
+                                                disabled={!(isConnected || address)}
                                               >
                                                 Call
                                               </button>
