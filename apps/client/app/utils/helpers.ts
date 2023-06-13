@@ -2,13 +2,14 @@ import { Abi, AbiFunction } from "abitype/zod";
 import { Chain, createPublicClient, createWalletClient, custom, http } from "viem";
 import { AbiFunction as AbiFunctionType } from "abitype";
 import { z } from "zod";
-import { Ethereum } from "@wagmi/core";
 
 export type ContractReturnItem = {
   name: string;
   value: any;
 };
 export type ContractReturn = { methodName: string; returnItems: ContractReturnItem[] };
+
+export const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 const zodFunctionReturnSchema = z.array(z.any());
 
@@ -54,7 +55,7 @@ export const callContractFunction = async (
   } else {
     let walletClient = createWalletClient({
       chain: fetherChainFromApiKey,
-      transport: custom(window.ethereum as Ethereum),
+      transport: custom(window.ethereum),
     });
 
     const [address] = await walletClient.getAddresses();
