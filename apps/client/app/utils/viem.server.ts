@@ -13,6 +13,24 @@ function getGithubPk() {
 
 const octo = new Octo({ appId: "302483", privateKey: getGithubPk() });
 
+export const BaseFetherChain: Chain = {
+  id: 696969,
+  name: "Fether",
+  network: "fether",
+  nativeCurrency: {
+    decimals: 18,
+    name: "Fether",
+    symbol: "FEth",
+  },
+  rpcUrls: {
+    default: {
+      http: [`https://fether-testing.ngrok.app/rpc/`],
+    },
+    public: { http: [`https://fether-testing.ngrok.app/rpc/`] },
+  },
+  testnet: false,
+};
+
 export const fetherChain: Chain = {
   id: 696969,
   name: "Fether",
