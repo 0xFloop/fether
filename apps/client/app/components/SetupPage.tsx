@@ -1,5 +1,5 @@
 import { Form, useActionData, useLoaderData, useNavigation } from "@remix-run/react";
-import { Copy, CheckCircle } from "lucide-react";
+import { Copy, CheckCircle, Loader } from "lucide-react";
 import { useState } from "react";
 import { sleep } from "~/utils/helpers";
 import { action, loader } from "~/routes/alpha.dashboard";
@@ -46,7 +46,17 @@ const SetupPage: React.FC<SetupPageProps> = (props: SetupPageProps) => {
                         value={props.userData.githubInstallationId}
                       />
                       <input type="hidden" name="formType" value="getAllRepos" />
-                      <button type="submit">Click to choose repository</button>
+                      {props.navigation.state == "submitting" &&
+                      props.navigation.formData.get("formType") == "getAllRepos" ? (
+                        <div className="flex flex-row items-center">
+                          Loading repositories
+                          <div className="ml-5 animate-spin">
+                            <Loader size={30} />
+                          </div>
+                        </div>
+                      ) : (
+                        <button type="submit">Click to choose repository</button>
+                      )}
                     </Form>
                     {props.actionArgs?.originCallForm == "getRepos" && (
                       <>
@@ -106,7 +116,17 @@ const SetupPage: React.FC<SetupPageProps> = (props: SetupPageProps) => {
                             value={props.userData.githubInstallationId}
                           />
                           <input type="hidden" name="formType" value="deployContract" />
-                          <button type="submit">Click here to deploy your contract</button>
+                          {props.navigation.state == "submitting" &&
+                          props.navigation.formData.get("formType") == "deployContract" ? (
+                            <div className="flex flex-row items-center">
+                              Deploying....
+                              <div className="ml-5 animate-spin">
+                                <Loader size={20} />
+                              </div>
+                            </div>
+                          ) : (
+                            <button type="submit">Click here to deploy your contract</button>
+                          )}
                         </Form>
                       </div>
                     </>
@@ -122,9 +142,20 @@ const SetupPage: React.FC<SetupPageProps> = (props: SetupPageProps) => {
                                 value={props.userData.githubInstallationId}
                               />
                               <input type="hidden" name="formType" value="getFilesOfChosenRepo" />
-                              <button type="submit">
-                                Click to select which solidity file to track
-                              </button>
+                              {props.navigation.state == "submitting" &&
+                              props.navigation.formData.get("formType") ==
+                                "getFilesOfChosenRepo" ? (
+                                <div className="flex flex-row items-center">
+                                  Loading files
+                                  <div className="ml-5 animate-spin">
+                                    <Loader size={30} />
+                                  </div>
+                                </div>
+                              ) : (
+                                <button type="submit">
+                                  Click to select which solidity file to track
+                                </button>
+                              )}
                             </Form>
                             {props.actionArgs?.originCallForm == "getFilesOfChosenRepo" && (
                               <>
