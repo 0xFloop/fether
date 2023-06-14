@@ -13,6 +13,11 @@ export const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 const zodFunctionReturnSchema = z.array(z.any());
 
+export function truncateToDecimals(num: number, dec = 2) {
+  const calcDec = Math.pow(10, dec);
+  return Math.trunc(num * calcDec) / calcDec;
+}
+
 export const callContractFunction = async (
   methodString: AbiFunctionType,
   contractAbi: string,
@@ -138,4 +143,18 @@ export const timeSince = (_date: any) => {
   }
 
   return interval + " " + intervalType;
+};
+export const getFunctionArgsFromInput = (abiFunction: AbiFunctionType): any[] => {
+  let args = [];
+  for (let i = 0; i < abiFunction.inputs.length; i++) {
+    const inputElement = document.getElementById(
+      `${abiFunction.name}-${abiFunction.inputs[i].name}`
+    ) as HTMLInputElement;
+
+    const val = inputElement.value;
+
+    args.push(val);
+  }
+
+  return args;
 };
