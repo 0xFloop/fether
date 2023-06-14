@@ -27,6 +27,7 @@ import { publicProvider } from "wagmi/providers/public";
 //TODO: USE THE CONNECTED WALLET NOT FORCED INJECTED WALLET
 //TODO: ADD A WAY TO FUND WALLET IF IT IS EMPTY
 //TODO: ADD SETTING AND USING THE DEPLOYER ADDRESS
+//TODO: MAYBE break this one big ol action into many other action routes
 
 type UserWithKeyRepoActivity =
   | (User & {
@@ -40,8 +41,6 @@ type UserWithKeyRepoActivity =
   | null;
 
 type RepoData = { repoName: string; repoId: string };
-
-//TODO: MAYBE break this big ol action into many other action routes
 
 export const action = async ({ request }: ActionArgs) => {
   const body = await request.formData();
@@ -107,7 +106,10 @@ export const action = async ({ request }: ActionArgs) => {
         }
 
       case "getFilesOfChosenRepo":
-        let foundryRootDir = await getRootDir(githubInstallationId as string);
+        let foundryRootDir = associatedUser.Repository?.foundryRootDir;
+        if (!foundryRootDir) {
+          foundryRootDir = await getRootDir(githubInstallationId as string);
+        }
 
         let fileNameArray: string[] = await getSolFileNames(
           githubInstallationId as string,
