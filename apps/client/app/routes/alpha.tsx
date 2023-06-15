@@ -21,7 +21,7 @@ export const loader = async ({ request, params }: LoaderArgs) => {
 
 export default function Index() {
   return (
-    <div className="relative pb-80 min-h-screen">
+    <div className="relative min-h-screen">
       <div
         id="navbar"
         className="h-20 border-b border-b-black flex flex-row justify-between items-center"
@@ -36,7 +36,7 @@ export default function Index() {
         </div>
       </div>
       <Outlet />
-      <div className="h-80 absolute bottom-0 w-screen bg-black flex justify-center align-middle">
+      {/* <div className="h-80 absolute bottom-0 w-screen bg-black flex justify-center align-middle">
         <div id="nav-links" className="flex flex-row justify-evenly flex-1 text-white items-center">
           <a href="https://docs.fether.xyz" target="_blank">
             documentation
@@ -45,7 +45,7 @@ export default function Index() {
             contact
           </a>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }
