@@ -48,6 +48,7 @@ model Repository {
   contractAddress String?
   contractAbi     String? @db.Text
   foundryRootDir  String?
+  deployerAddress String?
 
   createdAt DateTime      @default(now())
   updatedAt DateTime      @default(now()) @updatedAt
