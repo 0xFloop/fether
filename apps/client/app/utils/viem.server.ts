@@ -1,9 +1,17 @@
 import { db } from "~/db.server";
-import { Chain, createPublicClient, createTestClient, createWalletClient, http } from "viem";
+import {
+  Chain,
+  createPublicClient,
+  createTestClient,
+  createWalletClient,
+  http,
+  parseEther,
+} from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { App as Octo } from "octokit";
 import { zodContractBuildFileSchema } from "./octo.server";
 import { Abi, AbiParameter } from "abitype/zod";
+import { UserWithKeyRepoActivity } from "~/types";
 
 function getGithubPk() {
   const githubAppPk = process.env.appPK as string;
@@ -56,7 +64,6 @@ const pkaccount = privateKeyToAccount(
 export const deployerAddress = pkaccount.address;
 
 export const walletClient = createWalletClient({
-  account: deployerAddress,
   chain: fetherChain,
   transport: http(),
 });
@@ -72,21 +79,15 @@ export const adminClient = createTestClient({
   transport: http(),
 });
 
-export const deployContract = async (githubInstallationId: string) => {
+export const deployContract = async (
+  githubInstallationId: string,
+  repoData: UserWithKeyRepoActivity
+) => {
   const octokit = await octo.getInstallationOctokit(parseInt(githubInstallationId));
 
-  let repoData = await db.user.findUnique({
-    where: { githubInstallationId },
-    include: {
-      Repository: {
-        include: {
-          Activity: true,
-        },
-      },
-    },
-  });
-
   if (!repoData?.Repository?.foundryRootDir) throw new Error("No repo data found");
+
+  let deployerAddress = repoData.Repository.deployerAddress as `0x${string}`;
 
   let rootDir = repoData.Repository.foundryRootDir;
   let fileName = repoData.Repository.filename;
@@ -108,13 +109,26 @@ export const deployContract = async (githubInstallationId: string) => {
 
   let fileJSON = JSON.parse(contentsReq.data.toString());
   let validatedJSON = zodContractBuildFileSchema.parse(fileJSON);
-  let byteCode = validatedJSON.bytecode.object as `0x${string}`;
+  let bytecode = validatedJSON.bytecode.object as `0x${string}`;
   let abi = Abi.parse(fileJSON.abi);
   let dbAbi = JSON.stringify(fileJSON.abi);
-  let deployHash = await walletClient.deployContract({
-    bytecode: byteCode,
-    abi: abi,
+
+  if ((await publicClient.getBalance({ address: deployerAddress })) < 1) {
+    await adminClient.setBalance({ address: deployerAddress, value: parseEther("1") });
+  }
+
+  await adminClient.impersonateAccount({
+    address: deployerAddress,
   });
+
+  let deployHash = await walletClient.deployContract({
+    abi,
+    account: deployerAddress,
+    bytecode,
+  });
+
+  await adminClient.stopImpersonatingAccount({ address: deployerAddress });
+
   await new Promise((r) => setTimeout(r, 5500));
   const transaction = await publicClient.getTransactionReceipt({
     hash: deployHash,
@@ -122,10 +136,12 @@ export const deployContract = async (githubInstallationId: string) => {
 
   let functionName = "User Deployment";
   let activity = repoData.Repository.Activity;
-  for (let i = 0; i < activity.length; i++) {
-    if (activity[i].functionName.includes("Deployment")) {
-      functionName = "User Redeploy";
-      break;
+  if (activity) {
+    for (let i = 0; i < activity.length; i++) {
+      if (activity[i].functionName.includes("Deployment")) {
+        functionName = "User Redeploy";
+        break;
+      }
     }
   }
 
