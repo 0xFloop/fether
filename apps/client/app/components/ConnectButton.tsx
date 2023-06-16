@@ -35,7 +35,7 @@ export const CustomConnectButton = () => {
                 return (
                   <button
                     data-connected={Boolean(account)}
-                    className="text-white bg-black py-2 px-4 border rounded-lg"
+                    className="text-white bg-[#4f4f4f] py-2 px-4 border rounded-lg"
                     onClick={openConnectModal}
                     type="button"
                   >
@@ -47,7 +47,7 @@ export const CustomConnectButton = () => {
                 return (
                   <button
                     data-connected={Boolean(account)}
-                    className="text-white bg-black py-2 px-4 border rounded-lg"
+                    className="text-white bg-[#4f4f4f] py-2 px-4 border rounded-lg"
                     onClick={openChainModal}
                     type="button"
                   >
@@ -58,7 +58,7 @@ export const CustomConnectButton = () => {
               return (
                 <button
                   data-connected={Boolean(account)}
-                  className="text-white bg-black py-2 px-4 border rounded-lg"
+                  className="text-white bg-[#4f4f4f] py-2 px-4 border rounded-lg"
                   onClick={openAccountModal}
                   type="button"
                 >
