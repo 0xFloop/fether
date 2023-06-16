@@ -1,12 +1,12 @@
 import { ActionArgs, LoaderArgs, redirect } from "@remix-run/node";
-import { Form, useActionData, useLoaderData, useNavigation, Links } from "@remix-run/react";
+import { Form, useActionData, useLoaderData, useNavigation, useSubmit } from "@remix-run/react";
 import { db } from "../db.server";
 import { getSession as userGetSession } from "../utils/alphaSession.server";
 import { getRootDir, getSolFileNames, getUserRepositories } from "../utils/octo.server";
 import { Loader, X, ChevronDown, Copy, Edit, CheckCircle } from "lucide-react";
-import { deployContract } from "~/utils/viem.server";
+import { deployContract, fetherChain } from "~/utils/viem.server";
 import { AbiFunction as AbiFunctionType } from "abitype";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ContractReturn,
   callContractFunction,
@@ -16,7 +16,7 @@ import {
   truncateToDecimals,
 } from "~/utils/helpers";
 import * as Accordion from "@radix-ui/react-accordion";
-import { useAccount, useBalance } from "wagmi";
+import { useAccount, useBalance, useWalletClient } from "wagmi";
 
 import { RepoData, UserWithKeyRepoActivity } from "~/types";
 
@@ -27,7 +27,7 @@ export function links() {
 }
 
 import { CustomConnectButton } from "../components/ConnectButton";
-import { Chain, createTestClient, http, parseEther } from "viem";
+import { Chain, createTestClient, createWalletClient, custom, http, parseEther } from "viem";
 import SetupPage from "~/components/SetupPage";
 const BaseFetherChain: Chain = {
   id: 696969,
@@ -46,22 +46,27 @@ const BaseFetherChain: Chain = {
   },
   testnet: false,
 };
-//TODO: USE THE CONNECTED WALLET NOT FORCED INJECTED WALLET
-//TODO: ADD SETTING AND USING THE DEPLOYER ADDRESS
 
 //TODO: MAYBE break this one big ol action into many other action routes
 
 export const action = async ({ request }: ActionArgs) => {
   const body = await request.formData();
-  const formType = body.get("formType");
   const githubInstallationId = body.get("githubInstallationId");
   const chosenRepoData = body.get("chosenRepoData");
   const associatedUser = await db.user.findUnique({
     where: { githubInstallationId: githubInstallationId as string },
-    include: { ApiKey: true, Repository: true },
+    include: {
+      ApiKey: true,
+      Repository: {
+        include: {
+          Activity: true,
+        },
+      },
+    },
   });
 
   if (associatedUser) {
+    const formType = body.get("formType");
     switch (formType) {
       case "getAllRepos":
         console.log("getAllRepos");
@@ -156,7 +161,7 @@ export const action = async ({ request }: ActionArgs) => {
         };
 
       case "deployContract":
-        await deployContract(githubInstallationId as string);
+        await deployContract(githubInstallationId as string, associatedUser);
 
         return {
           originCallForm: "deployContract",
@@ -177,9 +182,25 @@ export const action = async ({ request }: ActionArgs) => {
           address: body.get("walletAddress") as `0x${string}`,
           value: parseEther("1") + parseEther(currentBalance),
         });
-      case "clearActionArgs":
         return {
-          originCallForm: "",
+          originCallForm: "fundWallet",
+          chosenRepoName: null,
+          repositories: null,
+          solFilesFromChosenRepo: null,
+          chosenFileName: null,
+        };
+
+      case "setDeployerAddress":
+        let newDeployerAddress = body.get("deployerAddress") as string;
+
+        await db.repository.update({
+          where: { userId: associatedUser.id },
+          data: {
+            deployerAddress: newDeployerAddress,
+          },
+        });
+        return {
+          originCallForm: "setDeployerAddress",
           chosenRepoName: null,
           repositories: null,
           solFilesFromChosenRepo: null,
@@ -187,7 +208,13 @@ export const action = async ({ request }: ActionArgs) => {
         };
 
       default:
-        return;
+        return {
+          originCallForm: "",
+          chosenRepoName: null,
+          repositories: null,
+          solFilesFromChosenRepo: null,
+          chosenFileName: null,
+        };
     }
   } else {
     console.log("user not found");
@@ -219,23 +246,23 @@ export const loader = async ({ request }: LoaderArgs) => {
 };
 
 export default function Index() {
-  const { address, isConnecting, isDisconnected, isConnected } = useAccount();
-  const { data } = useBalance({ address });
-
-  const animateCopy = async () => {
-    if (userData?.ApiKey) {
-      navigator.clipboard.writeText(userData.ApiKey.key);
-      setCopied(true);
-      await sleep(2000);
-      setCopied(false);
-    }
-  };
-
   const userData = useLoaderData<typeof loader>();
   const actionArgs = useActionData<typeof action>();
   const navigation = useNavigation();
+  const submit = useSubmit();
+
+  const { address, isConnecting, isDisconnected, isConnected } = useAccount();
+  const { data } = useBalance({ address });
+  const { data: walletClient, isError, isLoading } = useWalletClient();
+
+  const [deployerModal, setDeployerModal] = useState(false);
   const [copied, setCopied] = useState(false);
   const [functionCalled, setFunctionCalled] = useState<string | null>(null);
+  const [functionReturn, setFunctionReturn] = useState<ContractReturn>({
+    methodName: "",
+    returnItems: [],
+  });
+
   let deployStatus = "Deploy";
 
   if (userData?.Repository?.Activity) {
@@ -249,18 +276,22 @@ export default function Index() {
     }
   }
 
-  const [functionReturn, setFunctionReturn] = useState<ContractReturn>({
-    methodName: "",
-    returnItems: [],
-  });
+  const animateCopy = async () => {
+    if (userData?.ApiKey) {
+      navigator.clipboard.writeText(userData.ApiKey.key);
+      setCopied(true);
+      await sleep(2000);
+      setCopied(false);
+    }
+  };
 
   return (
     <div className="w-screen h-auto overflow-hidden display flex flex-col">
       {!userData?.Repository?.contractAbi ? (
         <SetupPage userData={userData} navigation={navigation} actionArgs={actionArgs} />
       ) : (
-        <div id="content" className="w-3/4 max-w-7xl mx-auto py-20 rounded-lg">
-          <div className="text-4xl flex gap-10 flex-row justify-between rounded-lg mt-10">
+        <div id="content" className="w-3/4 max-w-7xl mx-auto py-20 rounded-lg ">
+          <div className="text-4xl flex gap-10 flex-row justify-between rounded-lg">
             <div className="w-2/5">
               <div className="flex flex-col rounded-lg gap-10">
                 <div className="text-xl gap-2 bg-[#F5F5F5] p-5 flex flex-col rounded-lg">
@@ -320,7 +351,6 @@ export default function Index() {
                               name="githubInstallationId"
                               value={userData.githubInstallationId as string}
                             />
-                            <input type="hidden" name="formType" value="clearActionArgs" />
                             <button type="submit">
                               <X />
                             </button>
@@ -399,7 +429,6 @@ export default function Index() {
                                   name="githubInstallationId"
                                   value={userData.githubInstallationId as string}
                                 />
-                                <input type="hidden" name="formType" value="clearActionArgs" />
                                 <button type="submit">
                                   <X />
                                 </button>
@@ -442,15 +471,67 @@ export default function Index() {
                     <p className="text-2xl">Deployer: </p>
                     <div className="flex flex-row items-center">
                       <p>
-                        {userData?.Repository?.contractAddress?.slice(0, 8)}••••
-                        {userData?.Repository?.contractAddress?.slice(37)} &nbsp;{" "}
+                        {userData?.Repository?.deployerAddress?.slice(0, 8)}••••
+                        {userData?.Repository?.deployerAddress?.slice(37)} &nbsp;{" "}
                       </p>
-                      <button>
-                        <Edit
-                          className="transform active:scale-75 transition-transform"
-                          size={20}
+                      <Form method="post">
+                        <input
+                          type="hidden"
+                          name="githubInstallationId"
+                          value={userData.githubInstallationId as string}
                         />
-                      </button>
+                        <button
+                          onClick={() => {
+                            if (actionArgs?.originCallForm == "setDeployerAddress") {
+                              submit(null, { method: "post", action: "/" });
+                            }
+                            setDeployerModal(true);
+                          }}
+                        >
+                          <Edit
+                            className="transform active:scale-75 transition-transform"
+                            size={20}
+                          />
+                        </button>
+                      </Form>
+                      {deployerModal && actionArgs?.originCallForm != "setDeployerAddress" && (
+                        <div className="absolute left-1/4 w-1/2 p-5 z-10 bg-white border border-black rounded-lg">
+                          <button onClick={() => setDeployerModal(false)} className="float-right ">
+                            <X />
+                          </button>
+                          <Form method="post" className=" w-11/12">
+                            <input
+                              type="hidden"
+                              name="githubInstallationId"
+                              value={userData?.githubInstallationId?.toString()}
+                            />
+                            <input type="hidden" name="formType" value="setDeployerAddress" />
+                            {navigation.state == "submitting" &&
+                            navigation.formData.get("formType") == "setDeployerAddress" ? (
+                              <div className="flex flex-row items-center">
+                                Setting Deployer Address....
+                                <div className="ml-5 animate-spin">
+                                  <Loader size={20} />
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="flex flex-row items-center justify-between w-full">
+                                <input
+                                  className="text-lg h-10 rounded-lg p-2 w-1/2 border border-black"
+                                  name="deployerAddress"
+                                  placeholder="Input desired contract deployer address"
+                                />
+                                <button
+                                  className="text-white text-xl bg-black py-2 px-4 border rounded-lg"
+                                  type="submit"
+                                >
+                                  Set Deployer Address
+                                </button>
+                              </div>
+                            )}
+                          </Form>
+                        </div>
+                      )}
                     </div>
                   </div>
                   <div className="flex flex-row justify-between rounded-lg">
@@ -466,8 +547,41 @@ export default function Index() {
                       <CustomConnectButton />
                     </div>
                   </div>
+                  {isConnected && data?.formatted && (
+                    <div className="flex flex-row justify-between items-center rounded-lg">
+                      <div className="text-xl relative w-full">
+                        <Form method="post">
+                          <input
+                            type="hidden"
+                            name="githubInstallationId"
+                            value={userData.githubInstallationId as string}
+                          />
+                          <input type="hidden" name="formType" value="fundWallet" />
+                          <input type="hidden" name="walletAddress" value={address} />
+                          <input type="hidden" name="currentBalance" value={data?.formatted} />
 
-                  <ul className="flex flex-col gap-2 pt-5 bg-[#F5F5F5] rounded-lg">
+                          {navigation.state == "submitting" &&
+                          navigation.formData.get("formType") == "fundWallet" ? (
+                            <div className="text-white bg-[#4f4f4f] py-2 mt-2 px-4 text-xl border rounded-lg flex flex-row items-center  float-right">
+                              +1 FEth
+                              <div className="animate-spin items-center ml-3">
+                                <Loader size={20} />
+                              </div>
+                            </div>
+                          ) : (
+                            <button
+                              type="submit"
+                              className="text-white bg-[#4f4f4f] py-2 px-4 border rounded-lg mt-2 text-xl float-right"
+                            >
+                              Add FEth
+                            </button>
+                          )}
+                        </Form>
+                      </div>
+                    </div>
+                  )}
+
+                  <ul className="flex flex-col gap-2 bg-[#F5F5F5] rounded-lg">
                     <p className="text-2xl border-b border-b-black">Read</p>
                     <div className="py-2">
                       {JSON.parse(userData?.Repository?.contractAbi as string).map(
@@ -493,7 +607,7 @@ export default function Index() {
 
                                       setFunctionReturn(returnedData);
                                     }}
-                                    className="text-white bg-black py-2 px-4 border rounded-lg"
+                                    className="text-white bg-[#4f4f4f] py-2 px-4 border rounded-lg"
                                   >
                                     {functionCalled == method.name ? (
                                       <div className="flex flex-row items-center">
@@ -587,7 +701,7 @@ export default function Index() {
                                               }
                                             }
                                           }}
-                                          className="text-white bg-black py-2 px-4 border rounded-lg disabled:bg-[#cbcbcb]"
+                                          className="text-white bg-[#4f4f4f] py-2 px-4 border rounded-lg disabled:bg-[#cbcbcb]"
                                           disabled={!Boolean(address)}
                                         >
                                           {functionCalled == method.name ? (
@@ -639,7 +753,7 @@ export default function Index() {
                                                 }
                                               }
                                             }}
-                                            className="text-white bg-black py-2 px-4 border rounded-lg disabled:bg-[#cbcbcb]"
+                                            className="text-white bg-[#4f4f4f] py-2 px-4 border rounded-lg disabled:bg-[#cbcbcb]"
                                             disabled={!Boolean(address)}
                                           >
                                             {functionCalled == method.name ? (
@@ -691,43 +805,6 @@ export default function Index() {
               </div>
             </div>
             <div className="flex flex-col w-3/5 gap-10">
-              {isConnected && data?.formatted && (
-                <div className="flex flex-row justify-between items-center bg-[#F5F5F5] p-5 rounded-lg">
-                  <p className="text-2xl">
-                    <span className="font-semibold">Balance: </span>
-                    {truncateToDecimals(Number(data?.formatted))} {data?.symbol}
-                  </p>
-                  <div className="text-xl">
-                    <Form method="post">
-                      <input
-                        type="hidden"
-                        name="githubInstallationId"
-                        value={userData.githubInstallationId as string}
-                      />
-                      <input type="hidden" name="formType" value="fundWallet" />
-                      <input type="hidden" name="walletAddress" value={address} />
-                      <input type="hidden" name="currentBalance" value={data?.formatted} />
-
-                      {navigation.state == "submitting" &&
-                      navigation.formData.get("formType") == "fundWallet" ? (
-                        <div className="text-white bg-black py-2 px-4 border rounded-lg flex flex-row items-center">
-                          +1 FEth
-                          <div className="animate-spin items-center ml-3">
-                            <Loader size={20} />
-                          </div>
-                        </div>
-                      ) : (
-                        <button
-                          type="submit"
-                          className="text-white bg-black py-2 px-4 border rounded-lg"
-                        >
-                          Add FEth
-                        </button>
-                      )}
-                    </Form>
-                  </div>
-                </div>
-              )}
               <div className="flex-1  bg-[#F5F5F5] p-5 rounded-lg ">
                 <div className="flex flex-row justify-between items-center">
                   <p className="pb-2">Transactions:</p>
@@ -741,7 +818,7 @@ export default function Index() {
                     <input type="hidden" name="formType" value="deployContract" />
 
                     <button
-                      className="text-xl  text-white bg-black py-2 px-4 rounded-lg"
+                      className="text-xl text-white bg-[#4f4f4f] py-2 px-4 rounded-lg"
                       type="submit"
                     >
                       {navigation.state == "submitting" &&
