@@ -21,7 +21,7 @@ export const SupportedChains = [
         nativeSymbol: 'FEth',
         coingeckoId: 'coingecko:feth',
         defillamaPrefix: 'feth',
-        rpcUrl: 'https://fether-testing.ngrok.app/rpc/clhfj8uev00031jcazeu57018',
+        rpcUrl: 'https://fether-testing.ngrok.app/rpc/clj099j1s0007z9yep52aoz1t',
         blockexplorerUrl: 'https://ftmscan.com',
     },
 ];
