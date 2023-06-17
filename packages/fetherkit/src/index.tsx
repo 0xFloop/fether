@@ -1,6 +1,7 @@
 import { Chain } from "wagmi";
 import { ExtractAbiFunctionNames, Narrow } from "abitype";
 import { AbiFunction } from "abitype";
+import React, { Suspense, createContext, useContext, useEffect } from "react";
 
 export default class Fether {
   chain: Chain;
@@ -68,4 +69,54 @@ export default class Fether {
 
     this.address = data.contractAddress;
   }
+}
+
+export const BaseFetherChain: Chain = {
+  id: 696969,
+  name: "Fether",
+  network: "fether",
+  nativeCurrency: {
+    decimals: 18,
+    name: "Fether",
+    symbol: "FEth",
+  },
+  rpcUrls: {
+    default: {
+      http: [`https://fether-testing.ngrok.app/rpc/`],
+    },
+    public: { http: [`https://fether-testing.ngrok.app/rpc/`] },
+  },
+  testnet: false,
+};
+
+export const FetherContext = createContext<Fether>({
+  chain: BaseFetherChain,
+  key: "",
+  methods: {},
+  abi: [],
+  address: "0x",
+  init: async () => {},
+});
+
+export function useFether() {
+  return useContext(FetherContext);
+}
+
+interface FetherProviderProps {
+  children: React.ReactNode;
+  apiKey: string;
+}
+
+export function FetherProvider(props: FetherProviderProps) {
+  const fetherInstance = new Fether(props.apiKey);
+
+  useEffect(() => {
+    fetherInstance.init();
+  }, [fetherInstance]);
+
+  return (
+    <div>
+      <FetherContext.Provider value={fetherInstance}>{props.children}</FetherContext.Provider>
+    </div>
+  );
 }
