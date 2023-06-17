@@ -45,61 +45,66 @@ const SetupPage: React.FC<SetupPageProps> = (props: SetupPageProps) => {
         </div>
       ) : (
         <div>
-          <div className="text-4xl   border-b  bg-[#F5F5F5] p-5 flex flex-col justify-between rounded-lg">
-            <Form method="post">
-              <input
-                type="hidden"
-                name="githubInstallationId"
-                value={props.userData?.githubInstallationId?.toString()}
-              />
-              <input type="hidden" name="formType" value="getAllRepos" />
-              {props.navigation.state == "submitting" &&
-              props.navigation.formData.get("formType") == "getAllRepos" ? (
-                <div className="flex flex-row items-center">
-                  Loading repositories
-                  <div className="ml-5 animate-spin">
-                    <Loader size={30} />
+          {props.userData?.ApiKey && (
+            <div className="text-4xl   border-b  bg-[#F5F5F5] p-5 flex flex-col justify-between rounded-lg">
+              <Form method="post">
+                <input
+                  type="hidden"
+                  name="githubInstallationId"
+                  value={props.userData?.githubInstallationId?.toString()}
+                />
+                <input type="hidden" name="formType" value="getAllRepos" />
+                {props.navigation.state == "submitting" &&
+                props.navigation.formData.get("formType") == "getAllRepos" ? (
+                  <div className="flex flex-row items-center">
+                    Loading repositories
+                    <div className="ml-5 animate-spin">
+                      <Loader size={30} />
+                    </div>
                   </div>
-                </div>
-              ) : (
-                <button type="submit">Click to choose repository</button>
-              )}
-            </Form>
-            {props.actionArgs?.originCallForm == "getRepos" && (
-              <>
-                <Form method="post" className=" ">
-                  <input
-                    type="hidden"
-                    name="githubInstallationId"
-                    value={props.userData?.githubInstallationId?.toString()}
-                  />
-                  <input type="hidden" name="formType" value="getChosenRepo" />
+                ) : (
+                  <button type="submit">Click to choose repository</button>
+                )}
+              </Form>
+              {props.actionArgs?.originCallForm == "getRepos" && (
+                <>
+                  <Form method="post" className=" ">
+                    <input
+                      type="hidden"
+                      name="githubInstallationId"
+                      value={props.userData?.githubInstallationId?.toString()}
+                    />
+                    <input type="hidden" name="formType" value="getChosenRepo" />
 
-                  <fieldset className="grid grid-cols-2">
-                    {props.actionArgs.repositories?.map((repo: any) => (
-                      <label key={repo.repoName} className="text-xl">
-                        <input
-                          type="radio"
-                          name="chosenRepoData"
-                          value={[repo.repoName, repo.repoId]}
-                        />{" "}
-                        {repo.repoName}
-                      </label>
-                    ))}
-                  </fieldset>
-                  <br />
-                  <button type="submit" className="text-white bg-black py-2 px-4 border rounded-lg">
-                    {props.navigation.state == "submitting" &&
-                    props.navigation.formData.get("formType") == "getChosenRepo" ? (
-                      <p>Submitting....</p>
-                    ) : (
-                      <p>Submit</p>
-                    )}
-                  </button>
-                </Form>
-              </>
-            )}
-          </div>
+                    <fieldset className="grid grid-cols-2">
+                      {props.actionArgs.repositories?.map((repo: any) => (
+                        <label key={repo.repoName} className="text-xl">
+                          <input
+                            type="radio"
+                            name="chosenRepoData"
+                            value={[repo.repoName, repo.repoId]}
+                          />{" "}
+                          {repo.repoName}
+                        </label>
+                      ))}
+                    </fieldset>
+                    <br />
+                    <button
+                      type="submit"
+                      className="text-white bg-black py-2 px-4 border rounded-lg"
+                    >
+                      {props.navigation.state == "submitting" &&
+                      props.navigation.formData.get("formType") == "getChosenRepo" ? (
+                        <p>Submitting....</p>
+                      ) : (
+                        <p>Submit</p>
+                      )}
+                    </button>
+                  </Form>
+                </>
+              )}
+            </div>
+          )}
         </div>
       )}
 
