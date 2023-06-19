@@ -4,6 +4,7 @@ import { Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration } from "@re
 import { Chain, WagmiConfig, configureChains, createConfig } from "wagmi";
 import { alchemyProvider } from "wagmi/providers/alchemy";
 import { publicProvider } from "wagmi/providers/public";
+import { BaseFetherChain } from "~/utils/helpers";
 
 import stylesheet from "~/tailwind.css";
 
@@ -18,23 +19,6 @@ export const meta: MetaFunction = () => ({
   viewport: "width=device-width,initial-scale=1",
 });
 
-const BaseFetherChain: Chain = {
-  id: 696969,
-  name: "Fether",
-  network: "fether",
-  nativeCurrency: {
-    decimals: 18,
-    name: "Fether",
-    symbol: "FEth",
-  },
-  rpcUrls: {
-    default: {
-      http: [`https://fether-testing.ngrok.app/rpc/GlobalLoader`],
-    },
-    public: { http: [`https://fether-testing.ngrok.app/rpc/GlobalLoader`] },
-  },
-  testnet: false,
-};
 const { chains, publicClient } = configureChains(
   [BaseFetherChain],
   [alchemyProvider({ apiKey: "NOTNEEDED" }), publicProvider()]

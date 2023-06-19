@@ -17,7 +17,23 @@ export function truncateToDecimals(num: number, dec = 2) {
   const calcDec = Math.pow(10, dec);
   return Math.trunc(num * calcDec) / calcDec;
 }
-
+export const BaseFetherChain: Chain = {
+  id: 696969,
+  name: "Fether",
+  network: "fether",
+  nativeCurrency: {
+    decimals: 18,
+    name: "Fether",
+    symbol: "FEth",
+  },
+  rpcUrls: {
+    default: {
+      http: [`https://fether-testing.ngrok.app/rpc/GlobalLoader`],
+    },
+    public: { http: [`https://fether-testing.ngrok.app/rpc/GlobalLoader`] },
+  },
+  testnet: false,
+};
 export const callContractFunction = async (
   methodString: AbiFunctionType,
   contractAbi: string,
