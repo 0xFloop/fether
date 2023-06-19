@@ -24,7 +24,7 @@ export default function App() {
         <Links />
       </head>
       <body>
-        <FetherProvider apiKey="clj099j1s0007z9yep52aoz1t">
+        <FetherProvider apiKey={process.env.API_KEY as string}>
           <WagmiConfig client={client}>
             <ConnectKitProvider>
               <Outlet />
