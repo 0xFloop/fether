@@ -4,16 +4,16 @@ import { db } from "../db.server";
 import { getSession as userGetSession } from "../utils/alphaSession.server";
 import { getRootDir, getSolFileNames, getUserRepositories } from "../utils/octo.server";
 import { Loader, X, ChevronDown, Copy, Edit, CheckCircle } from "lucide-react";
-import { deployContract, fetherChain } from "~/utils/viem.server";
+import { deployContract } from "~/utils/viem.server";
 import { AbiFunction as AbiFunctionType } from "abitype";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   ContractReturn,
   callContractFunction,
   timeSince,
   sleep,
   getFunctionArgsFromInput,
-  truncateToDecimals,
+  BaseFetherChain,
 } from "~/utils/helpers";
 import * as Accordion from "@radix-ui/react-accordion";
 import { useAccount, useBalance, useWalletClient } from "wagmi";
@@ -27,25 +27,8 @@ export function links() {
 }
 
 import { CustomConnectButton } from "../components/ConnectButton";
-import { Chain, createTestClient, createWalletClient, custom, http, parseEther } from "viem";
+import { Chain, createTestClient, http, parseEther } from "viem";
 import SetupPage from "~/components/SetupPage";
-const BaseFetherChain: Chain = {
-  id: 696969,
-  name: "Fether",
-  network: "fether",
-  nativeCurrency: {
-    decimals: 18,
-    name: "Fether",
-    symbol: "FEth",
-  },
-  rpcUrls: {
-    default: {
-      http: [`https://fether-testing.ngrok.app/rpc/GlobalLoader`],
-    },
-    public: { http: [`https://fether-testing.ngrok.app/rpc/GlobalLoader`] },
-  },
-  testnet: false,
-};
 
 //TODO: MAYBE break this one big ol action into many other action routes
 
