@@ -234,9 +234,8 @@ export default function Index() {
   const navigation = useNavigation();
   const submit = useSubmit();
 
-  const { address, isConnecting, isDisconnected, isConnected } = useAccount();
+  const { address, isConnected } = useAccount();
   const { data } = useBalance({ address });
-  const { data: walletClient, isError, isLoading } = useWalletClient();
 
   const [deployerModal, setDeployerModal] = useState(false);
   const [copied, setCopied] = useState(false);
