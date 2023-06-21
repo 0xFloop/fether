@@ -8,21 +8,22 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "database": "workspace:*",
-    "fetherkit": "workspace:*",
     "@rainbow-me/rainbowkit": "^0.12.4",
     "@remix-run/node": "^1.14.1",
     "@remix-run/react": "^1.14.1",
     "@remix-run/vercel": "^1.14.1",
     "@vercel/node": "^2.6.2",
-    "@wagmi/core": "^0.10.8",
+    "@wagmi/core": "latest",
     "connectkit": "^1.2.2",
+    "database": "workspace:*",
     "ethers": "^5",
+    "fetherkit": "workspace:*",
     "isbot": "latest",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "viem": "0.2.14",
-    "wagmi": "^0.12.8"
+    "react-is": "^18.2.0",
+    "viem": "1.1.2",
+    "wagmi": "1.2.1"
   },
   "devDependencies": {
     "@remix-run/dev": "^1.14.1",
@@ -31,7 +32,7 @@
     "@types/react": "^18.0.25",
     "@types/react-dom": "^18.0.8",
     "eslint": "^8.27.0",
-    "typescript": "^4.8.4"
+    "typescript": "^5.0.4"
   },
   "engines": {
     "node": ">=14"
