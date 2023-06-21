@@ -276,7 +276,7 @@ export default function Index() {
           <div className="text-4xl flex gap-10 flex-row justify-between rounded-lg">
             <div className="w-2/5">
               <div className="flex flex-col rounded-lg gap-10">
-                <div className="text-xl gap-2 bg-[#F5F5F5] p-5 flex flex-col rounded-lg">
+                <div className="text-xl gap-2 bg-[#F5F5F5] shadow-md	 p-5 flex flex-col rounded-lg">
                   <p className="pb-2 text-4xl">Details:</p>
                   <div className="flex flex-row justify-between rounded-lg">
                     <p className="text-2xl ">Api Key:</p>
@@ -522,7 +522,7 @@ export default function Index() {
                   </div>
                 </div>
 
-                <div className="flex flex-col bg-[#F5F5F5] p-5 rounded-lg">
+                <div className="flex flex-col bg-[#F5F5F5] shadow-md	 p-5 rounded-lg">
                   <div className="flex flex-row justify-between">
                     <p>Functions: </p>
                     <div className="text-lg">
@@ -563,7 +563,7 @@ export default function Index() {
                     </div>
                   )}
 
-                  <ul className="flex flex-col gap-2 bg-[#F5F5F5] rounded-lg">
+                  <ul className="flex flex-col gap-2 bg-[#F5F5F5]  rounded-lg">
                     <p className="text-2xl border-b border-b-black">Read</p>
                     <div className="py-2">
                       {JSON.parse(userData?.Repository?.contractAbi as string).map(
@@ -787,7 +787,7 @@ export default function Index() {
               </div>
             </div>
             <div className="flex flex-col w-3/5 gap-10">
-              <div className="flex-1  bg-[#F5F5F5] p-5 rounded-lg ">
+              <div className="flex-1  bg-[#F5F5F5] shadow-md	 p-5 rounded-lg ">
                 <div className="flex flex-row justify-between items-center">
                   <p className="pb-2">Transactions:</p>
 
