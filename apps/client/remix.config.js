@@ -2,7 +2,6 @@
 module.exports = {
   future: {
     v2_routeConvention: true,
-    unstable_tailwind: true,
   },
   cacheDirectory: "./node_modules/.cache/remix",
   ignoredRouteFiles: ["**/.*"],
@@ -15,4 +14,5 @@ module.exports = {
     "@rainbow-me/rainbowkit",
     /^@?rainbow-me.*/,
   ],
+  tailwind: true,
 };
