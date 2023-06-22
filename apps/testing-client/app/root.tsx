@@ -1,4 +1,4 @@
-import type { LoaderArgs, MetaFunction } from "@remix-run/node";
+import type { LoaderArgs, MetaFunction, V2_MetaFunction } from "@remix-run/node";
 import {
   Links,
   LiveReload,
@@ -21,11 +21,24 @@ import { publicProvider } from "wagmi/providers/public";
 export function links() {
   return [{ rel: "stylesheet", href: rainbowStylesUrl }];
 }
-export const meta: MetaFunction = () => ({
-  charset: "utf-8",
-  title: "New Remix App",
-  viewport: "width=device-width,initial-scale=1",
-});
+export const meta: V2_MetaFunction = () => {
+  return [
+    {
+      property: "og:title",
+      content: "Very cool app",
+    },
+    {
+      name: "description",
+      content: "This app is the best",
+    },
+    { title: "Very cool app | Remix" },
+    {
+      name: "viewport",
+      content: "width=device-width,initial-scale=1",
+    },
+    { name: "charset", content: "utf-8" },
+  ];
+};
 export const loader = async ({ request }: LoaderArgs) => {
   //validate session cookie
 

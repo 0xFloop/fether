@@ -1,5 +1,5 @@
 import { RainbowKitProvider, getDefaultWallets } from "@rainbow-me/rainbowkit";
-import type { LinksFunction, MetaFunction } from "@remix-run/node";
+import type { LinksFunction, MetaFunction, V2_MetaFunction } from "@remix-run/node";
 import { Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration } from "@remix-run/react";
 import { Chain, WagmiConfig, configureChains, createConfig } from "wagmi";
 import { alchemyProvider } from "wagmi/providers/alchemy";
@@ -13,11 +13,13 @@ export const links: LinksFunction = () => [
   { href: stylesheet, rel: "stylesheet" },
 ];
 
-export const meta: MetaFunction = () => ({
-  charset: "utf-8",
-  title: "fether",
-  viewport: "width=device-width,initial-scale=1",
-});
+export const meta: V2_MetaFunction = () => {
+  return [
+    { name: "charset", content: "utf-8" },
+    { name: "title", content: "fether" },
+    { name: "viewport", content: "width=device-width,initial-scale=1" },
+  ];
+};
 
 const { chains, publicClient } = configureChains(
   [BaseFetherChain],
