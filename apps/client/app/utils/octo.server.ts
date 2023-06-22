@@ -1,5 +1,5 @@
 import { App as Octo } from "octokit";
-import { db } from "~/db.server";
+import { db } from "~/utils/db.server";
 import { set, z } from "zod";
 
 function getGithubPk() {

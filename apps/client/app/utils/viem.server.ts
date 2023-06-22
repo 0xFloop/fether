@@ -1,4 +1,4 @@
-import { db } from "~/db.server";
+import { db } from "~/utils/db.server";
 import {
   Chain,
   createPublicClient,

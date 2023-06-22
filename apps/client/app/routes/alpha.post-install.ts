@@ -1,5 +1,5 @@
 import { LoaderArgs, redirect } from "@vercel/remix";
-import { db } from "../db.server";
+import { db } from "../utils/db.server";
 import { getSession as userGetSession } from "../utils/alphaSession.server";
 
 export const loader = async ({ request }: LoaderArgs) => {

@@ -1,6 +1,6 @@
 import { ActionArgs, LoaderArgs, redirect } from "@vercel/remix";
 import { Form, useActionData, useLoaderData, useNavigation, useSubmit } from "@remix-run/react";
-import { db } from "../db.server";
+import { db } from "../utils/db.server";
 import { getSession as userGetSession } from "../utils/alphaSession.server";
 import { getRootDir, getSolFileNames, getUserRepositories } from "../utils/octo.server";
 import { Loader, X, ChevronDown, Copy, Edit, CheckCircle } from "lucide-react";

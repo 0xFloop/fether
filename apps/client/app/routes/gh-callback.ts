@@ -1,5 +1,5 @@
 import { LoaderArgs, redirect } from "@vercel/remix";
-import { db } from "../db.server";
+import { db } from "../utils/db.server";
 import {
   getSession as userGetSession,
   commitSession as userCommitSession,

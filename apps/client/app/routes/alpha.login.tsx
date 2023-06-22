@@ -1,6 +1,6 @@
 import { ActionArgs, LoaderArgs, json, redirect } from "@vercel/remix";
 import { Form, Link, useActionData } from "@remix-run/react";
-import { db } from "../db.server";
+import { db } from "../utils/db.server";
 import { getSession, commitSession } from "../utils/alphaAccessKeySession.server";
 import {
   getSession as userGetSession,

@@ -4,7 +4,7 @@ import { useState } from "react";
 import Typewriter from "typewriter-effect";
 import { X } from "lucide-react";
 import { AlphaKeyStatus } from "database";
-import { db } from "../db.server";
+import { db } from "../utils/db.server";
 import { getSession, commitSession } from "../utils/alphaAccessKeySession.server";
 import {
   getSession as getUserSession,
