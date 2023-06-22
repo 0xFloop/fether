@@ -1,4 +1,6 @@
 /** @type {import('@remix-run/dev').AppConfig} */
+const isDevelopment = process.env.NODE_ENV === "development";
+
 module.exports = {
   future: {
     v2_routeConvention: true,
@@ -9,8 +11,11 @@ module.exports = {
   },
   cacheDirectory: "./node_modules/.cache/remix",
   ignoredRouteFiles: ["**/.*"],
-  server: process.env.NODE_ENV === "development" ? undefined : "./server.js",
+  server: isDevelopment ? undefined : "./server.ts",
   serverBuildPath: "api/index.js",
+  watchPaths: async () => {
+    return ["../../packages/database/prisma/schema.prisma"];
+  },
   serverDependenciesToBundle: [
     "database",
     /^@?connectkit.*/,
