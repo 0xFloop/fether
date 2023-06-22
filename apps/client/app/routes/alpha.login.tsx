@@ -27,8 +27,7 @@ export default function Index() {
 
   return (
     <div className="w-screen h-screen overflow-hidden">
-      {" "}
-      <div className="relative left-0 w-full flex flex-col h-full items-center align-middle justify-center">
+      <div className="relative w-full flex flex-col h-full items-center align-middle justify-center">
         <div className="h-auto w-auto relative border-2 border-black rounded p-10">
           <Link to={handleLogin()}>Log in with GitHub</Link>
         </div>

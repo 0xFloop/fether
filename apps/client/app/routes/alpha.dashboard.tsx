@@ -16,7 +16,7 @@ import {
   BaseFetherChain,
 } from "~/utils/helpers";
 import * as Accordion from "@radix-ui/react-accordion";
-import { useAccount, useBalance, useWalletClient } from "wagmi";
+import { useAccount, useBalance } from "wagmi";
 
 import { RepoData, UserWithKeyRepoActivity } from "~/types";
 
@@ -27,8 +27,12 @@ export function links() {
 }
 
 import { CustomConnectButton } from "../components/ConnectButton";
-import { Chain, createTestClient, http, parseEther } from "viem";
+import { createTestClient, http, parseEther } from "viem";
 import SetupPage from "~/components/SetupPage";
+
+//TODO: make sigin page better ui
+//TODO: make setup wizard better ui
+//TODO: fix call trace ui
 
 //TODO: MAYBE break this one big ol action into many other action routes
 
@@ -268,11 +272,11 @@ export default function Index() {
   };
 
   return (
-    <div className="w-screen h-auto overflow-hidden display flex flex-col">
+    <div className="w-screen h-auto min-h-screen overflow-hidden display flex flex-col pt-20 text-[#121212]">
       {!userData?.Repository?.contractAbi ? (
         <SetupPage userData={userData} navigation={navigation} actionArgs={actionArgs} />
       ) : (
-        <div id="content" className="w-3/4 max-w-7xl mx-auto py-20 rounded-lg ">
+        <div id="content" className="w-3/4 max-w-7xl mx-auto py-20 rounded-lg">
           <div className="text-4xl flex gap-10 flex-row justify-between rounded-lg">
             <div className="w-2/5">
               <div className="flex flex-col rounded-lg gap-10">
@@ -324,7 +328,7 @@ export default function Index() {
                       </Form>
                     </div>
                     {actionArgs?.originCallForm == "getRepos" && (
-                      <div className="absolute left-1/4 w-1/2 p-5 z-10 bg-white border border-black rounded-lg">
+                      <div className="absolute left-1/4 w-1/2 p-5 z-10 bg-[#f0f0f0] border border-[#121212] rounded-lg">
                         <div className="w-full justify-between flex flex-row">
                           <p className="text-2xl">Choose Repository:</p>
                           <Form method="post">
@@ -362,7 +366,7 @@ export default function Index() {
 
                           <button
                             type="submit"
-                            className="text-white bg-black py-2 px-4 border rounded-lg"
+                            className="text-[#f0f0f0] bg-[#121212] py-2 px-4 border rounded-lg"
                           >
                             {navigation.state == "submitting" &&
                             navigation.formData.get("formType") == "getChosenRepo" ? (
@@ -402,7 +406,7 @@ export default function Index() {
                           </button>
                         </Form>
                         {actionArgs?.originCallForm == "getFilesOfChosenRepo" && (
-                          <div className="absolute left-1/4 w-1/2 p-5 z-10 bg-white border border-black rounded-lg">
+                          <div className="absolute left-1/4 w-1/2 p-5 z-10 bg-[#f0f0f0] border border-[#121212] rounded-lg">
                             <div className="w-full justify-between flex flex-row">
                               <p className="text-2xl">Choose File To Track:</p>
                               <Form method="post">
@@ -434,7 +438,7 @@ export default function Index() {
                               <br />
                               <button
                                 type="submit"
-                                className="text-white bg-black py-2 px-4 border rounded-lg"
+                                className="text-[#f0f0f0] bg-[#121212] py-2 px-4 border rounded-lg"
                               >
                                 {navigation.state == "submitting" &&
                                 navigation.formData.get("formType") == "chooseFileToTrack" ? (
@@ -477,7 +481,7 @@ export default function Index() {
                         </button>
                       </Form>
                       {deployerModal && actionArgs?.originCallForm != "setDeployerAddress" && (
-                        <div className="absolute left-1/4 w-1/2 p-5 z-10 bg-white border border-black rounded-lg">
+                        <div className="absolute left-1/4 w-1/2 p-5 z-10 bg-[#f0f0f0] border border-[#121212] rounded-lg">
                           <button onClick={() => setDeployerModal(false)} className="float-right ">
                             <X />
                           </button>
@@ -499,12 +503,12 @@ export default function Index() {
                             ) : (
                               <div className="flex flex-row items-center justify-between w-full">
                                 <input
-                                  className="text-lg h-10 rounded-lg p-2 w-1/2 border border-black"
+                                  className="text-lg h-10 rounded-lg p-2 w-1/2 border border-[#121212]"
                                   name="deployerAddress"
                                   placeholder="Input desired contract deployer address"
                                 />
                                 <button
-                                  className="text-white text-xl bg-black py-2 px-4 border rounded-lg"
+                                  className="text-[#f0f0f0] text-xl bg-[#121212] py-2 px-4 border rounded-lg"
                                   type="submit"
                                 >
                                   Set Deployer Address
@@ -544,7 +548,7 @@ export default function Index() {
 
                           {navigation.state == "submitting" &&
                           navigation.formData.get("formType") == "fundWallet" ? (
-                            <div className="text-white bg-[#4f4f4f] py-2 mt-2 px-4 text-xl border rounded-lg flex flex-row items-center  float-right">
+                            <div className="text-[#f0f0f0] bg-[#121212] py-2 mt-2 px-4 text-xl border rounded-lg flex flex-row items-center  float-right">
                               +1 FEth
                               <div className="animate-spin items-center ml-3">
                                 <Loader size={20} />
@@ -553,7 +557,7 @@ export default function Index() {
                           ) : (
                             <button
                               type="submit"
-                              className="text-white bg-[#4f4f4f] py-2 px-4 border rounded-lg mt-2 text-xl float-right"
+                              className="text-[#f0f0f0] bg-[#121212] py-2 px-4 border rounded-lg mt-2 text-xl float-right"
                             >
                               Add FEth
                             </button>
@@ -564,7 +568,7 @@ export default function Index() {
                   )}
 
                   <ul className="flex flex-col gap-2 bg-[#F5F5F5]  rounded-lg">
-                    <p className="text-2xl border-b border-b-black">Read</p>
+                    <p className="text-2xl border-b border-b-[#121212]">Read</p>
                     <div className="py-2">
                       {JSON.parse(userData?.Repository?.contractAbi as string).map(
                         (method: AbiFunctionType, i: number) => (
@@ -589,7 +593,7 @@ export default function Index() {
 
                                       setFunctionReturn(returnedData);
                                     }}
-                                    className="text-white bg-[#4f4f4f] py-2 px-4 border rounded-lg"
+                                    className="text-[#f0f0f0] bg-[#121212] py-2 px-4 border rounded-lg"
                                   >
                                     {functionCalled == method.name ? (
                                       <div className="flex flex-row items-center">
@@ -631,7 +635,7 @@ export default function Index() {
                         )
                       )}
                     </div>
-                    <p className="text-2xl border-b border-b-black">Write</p>
+                    <p className="text-2xl border-b border-b-[#121212]">Write</p>
 
                     {JSON.parse(userData?.Repository?.contractAbi).map(
                       (method: AbiFunctionType, i: number) => (
@@ -683,7 +687,7 @@ export default function Index() {
                                               }
                                             }
                                           }}
-                                          className="text-white bg-[#4f4f4f] py-2 px-4 border rounded-lg disabled:bg-[#cbcbcb]"
+                                          className="text-[#f0f0f0] bg-[#121212] py-2 px-4 border rounded-lg disabled:bg-[#cbcbcb]"
                                           disabled={!Boolean(address)}
                                         >
                                           {functionCalled == method.name ? (
@@ -735,7 +739,7 @@ export default function Index() {
                                                 }
                                               }
                                             }}
-                                            className="text-white bg-[#4f4f4f] py-2 px-4 border rounded-lg disabled:bg-[#cbcbcb]"
+                                            className="text-[#f0f0f0] bg-[#121212] py-2 px-4 border rounded-lg disabled:bg-[#cbcbcb]"
                                             disabled={!Boolean(address)}
                                           >
                                             {functionCalled == method.name ? (
@@ -800,7 +804,7 @@ export default function Index() {
                     <input type="hidden" name="formType" value="deployContract" />
 
                     <button
-                      className="text-xl text-white bg-[#4f4f4f] py-2 px-4 rounded-lg"
+                      className="text-xl text-[#f0f0f0] bg-[#121212] py-2 px-4 rounded-lg"
                       type="submit"
                     >
                       {navigation.state == "submitting" &&

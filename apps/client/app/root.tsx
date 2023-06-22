@@ -45,7 +45,7 @@ export default function App() {
         <Links />
       </head>
       <body>
-        <div className="mx-auto min-h-screen">
+        <div className="mx-auto min-h-screen bg-[#f0f0f0]">
           <WagmiConfig config={wagmiConfig}>
             <RainbowKitProvider chains={chains}>
               <Outlet />
