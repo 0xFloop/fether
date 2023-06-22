@@ -23,6 +23,7 @@ importers:
       '@remix-run/node': ^1.8.0
       '@remix-run/react': ^1.8.0
       '@remix-run/serve': ^1.14.1
+      '@remix-run/server-runtime': ^1.17.1
       '@remix-run/vercel': ^1.8.0
       '@tailwindcss/forms': ^0.5.3
       '@types/bcryptjs': ^2.4.2
@@ -51,6 +52,7 @@ importers:
       '@rainbow-me/rainbowkit': 1.0.1_txytgg72h3eb3r7pejsvbqs5ey
       '@remix-run/node': 1.17.1
       '@remix-run/react': 1.17.1_biqbaboplfbrettd7655fr4n2y
+      '@remix-run/server-runtime': 1.17.1
       '@remix-run/vercel': 1.17.1_@vercel+node@2.15.2
       '@vercel/node': 2.15.2
       abitype: 0.7.1_i2fvzue2cjjncoywjfv7hcm7mu
