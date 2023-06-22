@@ -1,12 +1,6 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "pipeline": {
-    "db:generate": {
-      "cache": false
-    },
-    "db:push": {
-      "cache": false
-    },
     "dev": {
       "dependsOn": ["prisma:generate", "build"],
       "cache": false

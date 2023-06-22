@@ -1,6 +1,4 @@
 /** @type {import('@remix-run/dev').AppConfig} */
-const isDevelopment = process.env.NODE_ENV === "development";
-
 module.exports = {
   future: {
     v2_routeConvention: true,
@@ -8,24 +6,17 @@ module.exports = {
     v2_meta: true,
     v2_normalizeFormMethod: true,
     v2_errorBoundary: true,
-    v2_dev: true,
   },
   cacheDirectory: "./node_modules/.cache/remix",
   ignoredRouteFiles: ["**/.*"],
-  server: isDevelopment ? undefined : "./server.ts",
+  server: process.env.NODE_ENV === "development" ? undefined : "./server.js",
   serverBuildPath: "api/index.js",
-  watchPaths: async () => {
-    return ["../../packages/database/prisma/schema.prisma"];
-  },
   serverDependenciesToBundle: [
     "database",
     /^@?connectkit.*/,
     /^@?wagmi.*/,
     "@rainbow-me/rainbowkit",
     /^@?rainbow-me.*/,
-    "@rainbow-me/rainbowkit/wallets",
-    /^@?wagmi.*/,
-    /.*/,
   ],
   tailwind: true,
 };
