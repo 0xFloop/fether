@@ -1,23 +1,30 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "pipeline": {
+    "db:generate": {
+      "cache": false
+    },
+    "db:push": {
+      "cache": false
+    },
     "dev": {
-      "dependsOn": ["prisma:generate"],
-      "cache": false,
-      "persistent": true
+      "dependsOn": ["prisma:generate", "build"],
+      "cache": false
     },
     "build": {
       "dependsOn": ["prisma:generate", "^build"],
-      "outputs": ["dist/**", "public/build/**", "build/**"]
-    },
-    "lint": {
-      "outputs": [],
-      "cache": false
+      "outputs": ["dist/**", "public/build/**", "build/**", "app/styles/app.css"]
     },
     "prisma:generate": {
       "cache": false
     },
     "prisma:push": {
+      "cache": false
+    },
+    "prisma:push-accept-data-loss": {
+      "cache": false
+    },
+    "storybook": {
       "cache": false
     },
     "prisma:studio": {
@@ -26,11 +33,11 @@
     "prisma:seed": {
       "cache": false
     },
-    "prisma:push-accept-data-loss": {
-      "cache": false
-    },
     "prisma:migrate-reset": {
       "cache": false
+    },
+    "lint": {
+      "outputs": []
     }
   }
 }
