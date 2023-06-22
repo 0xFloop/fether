@@ -17,8 +17,11 @@ module.exports = {
   serverDependenciesToBundle: [
     /^@?connectkit.*/,
     /^@?wagmi.*/,
-    "@rainbow-me/rainbowkit",
     /^@?rainbow-me.*/,
+    "@rainbow-me/rainbowkit",
+    "@rainbow-me/rainbowkit/wallets",
+    "wagmi",
+    "@wagmi/core",
   ],
   // appDirectory: "app",
   // assetsBuildDirectory: "public/build",
