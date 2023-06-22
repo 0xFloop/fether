@@ -7,7 +7,6 @@ module.exports = {
     v2_normalizeFormMethod: true,
     v2_errorBoundary: true,
   },
-  serverModuleFormat: "cjs",
   cacheDirectory: "./node_modules/.cache/remix",
   ignoredRouteFiles: ["**/.*"],
   server: process.env.NODE_ENV === "development" ? undefined : "./server.js",
