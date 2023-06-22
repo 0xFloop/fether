@@ -1,5 +1,5 @@
-import { Ethereum } from "@wagmi/core";
-import { ConnectKitButton } from "connectkit";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
+
 import { useState } from "react";
 import {
   createPublicClient,
@@ -14,7 +14,7 @@ import { useFether } from "fetherkit";
 export default function Index() {
   const fether = useFether();
   const [number, setNumber] = useState<number>();
-  const [windowEthereum, setWindowEthereum] = useState<Ethereum>();
+  const [windowEthereum, setWindowEthereum] = useState();
 
   let publicClient = createPublicClient({
     chain: fether.chain,
@@ -44,7 +44,7 @@ export default function Index() {
 
     let walletClient = createWalletClient({
       chain: fether.chain,
-      transport: custom(windowEthereum as Ethereum),
+      transport: custom(window.ethereum),
     });
 
     const [address] = await walletClient.getAddresses();
@@ -62,7 +62,7 @@ export default function Index() {
 
   return (
     <div>
-      <ConnectKitButton />
+      <ConnectButton />
       <button onClick={updateStateNumber}>click to get contract number value</button>
       <br />
       <br />

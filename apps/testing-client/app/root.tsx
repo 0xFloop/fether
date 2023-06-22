@@ -8,10 +8,19 @@ import {
   ScrollRestoration,
   useLoaderData,
 } from "@remix-run/react";
-import { ConnectKitProvider, getDefaultClient } from "connectkit";
-import { FetherProvider, BaseFetherChain } from "fetherkit";
-import { WagmiConfig, createClient } from "wagmi";
 
+import { FetherProvider, BaseFetherChain } from "fetherkit";
+
+import rainbowStylesUrl from "@rainbow-me/rainbowkit/styles.css";
+
+import { getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
+import { configureChains, createConfig, WagmiConfig } from "wagmi";
+import { alchemyProvider } from "wagmi/providers/alchemy";
+import { publicProvider } from "wagmi/providers/public";
+
+export function links() {
+  return [{ rel: "stylesheet", href: rainbowStylesUrl }];
+}
 export const meta: MetaFunction = () => ({
   charset: "utf-8",
   title: "New Remix App",
@@ -27,13 +36,22 @@ export const loader = async ({ request }: LoaderArgs) => {
 export default function App() {
   const apiKey = useLoaderData<typeof loader>();
 
-  const client = createClient(
-    getDefaultClient({
-      appName: "Fether Testing Client",
-      alchemyId: "r8ilH_ju-8gNnskLhLGNGtIYpVwaIvOO",
-      chains: [BaseFetherChain],
-    })
+  const { chains, publicClient } = configureChains(
+    [BaseFetherChain],
+    [alchemyProvider({ apiKey: "THIS ISNT NEEDED" }), publicProvider()]
   );
+
+  const { connectors } = getDefaultWallets({
+    appName: "My RainbowKit App",
+    projectId: "YOUR_PROJECT_ID",
+    chains,
+  });
+
+  const wagmiConfig = createConfig({
+    autoConnect: true,
+    connectors,
+    publicClient,
+  });
 
   return (
     <html lang="en">
@@ -43,10 +61,10 @@ export default function App() {
       </head>
       <body>
         <FetherProvider apiKey={apiKey}>
-          <WagmiConfig client={client}>
-            <ConnectKitProvider>
+          <WagmiConfig config={wagmiConfig}>
+            <RainbowKitProvider chains={chains}>
               <Outlet />
-            </ConnectKitProvider>
+            </RainbowKitProvider>
           </WagmiConfig>
         </FetherProvider>
         <ScrollRestoration />
