@@ -30,7 +30,9 @@ importers:
       '@types/react': ^18.0.25
       '@types/react-dom': ^18.0.8
       '@types/react-typical': ^0.1.0
+      '@vanilla-extract/css': ^1.11.1
       '@vanilla-extract/sprinkles': ^1.6.0
+      '@vercel/node': ^2.6.2
       '@vercel/remix': ^1.17.0
       abitype: ^0.7.1
       concurrently: ^7.6.0
@@ -53,8 +55,10 @@ importers:
       '@remix-run/node': 1.17.1
       '@remix-run/react': 1.17.1_biqbaboplfbrettd7655fr4n2y
       '@remix-run/server-runtime': 1.17.1
-      '@remix-run/vercel': 1.17.1
-      '@vanilla-extract/sprinkles': 1.6.0
+      '@remix-run/vercel': 1.17.1_@vercel+node@2.15.2
+      '@vanilla-extract/css': 1.11.1
+      '@vanilla-extract/sprinkles': 1.6.0_sqr63gfwi5yqhik3spxs63sakq
+      '@vercel/node': 2.15.2
       '@vercel/remix': 1.17.0_biqbaboplfbrettd7655fr4n2y
       abitype: 0.7.1_i2fvzue2cjjncoywjfv7hcm7mu
       database: link:../../packages/database
@@ -3929,15 +3933,6 @@ packages:
       set-cookie-parser: 2.6.0
       source-map: 0.7.4
 
-  /@remix-run/vercel/1.17.1:
-    resolution: {integrity: sha512-SPNZ88Dn/5kl4+EAVcJvqSAEr4KPlBDWCV0W5ntg47Uge7YOQO/VHzDcP9OHxv/IXc9zGLoJ+51SrR3YrVADZg==}
-    engines: {node: '>=14'}
-    peerDependencies:
-      '@vercel/node': ^1.8.3 || ^2.4.0
-    dependencies:
-      '@remix-run/node': 1.17.1
-    dev: false
-
   /@remix-run/vercel/1.17.1_@vercel+node@2.15.2:
     resolution: {integrity: sha512-SPNZ88Dn/5kl4+EAVcJvqSAEr4KPlBDWCV0W5ntg47Uge7YOQO/VHzDcP9OHxv/IXc9zGLoJ+51SrR3YrVADZg==}
     engines: {node: '>=14'}
@@ -4555,7 +4550,7 @@ packages:
   /@types/node-fetch/2.6.3:
     resolution: {integrity: sha512-ETTL1mOEdq/sxUtgtOhKjyB2Irra4cjxksvcMUR5Zr4n+PxVhsCD9WS46oPbHL3et9Zde7CNRr+WUNlcHvsX+w==}
     dependencies:
-      '@types/node': 14.18.33
+      '@types/node': 20.3.1
       form-data: 3.0.1
     dev: false
 
@@ -4877,7 +4872,6 @@ packages:
       deepmerge: 4.3.1
       media-query-parser: 2.0.2
       outdent: 0.8.0
-    dev: true
 
   /@vanilla-extract/css/1.9.1:
     resolution: {integrity: sha512-pu2SFiff5jRhPwvGoj8cM5l/qIyLvigOmy22ss5DGjwV5pJYezRjDLxWumi2luIwioMWvh9EozCjyfH8nq+7fQ==}
@@ -4938,10 +4932,12 @@ packages:
       '@vanilla-extract/css': 1.9.1
     dev: false
 
-  /@vanilla-extract/sprinkles/1.6.0:
+  /@vanilla-extract/sprinkles/1.6.0_sqr63gfwi5yqhik3spxs63sakq:
     resolution: {integrity: sha512-TDc/bKyYmt6PDd7/39a5HXUa+4mBI9PO0uw0jmxFMqe9EzrFEVevyRsjJ9KGK09ACItvVUotz98LIJTeliCbpQ==}
     peerDependencies:
       '@vanilla-extract/css': ^1.0.0
+    dependencies:
+      '@vanilla-extract/css': 1.11.1
     dev: false
 
   /@vercel/build-utils/6.7.5:
@@ -6658,7 +6654,6 @@ packages:
   /css-what/6.1.0:
     resolution: {integrity: sha512-HTUrgRJ7r4dsZKU6GjmpfRK1O76h97Z8MfS1G0FozR+oF2kG6Vfe8JE6zwrkbxigziPHinCJ+gCPjA9EaBDtRw==}
     engines: {node: '>= 6'}
-    dev: true
 
   /cssesc/3.0.0:
     resolution: {integrity: sha512-/Tb/JcjK111nNScGob5MNtsntNM1aCNUDipB/TkwZFhyDrrE47SOx/18wF2bbjgc3ZzCSKW1T5nt5EbFoAz/Vg==}
