@@ -639,11 +639,11 @@ export default function Index() {
 
                     {JSON.parse(userData?.Repository?.contractAbi).map(
                       (method: AbiFunctionType, i: number) => (
-                        <>
+                        <div key={i}>
                           {!(
                             method.stateMutability == "view" || method.stateMutability == "pure"
                           ) && (
-                            <li key={i} className="text-lg">
+                            <li className="text-lg">
                               <>
                                 <Accordion.Root type="multiple" className="w-full relative py-2">
                                   <Accordion.Item
@@ -783,7 +783,7 @@ export default function Index() {
                                 )}
                             </li>
                           )}
-                        </>
+                        </div>
                       )
                     )}
                   </ul>
