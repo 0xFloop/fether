@@ -2,7 +2,12 @@
 module.exports = {
   future: {
     v2_routeConvention: true,
+    v2_headers: true,
+    v2_meta: true,
+    v2_normalizeFormMethod: true,
+    v2_errorBoundary: true,
   },
+  serverModuleFormat: "cjs",
   cacheDirectory: "./node_modules/.cache/remix",
   ignoredRouteFiles: ["**/.*"],
   server: process.env.NODE_ENV === "development" ? undefined : "./server.js",
