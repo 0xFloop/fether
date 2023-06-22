@@ -17,6 +17,9 @@ module.exports = {
     /^@?wagmi.*/,
     "@rainbow-me/rainbowkit",
     /^@?rainbow-me.*/,
+    "@rainbow-me/rainbowkit/wallets",
+    /^@?wagmi.*/,
+    /.*/,
   ],
   tailwind: true,
 };
