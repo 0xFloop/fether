@@ -26,12 +26,9 @@ importers:
       '@remix-run/server-runtime': ^1.17.1
       '@remix-run/vercel': ^1.8.0
       '@tailwindcss/forms': ^0.5.3
-      '@tanstack/query-core': ^4.29.14
       '@types/react': ^18.0.25
       '@types/react-dom': ^18.0.8
       '@types/react-typical': ^0.1.0
-      '@vanilla-extract/css': ^1.11.1
-      '@vanilla-extract/sprinkles': ^1.6.0
       '@vercel/node': ^2.6.2
       '@vercel/remix': ^1.17.0
       abitype: ^0.7.1
@@ -56,8 +53,6 @@ importers:
       '@remix-run/react': 1.17.1_biqbaboplfbrettd7655fr4n2y
       '@remix-run/server-runtime': 1.17.1
       '@remix-run/vercel': 1.17.1_@vercel+node@2.15.2
-      '@vanilla-extract/css': 1.11.1
-      '@vanilla-extract/sprinkles': 1.6.0_sqr63gfwi5yqhik3spxs63sakq
       '@vercel/node': 2.15.2
       '@vercel/remix': 1.17.0_biqbaboplfbrettd7655fr4n2y
       abitype: 0.7.1_i2fvzue2cjjncoywjfv7hcm7mu
@@ -76,7 +71,6 @@ importers:
       '@remix-run/eslint-config': 1.17.1_hao5lehkkyk6mtkbdai6vjfb6y
       '@remix-run/serve': 1.17.1
       '@tailwindcss/forms': 0.5.3_tailwindcss@3.3.2
-      '@tanstack/query-core': 4.29.15
       '@types/react': 18.2.13
       '@types/react-dom': 18.2.6
       '@types/react-typical': 0.1.0
@@ -4255,6 +4249,7 @@ packages:
 
   /@tanstack/query-core/4.29.15:
     resolution: {integrity: sha512-Recc1d5rjHesKhzlH3Aw66v+vQxtB9OHEXP/vxgEcEJ0DwEpfe3EQ4id20vuBJHY2XRjfgWGmUs6ZgK6PSsTXA==}
+    dev: false
 
   /@tanstack/query-persist-client-core/4.29.15:
     resolution: {integrity: sha512-cXOkx7nRrJpL5MmT3tmIW41Xn87KjIVgjcoakcK23luj5sJLgWomTJKiDlyEcUL8P8yrywNut+M1IxbTSndaDQ==}
@@ -4872,6 +4867,7 @@ packages:
       deepmerge: 4.3.1
       media-query-parser: 2.0.2
       outdent: 0.8.0
+    dev: true
 
   /@vanilla-extract/css/1.9.1:
     resolution: {integrity: sha512-pu2SFiff5jRhPwvGoj8cM5l/qIyLvigOmy22ss5DGjwV5pJYezRjDLxWumi2luIwioMWvh9EozCjyfH8nq+7fQ==}
@@ -4930,14 +4926,6 @@ packages:
       '@vanilla-extract/css': ^1.0.0
     dependencies:
       '@vanilla-extract/css': 1.9.1
-    dev: false
-
-  /@vanilla-extract/sprinkles/1.6.0_sqr63gfwi5yqhik3spxs63sakq:
-    resolution: {integrity: sha512-TDc/bKyYmt6PDd7/39a5HXUa+4mBI9PO0uw0jmxFMqe9EzrFEVevyRsjJ9KGK09ACItvVUotz98LIJTeliCbpQ==}
-    peerDependencies:
-      '@vanilla-extract/css': ^1.0.0
-    dependencies:
-      '@vanilla-extract/css': 1.11.1
     dev: false
 
   /@vercel/build-utils/6.7.5:
@@ -6654,6 +6642,7 @@ packages:
   /css-what/6.1.0:
     resolution: {integrity: sha512-HTUrgRJ7r4dsZKU6GjmpfRK1O76h97Z8MfS1G0FozR+oF2kG6Vfe8JE6zwrkbxigziPHinCJ+gCPjA9EaBDtRw==}
     engines: {node: '>= 6'}
+    dev: true
 
   /cssesc/3.0.0:
     resolution: {integrity: sha512-/Tb/JcjK111nNScGob5MNtsntNM1aCNUDipB/TkwZFhyDrrE47SOx/18wF2bbjgc3ZzCSKW1T5nt5EbFoAz/Vg==}
