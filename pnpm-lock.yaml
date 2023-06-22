@@ -27,6 +27,7 @@ importers:
       '@remix-run/vercel': ^1.8.0
       '@tailwindcss/forms': ^0.5.3
       '@tanstack/query-sync-storage-persister': ^4.29.15
+      '@tanstack/react-query': ^4.29.15
       '@types/react': ^18.0.25
       '@types/react-dom': ^18.0.8
       '@types/react-typical': ^0.1.0
@@ -56,6 +57,7 @@ importers:
       '@remix-run/server-runtime': 1.17.1
       '@remix-run/vercel': 1.17.1_@vercel+node@2.15.2
       '@tanstack/query-sync-storage-persister': 4.29.15
+      '@tanstack/react-query': 4.29.15_biqbaboplfbrettd7655fr4n2y
       '@vanilla-extract/css': 1.11.1
       '@vanilla-extract/sprinkles': 1.6.0_sqr63gfwi5yqhik3spxs63sakq
       '@vercel/node': 2.15.2
