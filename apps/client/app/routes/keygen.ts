@@ -1,4 +1,4 @@
-import { ActionArgs, redirect } from "@remix-run/node";
+import { ActionArgs, redirect } from "@vercel/remix";
 import { db } from "../db.server";
 import { KeyTier } from "database";
 

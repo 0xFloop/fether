@@ -1,5 +1,5 @@
 import { RainbowKitProvider, getDefaultWallets } from "@rainbow-me/rainbowkit";
-import type { LinksFunction, MetaFunction, V2_MetaFunction } from "@remix-run/node";
+import type { LinksFunction, MetaFunction, V2_MetaFunction } from "@vercel/remix";
 import { Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration } from "@remix-run/react";
 import { Chain, WagmiConfig, configureChains, createConfig } from "wagmi";
 import { alchemyProvider } from "wagmi/providers/alchemy";

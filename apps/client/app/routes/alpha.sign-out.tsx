@@ -1,4 +1,4 @@
-import { LoaderArgs, redirect } from "@remix-run/node";
+import { LoaderArgs, redirect } from "@vercel/remix";
 import {
   getSession as userGetSession,
   commitSession as userCommitSession,

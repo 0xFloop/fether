@@ -1,4 +1,4 @@
-import { ActionArgs, LoaderArgs, json, redirect } from "@remix-run/node";
+import { ActionArgs, LoaderArgs, json, redirect } from "@vercel/remix";
 import { Form, Link, Outlet, useActionData } from "@remix-run/react";
 import { db } from "../db.server";
 import { getSession, commitSession } from "../utils/alphaAccessKeySession.server";
