@@ -32,6 +32,7 @@ importers:
       '@vercel/node': ^2.7.0
       abitype: ^0.7.1
       concurrently: ^7.6.0
+      createUtils: link:@vanilla-extract/sprinkles/createUtils
       database: workspace:*
       eslint: ^8.27.0
       isbot: latest
@@ -54,6 +55,7 @@ importers:
       '@remix-run/vercel': 1.17.1_@vercel+node@2.15.2
       '@vercel/node': 2.15.2
       abitype: 0.7.1_i2fvzue2cjjncoywjfv7hcm7mu
+      createUtils: link:@vanilla-extract/sprinkles/createUtils
       database: link:../../packages/database
       isbot: 3.6.12
       lucide-react: 0.244.0_react@18.2.0
