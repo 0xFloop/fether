@@ -24,7 +24,7 @@ export default function Index() {
     <div className="relative min-h-screen">
       <div
         id="navbar"
-        className="h-20 border-b border-b-black flex flex-row justify-between items-center"
+        className="absolute w-full h-20 border-b border-b-black flex flex-row justify-between items-center"
       >
         <Link to="/" id="logo" className="text-5xl flex-1 pl-8 ">
           fether
