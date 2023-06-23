@@ -1,5 +1,5 @@
 import { ActionArgs, LoaderArgs, json, redirect } from "@vercel/remix";
-import { Form, Link, useActionData } from "@remix-run/react";
+import { Form, Link, useActionData, useLoaderData } from "@remix-run/react";
 import { db } from "../utils/db.server";
 import { getSession, commitSession } from "../utils/alphaAccessKeySession.server";
 import {
@@ -8,19 +8,19 @@ import {
 } from "../utils/alphaSession.server";
 
 export const loader = async ({ request }: LoaderArgs) => {
+  let redirectUri = process.env.fetherGithubRedirectUri as string;
   const session = await getSession(request.headers.get("Cookie"));
   const user = await userGetSession(request.headers.get("Cookie"));
   if (!session.has("alphaKey")) throw redirect("/");
   if (user.has("userId")) throw redirect("/alpha/dashboard");
-  else return null;
+  else return redirectUri;
 };
 
 export default function Index() {
+  const redirectUri = useLoaderData();
   // const data = useActionData<typeof action>();
   const clientId = "1755f9594459f4e4030c";
-  let redirectUri = process.env.fetherGithubRedirectUri as string;
   function handleLogin() {
-    console.log(redirectUri);
     const scope = "user:email";
     const url = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}`;
     return url;

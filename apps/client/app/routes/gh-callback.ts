@@ -7,9 +7,9 @@ import {
 
 async function handleAuthentication(
   code: string,
-  redirect_uri: string
+  redirectUri: string
 ): Promise<{ githubUsername: string | null; githubId: string | null }> {
-  console.log(redirect_uri);
+  console.log(redirectUri);
 
   let githubUsername: string | null = null;
   let githubId: string | null = null;
@@ -25,7 +25,7 @@ async function handleAuthentication(
       client_id: "1755f9594459f4e4030c",
       client_secret: "7054d91280bf03b0594900df18efb860b43d5909",
       code,
-      redirect_uri: redirect_uri,
+      redirect_uri: redirectUri,
     }),
   };
 
@@ -57,10 +57,15 @@ async function handleAuthentication(
 }
 
 export const loader = async ({ request }: LoaderArgs) => {
+  const redirectUri = process.env.fetherGithubRedirectUri as string;
+
+  console.log(redirectUri);
+  console.log("WHST TE FUCK IS GOING ON");
+
   const url = new URL(request.url);
   let { githubUsername, githubId } = await handleAuthentication(
     url.searchParams.get("code") as string,
-    process.env.fetherGithubRedirectUri as string
+    redirectUri
   );
 
   const session = await userGetSession(request.headers.get("Cookie"));
