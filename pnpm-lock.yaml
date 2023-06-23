@@ -29,7 +29,7 @@ importers:
       '@types/react': ^18.0.25
       '@types/react-dom': ^18.0.8
       '@types/react-typical': ^0.1.0
-      '@vercel/node': ^2.6.2
+      '@vercel/node': ^2.7.0
       '@vercel/remix': ^1.17.0
       abitype: ^0.7.1
       concurrently: ^7.6.0
