@@ -15,8 +15,7 @@ module.exports = {
     /^@?wagmi.*/,
     /^@?connectkit.*/,
     /^@?rainbow-me.*/,
-    "@vanilla-extract/sprinkles",
-    "@vanilla-extract/sprinkles/createUtils",
+    /^@?vanilla-extract.*/,
   ],
   watchPaths: async () => {
     return ["../../packages/database/prisma/schema.prisma"];
