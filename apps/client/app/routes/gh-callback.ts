@@ -8,13 +8,15 @@ import {
 async function handleAuthentication(
   code: string
 ): Promise<{ githubUsername: string | null; githubId: string | null }> {
-  let redirectUrl =
+  let redirectUri =
     process.env.NODE_ENV == "development"
       ? "http://localhost:3000/gh-callback"
       : "https://fether.xyz/gh-callback";
+
   let githubUsername: string | null = null;
   let githubId: string | null = null;
   const url = "https://github.com/login/oauth/access_token";
+
   const options = {
     method: "POST",
     headers: {
@@ -25,9 +27,10 @@ async function handleAuthentication(
       client_id: "1755f9594459f4e4030c",
       client_secret: "7054d91280bf03b0594900df18efb860b43d5909",
       code,
-      redirect_uri: redirectUrl,
+      redirect_uri: redirectUri,
     }),
   };
+
   await fetch(url, options)
     .then((response) => response.json())
     .then(async (data) => {
