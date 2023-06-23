@@ -6,8 +6,11 @@ import {
 } from "../utils/alphaSession.server";
 
 async function handleAuthentication(
-  code: string
+  code: string,
+  redirect_uri: string
 ): Promise<{ githubUsername: string | null; githubId: string | null }> {
+  console.log(redirect_uri);
+
   let githubUsername: string | null = null;
   let githubId: string | null = null;
   const url = "https://github.com/login/oauth/access_token";
@@ -22,7 +25,7 @@ async function handleAuthentication(
       client_id: "1755f9594459f4e4030c",
       client_secret: "7054d91280bf03b0594900df18efb860b43d5909",
       code,
-      redirect_uri: process.env.fetherGithubRedirectUri as string,
+      redirect_uri: redirect_uri,
     }),
   };
 
@@ -56,7 +59,8 @@ async function handleAuthentication(
 export const loader = async ({ request }: LoaderArgs) => {
   const url = new URL(request.url);
   let { githubUsername, githubId } = await handleAuthentication(
-    url.searchParams.get("code") as string
+    url.searchParams.get("code") as string,
+    process.env.fetherGithubRedirectUri as string
   );
 
   const session = await userGetSession(request.headers.get("Cookie"));

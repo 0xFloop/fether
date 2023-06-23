@@ -20,6 +20,7 @@ export default function Index() {
   const clientId = "1755f9594459f4e4030c";
   let redirectUri = process.env.fetherGithubRedirectUri as string;
   function handleLogin() {
+    console.log(redirectUri);
     const scope = "user:email";
     const url = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}`;
     return url;
