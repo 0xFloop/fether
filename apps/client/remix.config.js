@@ -16,6 +16,7 @@ module.exports = {
     /^@?connectkit.*/,
     /^@?rainbow-me.*/,
     /^@?vanilla-extract.*/,
+    /^@?tanstack.*/,
   ],
   watchPaths: async () => {
     return ["../../packages/database/prisma/schema.prisma"];
