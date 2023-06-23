@@ -7,6 +7,7 @@ module.exports = {
   cacheDirectory: "./node_modules/.cache/remix",
   server: isDevelopment ? undefined : "./server.ts",
   serverBuildPath: "api/index.js",
+  serverBuildTarget: "vercel",
   serverDependenciesToBundle: [
     "database",
     "@rainbow-me/rainbowkit",
@@ -14,6 +15,8 @@ module.exports = {
     /^@?wagmi.*/,
     /^@?connectkit.*/,
     /^@?rainbow-me.*/,
+    "@vanilla-extract/sprinkles",
+    "@vanilla-extract/sprinkles/createUtils",
   ],
   watchPaths: async () => {
     return ["../../packages/database/prisma/schema.prisma"];
