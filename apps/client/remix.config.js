@@ -14,6 +14,7 @@ module.exports = {
     "@rainbow-me/rainbowkit/wallets",
     "use-sync-external-store",
     "use-sync-external-store/shim/index.js",
+    "eventemitter3",
     /^@?wagmi.*/,
     /^@?connectkit.*/,
     /^@?rainbow-me.*/,
