@@ -17,6 +17,7 @@ module.exports = {
     /^@?rainbow-me.*/,
     /^@?vanilla-extract.*/,
     /^@?tanstack.*/,
+    /^use-sync-external-store.*/,
   ],
   watchPaths: async () => {
     return ["../../packages/database/prisma/schema.prisma"];
