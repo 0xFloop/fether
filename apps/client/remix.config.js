@@ -12,14 +12,9 @@ module.exports = {
     "database",
     "@rainbow-me/rainbowkit",
     "@rainbow-me/rainbowkit/wallets",
-    "use-sync-external-store",
-    "use-sync-external-store/shim/index.js",
-    "eventemitter3",
     /^@?wagmi.*/,
     /^@?connectkit.*/,
     /^@?rainbow-me.*/,
-    /^@?vanilla-extract.*/,
-    /^@?tanstack.*/,
   ],
   watchPaths: async () => {
     return ["../../packages/database/prisma/schema.prisma"];
