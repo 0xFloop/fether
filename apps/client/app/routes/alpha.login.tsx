@@ -18,10 +18,7 @@ export const loader = async ({ request }: LoaderArgs) => {
 export default function Index() {
   // const data = useActionData<typeof action>();
   const clientId = "1755f9594459f4e4030c";
-  let redirectUri =
-    process.env.NODE_ENV == "development"
-      ? "http://localhost:3000/gh-callback"
-      : "https://fether.xyz/gh-callback";
+  let redirectUri = process.env.fetherGithubRedirectUri as string;
   function handleLogin() {
     const scope = "user:email";
     const url = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}`;
