@@ -50,9 +50,23 @@ export const fetherChain: Chain = {
   },
   rpcUrls: {
     default: {
-      http: [`https://fether-testing.ngrok.app/rpc/${process.env.API_KEY as string}`],
+      http: [
+        `https://${
+          process.env.NODE_ENV == "production"
+            ? "fether-server.vercel.app"
+            : "fether-testing.ngrok.app"
+        }/rpc/${process.env.API_KEY as string}`,
+      ],
     },
-    public: { http: [`https://fether-testing.ngrok.app/rpc/${process.env.API_KEY as string}`] },
+    public: {
+      http: [
+        `https://${
+          process.env.NODE_ENV == "production"
+            ? "fether-server.vercel.app"
+            : "fether-testing.ngrok.app"
+        }/rpc/${process.env.API_KEY as string}`,
+      ],
+    },
   },
   testnet: false,
 };
@@ -83,6 +97,7 @@ export const deployContract = async (
   githubInstallationId: string,
   repoData: UserWithKeyRepoActivity
 ) => {
+  console.log("deploying contract");
   const octokit = await octo.getInstallationOctokit(parseInt(githubInstallationId));
 
   if (!repoData?.Repository?.foundryRootDir) throw new Error("No repo data found");
