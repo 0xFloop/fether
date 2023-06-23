@@ -13,6 +13,7 @@ module.exports = {
     "@rainbow-me/rainbowkit",
     "@rainbow-me/rainbowkit/wallets",
     "use-sync-external-store",
+    "use-sync-external-store/shim/index.js",
     /^@?wagmi.*/,
     /^@?connectkit.*/,
     /^@?rainbow-me.*/,
