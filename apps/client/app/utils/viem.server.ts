@@ -12,6 +12,7 @@ import { App as Octo } from "octokit";
 import { zodContractBuildFileSchema } from "./octo.server";
 import { Abi, AbiParameter } from "abitype/zod";
 import { UserWithKeyRepoActivity } from "~/types";
+import { fetherChainFromKey } from "./helpers";
 
 function getGithubPk() {
   const githubAppPk = process.env.appPK as string;
@@ -32,30 +33,12 @@ export const BaseFetherChain: Chain = {
   },
   rpcUrls: {
     default: {
-      http: [`https://fether-testing.ngrok.app/rpc/`],
-    },
-    public: { http: [`https://fether-testing.ngrok.app/rpc/`] },
-  },
-  testnet: false,
-};
-
-export const fetherChain: Chain = {
-  id: 696969,
-  name: "Fether",
-  network: "fether",
-  nativeCurrency: {
-    decimals: 18,
-    name: "Fether",
-    symbol: "FEth",
-  },
-  rpcUrls: {
-    default: {
       http: [
         `https://${
           process.env.NODE_ENV == "production"
             ? "fether-server.vercel.app"
             : "fether-testing.ngrok.app"
-        }/rpc/${process.env.API_KEY as string}`,
+        }/rpc/`,
       ],
     },
     public: {
@@ -64,7 +47,7 @@ export const fetherChain: Chain = {
           process.env.NODE_ENV == "production"
             ? "fether-server.vercel.app"
             : "fether-testing.ngrok.app"
-        }/rpc/${process.env.API_KEY as string}`,
+        }/rpc/`,
       ],
     },
   },
@@ -76,22 +59,6 @@ const pkaccount = privateKeyToAccount(
 );
 
 export const deployerAddress = pkaccount.address;
-
-export const walletClient = createWalletClient({
-  chain: fetherChain,
-  transport: http(),
-});
-
-export const publicClient = createPublicClient({
-  chain: fetherChain,
-  transport: http(),
-});
-
-export const adminClient = createTestClient({
-  chain: fetherChain,
-  mode: "anvil",
-  transport: http(),
-});
 
 export const deployContract = async (
   githubInstallationId: string,
@@ -120,6 +87,21 @@ export const deployContract = async (
       "X-GitHub-Api-Version": "2022-11-28",
       Accept: "application/vnd.github.raw",
     },
+  });
+  const walletClient = createWalletClient({
+    chain: fetherChainFromKey(repoData.ApiKey?.key as string),
+    transport: http(),
+  });
+
+  const publicClient = createPublicClient({
+    chain: fetherChainFromKey(repoData.ApiKey?.key as string),
+    transport: http(),
+  });
+
+  const adminClient = createTestClient({
+    chain: fetherChainFromKey(repoData.ApiKey?.key as string),
+    mode: "anvil",
+    transport: http(),
   });
 
   let fileJSON = JSON.parse(contentsReq.data.toString());

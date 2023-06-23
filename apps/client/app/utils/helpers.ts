@@ -112,9 +112,23 @@ export function fetherChainFromKey(apikey: string): Chain {
     },
     rpcUrls: {
       default: {
-        http: [`https://fether-testing.ngrok.app/rpc/${apikey}`],
+        http: [
+          `https://${
+            process.env.NODE_ENV == "production"
+              ? "fether-server.vercel.app"
+              : "fether-testing.ngrok.app"
+          }/rpc/${apikey}`,
+        ],
       },
-      public: { http: [`https://fether-testing.ngrok.app/rpc/${apikey}`] },
+      public: {
+        http: [
+          `https://${
+            process.env.NODE_ENV == "production"
+              ? "fether-server.vercel.app"
+              : "fether-testing.ngrok.app"
+          }/rpc/${apikey}`,
+        ],
+      },
     },
     testnet: false,
   };
