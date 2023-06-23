@@ -148,6 +148,8 @@ export const action = async ({ request }: ActionArgs) => {
         };
 
       case "deployContract":
+        console.log(process.env.NODE_ENV);
+        console.log("deployContract");
         await deployContract(githubInstallationId as string, associatedUser);
 
         return {
