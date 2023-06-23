@@ -10,7 +10,7 @@ import {
 import { privateKeyToAccount } from "viem/accounts";
 import { App as Octo } from "octokit";
 import { zodContractBuildFileSchema } from "./octo.server";
-import { Abi, AbiParameter } from "abitype/zod";
+import { Abi } from "abitype/zod";
 import { UserWithKeyRepoActivity } from "~/types";
 import { fetherChainFromKey } from "./helpers";
 
@@ -21,38 +21,6 @@ function getGithubPk() {
 }
 
 const octo = new Octo({ appId: "302483", privateKey: getGithubPk() });
-
-export const BaseFetherChain: Chain = {
-  id: 696969,
-  name: "Fether",
-  network: "fether",
-  nativeCurrency: {
-    decimals: 18,
-    name: "Fether",
-    symbol: "FEth",
-  },
-  rpcUrls: {
-    default: {
-      http: [
-        `https://${
-          process.env.NODE_ENV == "production"
-            ? "fether-server.vercel.app"
-            : "fether-testing.ngrok.app"
-        }/rpc/`,
-      ],
-    },
-    public: {
-      http: [
-        `https://${
-          process.env.NODE_ENV == "production"
-            ? "fether-server.vercel.app"
-            : "fether-testing.ngrok.app"
-        }/rpc/`,
-      ],
-    },
-  },
-  testnet: false,
-};
 
 const pkaccount = privateKeyToAccount(
   "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"

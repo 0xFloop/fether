@@ -17,6 +17,7 @@ export function truncateToDecimals(num: number, dec = 2) {
   const calcDec = Math.pow(10, dec);
   return Math.trunc(num * calcDec) / calcDec;
 }
+
 export const BaseFetherChain: Chain = {
   id: 696969,
   name: "Fether",
@@ -28,9 +29,23 @@ export const BaseFetherChain: Chain = {
   },
   rpcUrls: {
     default: {
-      http: [`https://fether-testing.ngrok.app/rpc/GlobalLoader`],
+      http: [
+        `https://${
+          process.env.NODE_ENV == "production"
+            ? "fether-server.vercel.app"
+            : "fether-testing.ngrok.app"
+        }/rpc/`,
+      ],
     },
-    public: { http: [`https://fether-testing.ngrok.app/rpc/GlobalLoader`] },
+    public: {
+      http: [
+        `https://${
+          process.env.NODE_ENV == "production"
+            ? "fether-server.vercel.app"
+            : "fether-testing.ngrok.app"
+        }/rpc/`,
+      ],
+    },
   },
   testnet: false,
 };
