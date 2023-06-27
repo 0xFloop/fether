@@ -9,9 +9,8 @@ import {
   zodSingleJsonRpcCallSchema,
   zodArrayJsonRpcCallSchema,
 } from "./utils/config";
-import { adminClient, publicClient, walletClient } from "./utils/viemClients";
+import { publicClient, walletClient } from "./utils/viemClients";
 import { PrismaClient } from "database";
-import { type } from "os";
 import { decodeFunctionData, keccak256, parseTransaction } from "viem";
 const db = new PrismaClient();
 
