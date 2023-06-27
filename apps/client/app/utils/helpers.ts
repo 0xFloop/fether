@@ -29,22 +29,10 @@ export const BaseFetherChain: Chain = {
   },
   rpcUrls: {
     default: {
-      http: [
-        `https://${
-          process.env.NODE_ENV == "production"
-            ? "fether-server.vercel.app"
-            : "fether-testing.ngrok.app"
-        }/rpc/`,
-      ],
+      http: [`http://fether-server.vercel.app/rpc/GlobalLoader`],
     },
     public: {
-      http: [
-        `https://${
-          process.env.NODE_ENV == "production"
-            ? "fether-server.vercel.app"
-            : "fether-testing.ngrok.app"
-        }/rpc/`,
-      ],
+      http: [`http://fether-server.vercel.app/rpc/GlobalLoader`],
     },
   },
   testnet: false,

@@ -19,5 +19,5 @@
     "outDir": "api",
     "target": "es2020"
   },
-  "exclude": ["node_modules", "build"]
+  "exclude": ["node_modules", "api"]
 }

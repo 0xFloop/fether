@@ -31,7 +31,6 @@ type traceType = {
 
 app.post("/rpc/:API_KEY", jsonParser, async (req, res) => {
   res.set("Access-Control-Allow-Origin", "*");
-  res.set("Access-Control-Allow-Origin", "https://www.fether.xyz");
 
   try {
     let reqbodySingle;
@@ -65,10 +64,7 @@ app.post("/rpc/:API_KEY", jsonParser, async (req, res) => {
         .status(469)
         .json(error);
     } else {
-      let rpcUrl =
-        process.env.NODE_ENV == "production"
-          ? (process.env.ANVIL_SERVER_IP as string)
-          : "http://127.0.0.1:8545";
+      let rpcUrl = process.env.ANVIL_SERVER_IP as string;
 
       let response = await fetch(rpcUrl, {
         method: "POST",
@@ -128,7 +124,6 @@ app.post("/rpc/:API_KEY", jsonParser, async (req, res) => {
 
 app.post("/payload", jsonParser, async (req, res) => {
   res.set("Access-Control-Allow-Origin", "*");
-  res.set("Access-Control-Allow-Origin", "https://www.fether.xyz");
 
   try {
     let installId = req.body.installation.id.toString();
