@@ -16,7 +16,7 @@
     "noImplicitAny": true,
     "skipLibCheck": true,
     "strict": true,
-    "outDir": "build",
+    "outDir": "api",
     "target": "es2020"
   },
   "exclude": ["node_modules", "build"]

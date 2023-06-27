@@ -60,9 +60,18 @@ app.post("/rpc/:API_KEY", jsonParser, async (req, res) => {
         id: "1",
       };
 
-      return res.set("Access-Control-Allow-Origin", "*").status(469).json(error);
+      return res
+        .set("Access-Control-Allow-Origin", "*")
+        .setHeader("Cache-Control", "s-max-age=1, stale-while-revalidate")
+        .status(469)
+        .json(error);
     } else {
-      let response = await fetch("http://127.0.0.1:8545", {
+      let rpcUrl =
+        process.env.NODE_ENV == "production"
+          ? "https://fether-server.vercel.app"
+          : "http://127.0.0.1:8545";
+
+      let response = await fetch(rpcUrl, {
         method: "POST",
         body: JSON.stringify(reqbodySingle || reqbodyArray),
         headers: { "Content-Type": "application/json" },
@@ -110,11 +119,18 @@ app.post("/rpc/:API_KEY", jsonParser, async (req, res) => {
       // });
 
       let responseJson = await response.json();
-      res.set("Access-Control-Allow-Origin", "*").send(responseJson);
+      res
+        .set("Access-Control-Allow-Origin", "*")
+        .setHeader("Cache-Control", "s-max-age=1, stale-while-revalidate")
+        .send(responseJson);
     }
   } catch (err) {
     console.log("ERROR OCCURED: \n", err);
-    res.set("Access-Control-Allow-Origin", "*").status(500).end(err);
+    res
+      .set("Access-Control-Allow-Origin", "*")
+      .setHeader("Cache-Control", "s-max-age=1, stale-while-revalidate")
+      .status(500)
+      .end(err);
   }
 });
 
@@ -203,13 +219,10 @@ app.post("/payload", jsonParser, async (req, res) => {
             }
           }
       }
-
-      // res.send("POST REQ FROM GITHUB BELOW: \n" + JSON.stringify(req.body));
-      //@ts-ignore
-      res.send("yay");
+      res.setHeader("Cache-Control", "s-max-age=1, stale-while-revalidate").send("yay");
     } else {
       console.log("no api key found for this repo: ", req.body.installation.id);
-      res.status(500);
+      res.setHeader("Cache-Control", "s-max-age=1, stale-while-revalidate").status(500);
       res.end("No api key found for this repo, please sign up at https://www.fether.xyz.");
     }
   } catch (err) {
@@ -224,7 +237,9 @@ app.get("/fetherkit/:API_KEY", async (req, res) => {
   try {
     let validated = await validateSender(req.params.API_KEY);
     if (!validated.success) {
-      res.set("Access-Control-Allow-Origin", "*");
+      res
+        .set("Access-Control-Allow-Origin", "*")
+        .setHeader("Cache-Control", "s-max-age=1, stale-while-revalidate");
       let error = {
         jsonrpc: "2.0",
         error: {
@@ -237,7 +252,9 @@ app.get("/fetherkit/:API_KEY", async (req, res) => {
       res.status(500);
       res.json(error);
     } else {
-      res.set("Access-Control-Allow-Origin", "*");
+      res
+        .set("Access-Control-Allow-Origin", "*")
+        .setHeader("Cache-Control", "s-max-age=1, stale-while-revalidate");
       res.json(validated.apiKeyData?.associatedUser.Repository);
     }
   } catch (err) {
