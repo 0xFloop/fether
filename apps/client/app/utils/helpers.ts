@@ -29,10 +29,10 @@ export const BaseFetherChain: Chain = {
   },
   rpcUrls: {
     default: {
-      http: [`http://fether-server.vercel.app/rpc/GlobalLoader`],
+      http: [`https://fether-server.vercel.app/rpc/GlobalLoader`],
     },
     public: {
-      http: [`http://fether-server.vercel.app/rpc/GlobalLoader`],
+      http: [`https://fether-server.vercel.app/rpc/GlobalLoader`],
     },
   },
   testnet: false,
