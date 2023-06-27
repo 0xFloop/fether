@@ -66,7 +66,7 @@ app.post("/rpc/:API_KEY", jsonParser, async (req, res) => {
     } else {
       let rpcUrl =
         process.env.NODE_ENV == "production"
-          ? "https://fether-server.vercel.app"
+          ? (process.env.ANVIL_SERVER_IP as string)
           : "http://127.0.0.1:8545";
 
       let response = await fetch(rpcUrl, {
