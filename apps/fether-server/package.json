@@ -2,7 +2,7 @@
   "name": "fether-server",
   "version": "1.0.0",
   "description": "",
-  "main": "build/index.js",
+  "main": "api/index.js",
   "scripts": {
     "build": "tsc",
     "prestart": "npm run build",
