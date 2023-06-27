@@ -30,6 +30,8 @@ type traceType = {
 };
 
 app.post("/rpc/:API_KEY", jsonParser, async (req, res) => {
+  res.set("Access-Control-Allow-Origin", "*");
+
   try {
     let reqbodySingle;
     let reqbodyArray;
@@ -39,10 +41,7 @@ app.post("/rpc/:API_KEY", jsonParser, async (req, res) => {
     } else {
       let isArrayRequest = zodArrayJsonRpcCallSchema.safeParse(req.body);
       if (!isArrayRequest.success) {
-        return res
-          .set("Access-Control-Allow-Origin", "*")
-          .status(469)
-          .json({ message: "Invalid JSON-RPC request" });
+        return res.status(469).json({ message: "Invalid JSON-RPC request" });
       } else {
         console.log(isArrayRequest.data.length);
         reqbodyArray = isArrayRequest.data;
@@ -61,7 +60,6 @@ app.post("/rpc/:API_KEY", jsonParser, async (req, res) => {
       };
 
       return res
-        .set("Access-Control-Allow-Origin", "*")
         .setHeader("Cache-Control", "s-max-age=1, stale-while-revalidate")
         .status(469)
         .json(error);
@@ -119,22 +117,17 @@ app.post("/rpc/:API_KEY", jsonParser, async (req, res) => {
       // });
 
       let responseJson = await response.json();
-      res
-        .set("Access-Control-Allow-Origin", "*")
-        .setHeader("Cache-Control", "s-max-age=1, stale-while-revalidate")
-        .send(responseJson);
+      res.setHeader("Cache-Control", "s-max-age=1, stale-while-revalidate").send(responseJson);
     }
   } catch (err) {
     console.log("ERROR OCCURED: \n", err);
-    res
-      .set("Access-Control-Allow-Origin", "*")
-      .setHeader("Cache-Control", "s-max-age=1, stale-while-revalidate")
-      .status(500)
-      .end(err);
+    res.setHeader("Cache-Control", "s-max-age=1, stale-while-revalidate").status(500).end(err);
   }
 });
 
 app.post("/payload", jsonParser, async (req, res) => {
+  res.set("Access-Control-Allow-Origin", "*");
+
   try {
     let installId = req.body.installation.id.toString();
 
@@ -234,12 +227,11 @@ app.post("/payload", jsonParser, async (req, res) => {
 });
 
 app.get("/fetherkit/:API_KEY", async (req, res) => {
+  res.set("Access-Control-Allow-Origin", "*");
   try {
     let validated = await validateSender(req.params.API_KEY);
     if (!validated.success) {
-      res
-        .set("Access-Control-Allow-Origin", "*")
-        .setHeader("Cache-Control", "s-max-age=1, stale-while-revalidate");
+      res.setHeader("Cache-Control", "s-max-age=1, stale-while-revalidate");
       let error = {
         jsonrpc: "2.0",
         error: {
@@ -252,9 +244,7 @@ app.get("/fetherkit/:API_KEY", async (req, res) => {
       res.status(500);
       res.json(error);
     } else {
-      res
-        .set("Access-Control-Allow-Origin", "*")
-        .setHeader("Cache-Control", "s-max-age=1, stale-while-revalidate");
+      res.setHeader("Cache-Control", "s-max-age=1, stale-while-revalidate");
       res.json(validated.apiKeyData?.associatedUser.Repository);
     }
   } catch (err) {
