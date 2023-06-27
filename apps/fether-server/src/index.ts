@@ -31,6 +31,7 @@ type traceType = {
 
 app.post("/rpc/:API_KEY", jsonParser, async (req, res) => {
   res.set("Access-Control-Allow-Origin", "*");
+  res.set("Access-Control-Allow-Origin", "https://www.fether.xyz");
 
   try {
     let reqbodySingle;
@@ -127,6 +128,7 @@ app.post("/rpc/:API_KEY", jsonParser, async (req, res) => {
 
 app.post("/payload", jsonParser, async (req, res) => {
   res.set("Access-Control-Allow-Origin", "*");
+  res.set("Access-Control-Allow-Origin", "https://www.fether.xyz");
 
   try {
     let installId = req.body.installation.id.toString();
@@ -228,6 +230,8 @@ app.post("/payload", jsonParser, async (req, res) => {
 
 app.get("/fetherkit/:API_KEY", async (req, res) => {
   res.set("Access-Control-Allow-Origin", "*");
+  res.set("Access-Control-Allow-Origin", "https://www.fether.xyz");
+
   try {
     let validated = await validateSender(req.params.API_KEY);
     if (!validated.success) {
