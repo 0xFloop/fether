@@ -28,6 +28,7 @@ const { chains, publicClient } = configureChains(
 
 const { connectors } = getDefaultWallets({
   appName: "Fether",
+  projectId: "42490798ad26dff0d5bfc67ee7abf1fb",
   chains,
 });
 

@@ -114,7 +114,7 @@ export const zodContractBuildFileSchema = z.object({
   }),
   methodIdentifiers: z.object({}),
 });
-
+export const zodApiKey = z.string();
 export const zodSingleJsonRpcCallSchema = z.object({
   jsonrpc: z.literal("2.0"),
   id: z.union([z.number(), z.string()]),

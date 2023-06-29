@@ -1,0 +1,38 @@
+{
+  "name": "fether-server-remix",
+  "private": true,
+  "sideEffects": false,
+  "scripts": {
+    "build": "remix build",
+    "dev": "PORT=3004 remix dev",
+    "typecheck": "tsc"
+  },
+  "dependencies": {
+    "@remix-run/css-bundle": "^1.18.0",
+    "@remix-run/node": "^1.18.0",
+    "@remix-run/react": "^1.18.0",
+    "@remix-run/vercel": "^1.18.0",
+    "@vercel/node": "^2.10.3",
+    "@vercel/remix": "^1.17.0",
+    "abitype": "^0.7.1",
+    "database": "workspace:*",
+    "isbot": "^3.6.8",
+    "octokit": "^2.0.14",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "viem": "1.1.2",
+    "zod": "^3.21.4"
+  },
+  "devDependencies": {
+    "@remix-run/dev": "^1.18.0",
+    "@remix-run/eslint-config": "^1.18.0",
+    "@remix-run/serve": "^1.18.0",
+    "@types/react": "^18.0.35",
+    "@types/react-dom": "^18.0.11",
+    "eslint": "^8.38.0",
+    "typescript": "^5.0.4"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
