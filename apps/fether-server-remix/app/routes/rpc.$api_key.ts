@@ -91,7 +91,13 @@ export const action = async ({ request, params }: ActionArgs) => {
       let responseJson = await response.json();
 
       return new Response(JSON.stringify(responseJson), {
-        headers: { "Access-Control-Allow-Origin": "*", "Content-Type": "application/json" },
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Content-Type": "application/json",
+          Allow: "OPTIONS, GET, POST",
+          "Access-Control-Allow-Headers": "Origin, Content-Type",
+          "Access-Control-Allow-Methods": "OPTIONS, GET, POST",
+        },
       });
     }
   } catch (err) {
@@ -104,4 +110,21 @@ export const action = async ({ request, params }: ActionArgs) => {
   }
 };
 
-export const loader = async ({ request, params }: LoaderArgs) => {};
+export const loader = async ({ request, params }: LoaderArgs) => {
+  console.log(request.method);
+  if (request.method == "OPTIONS") {
+    return new Response(null, {
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Content-Type": "application/json",
+        Allow: "OPTIONS, GET, POST",
+        "Access-Control-Allow-Headers": "Origin, Content-Type",
+        "Access-Control-Allow-Methods": "OPTIONS, GET, POST",
+      },
+    });
+  }
+  return new Response(null, {
+    status: 200,
+    headers: { "Access-Control-Allow-Origin": "*" },
+  });
+};
