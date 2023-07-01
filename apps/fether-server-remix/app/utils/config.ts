@@ -1,7 +1,5 @@
 import { Chain } from "viem";
 import { z } from "zod";
-import * as dotenv from "dotenv";
-dotenv.config();
 
 export const port = 3001;
 export const githubAppPk = process.env.appPK as string;
