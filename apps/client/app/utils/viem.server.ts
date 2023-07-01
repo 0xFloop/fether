@@ -56,18 +56,20 @@ export const deployContract = async (
       Accept: "application/vnd.github.raw",
     },
   });
+  const fetherChain = fetherChainFromKey(repoData.ApiKey?.key as string);
+
   const walletClient = createWalletClient({
-    chain: fetherChainFromKey(repoData.ApiKey?.key as string),
+    chain: fetherChain,
     transport: http(),
   });
 
   const publicClient = createPublicClient({
-    chain: fetherChainFromKey(repoData.ApiKey?.key as string),
+    chain: fetherChain,
     transport: http(),
   });
 
   const adminClient = createTestClient({
-    chain: fetherChainFromKey(repoData.ApiKey?.key as string),
+    chain: fetherChain,
     mode: "anvil",
     transport: http(),
   });
