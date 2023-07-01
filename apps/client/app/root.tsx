@@ -1,10 +1,5 @@
-import { RainbowKitProvider, getDefaultWallets } from "@rainbow-me/rainbowkit";
-import type { LinksFunction, MetaFunction, V2_MetaFunction } from "@vercel/remix";
+import type { LinksFunction, V2_MetaFunction } from "@vercel/remix";
 import { Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration } from "@remix-run/react";
-import { Chain, WagmiConfig, configureChains, createConfig } from "wagmi";
-import { alchemyProvider } from "wagmi/providers/alchemy";
-import { publicProvider } from "wagmi/providers/public";
-import { BaseFetherChain } from "~/utils/helpers";
 
 import stylesheet from "~/tailwind.css";
 
@@ -21,23 +16,6 @@ export const meta: V2_MetaFunction = () => {
   ];
 };
 
-const { chains, publicClient } = configureChains(
-  [BaseFetherChain],
-  [alchemyProvider({ apiKey: "NOTNEEDED" }), publicProvider()]
-);
-
-const { connectors } = getDefaultWallets({
-  appName: "Fether",
-  projectId: "42490798ad26dff0d5bfc67ee7abf1fb",
-  chains,
-});
-
-const wagmiConfig = createConfig({
-  autoConnect: true,
-  connectors,
-  publicClient,
-});
-
 export default function App() {
   return (
     <html lang="en" className="h-full">
@@ -47,11 +25,7 @@ export default function App() {
       </head>
       <body>
         <div className="mx-auto min-h-screen bg-[#f0f0f0]">
-          <WagmiConfig config={wagmiConfig}>
-            <RainbowKitProvider chains={chains}>
-              <Outlet />
-            </RainbowKitProvider>
-          </WagmiConfig>
+          <Outlet />
         </div>
         <ScrollRestoration />
         <Scripts />

@@ -13,7 +13,7 @@ import {
   timeSince,
   sleep,
   getFunctionArgsFromInput,
-  BaseFetherChain,
+  fetherChainFromKey,
 } from "~/utils/helpers";
 import * as Accordion from "@radix-ui/react-accordion";
 import { useAccount, useBalance } from "wagmi";
@@ -163,7 +163,7 @@ export const action = async ({ request }: ActionArgs) => {
         let currentBalance = body.get("currentBalance") as `${number}`;
         console.log("fundWallet");
         const adminClient = createTestClient({
-          chain: BaseFetherChain,
+          chain: fetherChainFromKey(associatedUser.ApiKey?.key as string),
           mode: "anvil",
           transport: http(),
         });
