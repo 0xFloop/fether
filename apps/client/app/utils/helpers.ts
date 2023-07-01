@@ -18,25 +18,6 @@ export function truncateToDecimals(num: number, dec = 2) {
   return Math.trunc(num * calcDec) / calcDec;
 }
 
-export const BaseFetherChain: Chain = {
-  id: 696969,
-  name: "Fether",
-  network: "fether",
-  nativeCurrency: {
-    decimals: 18,
-    name: "Fether",
-    symbol: "FEth",
-  },
-  rpcUrls: {
-    default: {
-      http: [`https://fether-server.vercel.app/rpc/GlobalLoader`],
-    },
-    public: {
-      http: [`https://fether-server.vercel.app/rpc/GlobalLoader`],
-    },
-  },
-  testnet: false,
-};
 export const callContractFunction = async (
   methodString: AbiFunctionType,
   contractAbi: string,

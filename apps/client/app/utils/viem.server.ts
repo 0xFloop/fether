@@ -128,3 +128,35 @@ export const deployContract = async (
     },
   });
 };
+
+export const BaseFetherChain: Chain = {
+  id: 696969,
+  name: "Fether",
+  network: "fether",
+  nativeCurrency: {
+    decimals: 18,
+    name: "Fether",
+    symbol: "FEth",
+  },
+  rpcUrls: {
+    default: {
+      http: [
+        `https://${
+          process.env.NODE_ENV == "production"
+            ? "fether-server.vercel.app"
+            : "fether-testing.ngrok.app"
+        }/rpc/GlobalLoader`,
+      ],
+    },
+    public: {
+      http: [
+        `https://${
+          process.env.NODE_ENV == "production"
+            ? "fether-server.vercel.app"
+            : "fether-testing.ngrok.app"
+        }/rpc/GlobalLoader`,
+      ],
+    },
+  },
+  testnet: false,
+};
