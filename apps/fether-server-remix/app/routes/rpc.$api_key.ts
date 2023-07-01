@@ -1,4 +1,4 @@
-import { ActionArgs, redirect } from "@vercel/remix";
+import { ActionArgs, LoaderArgs } from "@vercel/remix";
 import { db } from "../utils/db.server";
 import { zodSingleJsonRpcCallSchema, zodArrayJsonRpcCallSchema, zodApiKey } from "../utils/config";
 import { validateSender } from "~/utils/validate";
@@ -7,7 +7,6 @@ import { decodeFunctionData, keccak256, parseTransaction } from "viem";
 export const action = async ({ request, params }: ActionArgs) => {
   let api_key = zodApiKey.parse(params.api_key);
   const reqBody = await request.json();
-
   try {
     let reqbodySingle;
     let reqbodyArray;
@@ -89,12 +88,10 @@ export const action = async ({ request, params }: ActionArgs) => {
           }
         }
       }
-
       let responseJson = await response.json();
 
       return new Response(JSON.stringify(responseJson), {
-        status: 200,
-        headers: { "Access-Control-Allow-Origin": "*" },
+        headers: { "Access-Control-Allow-Origin": "*", "Content-Type": "application/json" },
       });
     }
   } catch (err) {
@@ -106,3 +103,5 @@ export const action = async ({ request, params }: ActionArgs) => {
     });
   }
 };
+
+export const loader = async ({ request, params }: LoaderArgs) => {};
