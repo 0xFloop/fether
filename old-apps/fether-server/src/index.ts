@@ -206,7 +206,7 @@ app.post("/payload", jsonParser, async (req, res) => {
                 data: {
                   contractAddress: transaction["contractAddress"],
                   contractAbi: dbAbi,
-                  updatedAt: new Date(),
+                  lastDeployed: new Date(),
                 },
               });
             }

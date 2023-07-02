@@ -522,7 +522,11 @@ export default function Index() {
                   </div>
                   <div className="flex flex-row justify-between rounded-lg">
                     <p className="text-2xl">Last Deployment: </p>
-                    <p>{timeSince(userData?.Repository?.updatedAt)} ago</p>
+                    <p>
+                      {userData?.Repository?.lastDeployed
+                        ? `${timeSince(userData?.Repository?.lastDeployed)} ago`
+                        : "N/A"}
+                    </p>
                   </div>
                 </div>
 

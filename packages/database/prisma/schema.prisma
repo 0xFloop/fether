@@ -40,15 +40,16 @@ model ApiKey {
 }
 
 model Repository {
-  id              String  @id @unique @default(cuid())
+  id              String    @id @unique @default(cuid())
   name            String
-  userId          String  @unique
-  associatedUser  User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId          String    @unique
+  associatedUser  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   filename        String?
   contractAddress String?
-  contractAbi     String? @db.Text
+  contractAbi     String?   @db.Text
   foundryRootDir  String?
   deployerAddress String?
+  lastDeployed    DateTime?
 
   createdAt DateTime      @default(now())
   updatedAt DateTime      @default(now()) @updatedAt

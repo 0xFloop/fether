@@ -124,7 +124,7 @@ export const deployContract = async (
     data: {
       contractAddress: transaction["contractAddress"],
       contractAbi: dbAbi,
-      updatedAt: new Date(),
+      lastDeployed: new Date(),
     },
   });
 };
