@@ -88,7 +88,7 @@ export const action = async ({ request }: ActionArgs) => {
                 data: {
                   contractAddress: transaction["contractAddress"],
                   contractAbi: dbAbi,
-                  updatedAt: new Date(),
+                  lastDeployed: new Date(),
                 },
               });
             }
