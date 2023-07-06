@@ -2,7 +2,7 @@
 pragma solidity ^0.8.13;
 
 contract Counter {
-    uint256 number = 69;
+    uint256 number = 420;
     string letter = "F";
 
     function setLeNumber(uint256 newNumber) public {
