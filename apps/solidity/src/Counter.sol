@@ -2,14 +2,14 @@
 pragma solidity ^0.8.13;
 
 contract Counter {
-    uint256 number = 85;
-    string letter = "A";
+    uint256 number = 69;
+    string letter = "F";
 
     function setLeNumber(uint256 newNumber) public {
         number = newNumber;
     }
 
-    function setNumberAndLetter(
+    function setNumberAndLetterHiElena(
         uint256 newNumber,
         string memory newString
     ) public {
@@ -17,7 +17,7 @@ contract Counter {
         letter = newString;
     }
 
-    function getLeNumber() public view returns (uint256 _number) {
+    function getLeNumberFromElena() public view returns (uint256 _number) {
         return number;
     }
 
