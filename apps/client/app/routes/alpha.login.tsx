@@ -15,22 +15,21 @@ export const loader = async ({ request }: LoaderArgs) => {
   if (user.has("userId")) throw redirect("/alpha/dashboard");
   else return redirectUri;
 };
-
+export const action = async ({ request }: ActionArgs) => {
+  const clientId = process.env.fetherGithubOAuthClientId as string;
+  const redirectUri = process.env.fetherGithubRedirectUri as string;
+  const scope = "user:email";
+  const url = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}`;
+  return redirect(url);
+};
 export default function Index() {
-  const redirectUri = useLoaderData();
-  // const data = useActionData<typeof action>();
-  const clientId = "1755f9594459f4e4030c";
-  function handleLogin() {
-    const scope = "user:email";
-    const url = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}`;
-    return url;
-  }
-
   return (
     <div className="w-screen h-screen overflow-hidden">
       <div className="relative w-full flex flex-col h-full items-center align-middle justify-center">
         <div className="h-auto w-auto relative border-2 border-black rounded p-10">
-          <Link to={handleLogin()}>Log in with GitHub</Link>
+          <Form method="post">
+            <button type="submit">Log in with GitHub</button>
+          </Form>
         </div>
       </div>
     </div>
