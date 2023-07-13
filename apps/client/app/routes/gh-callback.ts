@@ -22,8 +22,8 @@ async function handleAuthentication(
       Accept: "application/json",
     },
     body: JSON.stringify({
-      client_id: "1755f9594459f4e4030c",
-      client_secret: "7054d91280bf03b0594900df18efb860b43d5909",
+      client_id: process.env.fetherGithubOAuthClientId as string,
+      client_secret: process.env.fetherGithubOAuthClientSecret as string,
       code,
       redirect_uri: redirectUri,
     }),
@@ -58,9 +58,6 @@ async function handleAuthentication(
 
 export const loader = async ({ request }: LoaderArgs) => {
   const redirectUri = process.env.fetherGithubRedirectUri as string;
-
-  console.log(redirectUri);
-  console.log("WHST TE FUCK IS GOING ON");
 
   const url = new URL(request.url);
   let { githubUsername, githubId } = await handleAuthentication(

@@ -5,7 +5,10 @@ import { App as Octo } from "octokit";
 import { Abi } from "abitype/zod";
 import { publicClient, walletClient } from "~/utils/viemClients";
 
-const octo = new Octo({ appId: "302483", privateKey: formattedGithubAppPk });
+const octo = new Octo({
+  appId: process.env.fetherGithubAppId as string,
+  privateKey: formattedGithubAppPk,
+});
 
 export const action = async ({ request }: ActionArgs) => {
   try {

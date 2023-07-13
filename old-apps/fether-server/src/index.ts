@@ -19,7 +19,10 @@ const bodyParser = require("body-parser");
 const jsonParser = bodyParser.json();
 const cors = require("cors");
 app.use(cors());
-const octo = new Octo({ appId: "302483", privateKey: formattedGithubAppPk });
+const octo = new Octo({
+  appId: process.env.fetherGithubAppId as string,
+  privateKey: formattedGithubAppPk,
+});
 
 type traceType = {
   jsonrpc: "2.0";

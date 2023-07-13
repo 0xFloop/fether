@@ -8,7 +8,10 @@ function getGithubPk() {
   return formattedGithubAppPk;
 }
 
-const octo = new Octo({ appId: "302483", privateKey: getGithubPk() });
+const octo = new Octo({
+  appId: process.env.fetherGithubAppId as string,
+  privateKey: getGithubPk(),
+});
 
 export const getUserRepositories = async (githubInstallationId: string) => {
   const octokit = await octo.getInstallationOctokit(parseInt(githubInstallationId));
