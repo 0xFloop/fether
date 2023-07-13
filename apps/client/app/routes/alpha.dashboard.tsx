@@ -28,7 +28,7 @@ export function links() {
 
 import { CustomConnectButton } from "../components/ConnectButton";
 import { createTestClient, http, parseEther } from "viem";
-import SetupPage from "~/components/SetupPage";
+import SetupWizard from "~/components/SetupWizard";
 
 //TODO: make sigin page better ui
 //TODO: make setup wizard better ui
@@ -274,7 +274,7 @@ export default function Index() {
   return (
     <div className="w-screen h-auto min-h-screen overflow-hidden display flex flex-col pt-20 text-[#121212]">
       {!userData?.Repository?.contractAbi ? (
-        <SetupPage userData={userData} navigation={navigation} actionArgs={actionArgs} />
+        <SetupWizard userData={userData} navigation={navigation} actionArgs={actionArgs} />
       ) : (
         <div id="content" className="w-3/4 max-w-7xl mx-auto py-20 rounded-lg">
           <div className="text-4xl flex gap-10 flex-row justify-between rounded-lg">

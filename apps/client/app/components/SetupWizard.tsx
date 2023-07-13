@@ -1,16 +1,15 @@
 import { Form, useActionData, useLoaderData, useNavigation } from "@remix-run/react";
-import { Copy, CheckCircle, Loader } from "lucide-react";
+import { Loader } from "lucide-react";
 import { useState } from "react";
-import { sleep } from "~/utils/helpers";
 import { action, loader } from "~/routes/alpha.dashboard";
 
-interface SetupPageProps {
+interface SetupWizardProps {
   userData: ReturnType<typeof useLoaderData<typeof loader>>;
   actionArgs: ReturnType<typeof useActionData<typeof action>>;
   navigation: ReturnType<typeof useNavigation>;
 }
 
-const SetupPage: React.FC<SetupPageProps> = (props: SetupPageProps) => {
+const SetupWizard: React.FC<SetupWizardProps> = (props: SetupWizardProps) => {
   return (
     <div id="content" className="flex flex-col w-3/4 max-w-7xl gap-10 mx-auto py-20 rounded-lg">
       {props.userData?.ApiKey ? (
@@ -31,9 +30,12 @@ const SetupPage: React.FC<SetupPageProps> = (props: SetupPageProps) => {
 
       {props.userData?.ApiKey && !props.userData?.githubInstallationId && (
         <div className="text-4xl  bg-[#F5F5F5] p-5 flex flex-row justify-between rounded-lg  ">
-          <a href="https://github.com/apps/fetherkit/installations/new" target="_blank">
+          <a href="https://github.com/apps/testingfetherkit/installations/new" target="_blank">
             Click to add github FetherKit app
           </a>
+          <Form method="post" action="/gh-app-install">
+            <button type="submit">Click to get installation id</button>
+          </Form>
         </div>
       )}
 
@@ -241,4 +243,4 @@ const SetupPage: React.FC<SetupPageProps> = (props: SetupPageProps) => {
   );
 };
 
-export default SetupPage;
+export default SetupWizard;
