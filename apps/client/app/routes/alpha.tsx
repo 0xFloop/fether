@@ -1,5 +1,5 @@
 import { ActionArgs, LoaderArgs, json, redirect } from "@vercel/remix";
-import { Form, Link, Outlet, useActionData } from "@remix-run/react";
+import { Form, Link, Outlet, useActionData, useLoaderData } from "@remix-run/react";
 import { db } from "../utils/db.server";
 import { getSession, commitSession } from "../utils/alphaAccessKeySession.server";
 import {
@@ -21,7 +21,7 @@ export const loader = async ({ request, params }: LoaderArgs) => {
     else if (session.has("alphaKey")) throw redirect("/alpha/login");
     else throw redirect("/");
   }
-  return "success";
+  return user.has("userId");
 };
 
 const { chains, publicClient } = configureChains(
@@ -42,22 +42,25 @@ const wagmiConfig = createConfig({
 });
 
 export default function Index() {
+  const userHasId = useLoaderData<typeof loader>();
   return (
     <WagmiConfig config={wagmiConfig}>
       <RainbowKitProvider chains={chains}>
         <div className="relative min-h-screen">
           <div
             id="navbar"
-            className="absolute w-full h-20 border-b border-b-black flex flex-row justify-between items-center"
+            className="absolute w-full h-20 border-b border-b-black flex flex-row justify-between items-center z-50"
           >
             <Link to="/" id="logo" className="text-5xl flex-1 pl-8 ">
               fether
             </Link>
-            <div className="flex-1  pr-8">
-              <a id="signout" href="/alpha/sign-out" className="float-right">
-                signout
-              </a>
-            </div>
+            {userHasId && (
+              <div className="flex-1  pr-8">
+                <a id="signout" href="/alpha/sign-out" className="float-right">
+                  signout
+                </a>
+              </div>
+            )}
           </div>
           <Outlet />
           {/* <div className="h-80 absolute bottom-0 w-screen bg-black flex justify-center align-middle">
