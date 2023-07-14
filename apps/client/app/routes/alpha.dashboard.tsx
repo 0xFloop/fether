@@ -30,7 +30,8 @@ import { CustomConnectButton } from "../components/ConnectButton";
 import { createTestClient, http, parseEther } from "viem";
 import SetupWizard from "~/components/SetupWizard";
 
-//TODO: make sigin page better ui
+//TODO: fix compatibility with other repo's. display dirs and files in a tree structure
+//TODO: allow updates within signup page, prevents lockup bug state
 //TODO: make setup wizard better ui
 //TODO: fix call trace ui
 

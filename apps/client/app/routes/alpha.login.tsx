@@ -24,13 +24,22 @@ export const action = async ({ request }: ActionArgs) => {
 };
 export default function Index() {
   return (
-    <div className="w-screen h-screen overflow-hidden">
-      <div className="relative w-full flex flex-col h-full items-center align-middle justify-center">
-        <div className="h-auto w-auto relative border-2 border-black rounded p-10">
-          <Form method="post">
-            <button type="submit">Log in with GitHub</button>
-          </Form>
-        </div>
+    <div className="w-screen h-screen relative flex items-center justify-center">
+      <div className="w-[500px] relative flex flex-col items-center px-10 py-20 border-x-2 border-black">
+        <img
+          className="w-16 absolute top-0 left-0"
+          src="/images/fetherBlackTransparent.svg"
+          alt="fether logo"
+        />
+        <h1 className="text-xl mt-10">
+          Fether utilizes Log In With GitHub to streamline the GitHub integration necessary for
+          continuous contract tracking.
+        </h1>
+        <Form method="post">
+          <button className="mt-10 px-10 py-5 border-2 border-black rounded" type="submit">
+            Log in with GitHub
+          </button>
+        </Form>
       </div>
     </div>
   );
