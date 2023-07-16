@@ -8,7 +8,7 @@ module.exports = {
       body: ["Inter var", "sans-serif"],
     },
     extend: {
-      colors: {},
+      colors: { "secondary-blue": "#3232FF" },
       keyframes: {},
       animation: {},
     },
