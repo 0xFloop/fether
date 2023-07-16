@@ -28,14 +28,14 @@ export function links() {
 
 import { CustomConnectButton } from "../components/ConnectButton";
 import { createTestClient, http, parseEther } from "viem";
-import SetupWizard from "~/components/SetupWizard";
+import OldSetupWizard from "~/components/OldSetupWizard";
+import NewSetupWizard from "~/components/SetupWizard";
 
 //TODO: fix compatibility with other repo's. display dirs and files in a tree structure
+//TODO: create error page
 //TODO: allow updates within signup page, prevents lockup bug state
 //TODO: make setup wizard better ui
 //TODO: fix call trace ui
-
-//TODO: MAYBE break this one big ol action into many other action routes
 
 export const action = async ({ request }: ActionArgs) => {
   const body = await request.formData();
@@ -273,11 +273,19 @@ export default function Index() {
   };
 
   return (
-    <div className="w-screen h-auto min-h-screen overflow-hidden display flex flex-col pt-20 text-[#121212]">
+    <div className="w-screen h-auto min-h-screen overflow-hidden display flex flex-col items-center justify-center text-[#121212]">
       {!userData?.Repository?.contractAbi ? (
-        <SetupWizard userData={userData} navigation={navigation} actionArgs={actionArgs} />
+        <>
+          {/* <OldSetupWizard userData={userData} navigation={navigation} actionArgs={actionArgs} /> */}
+          <NewSetupWizard
+            userData={userData}
+            navigation={navigation}
+            actionArgs={actionArgs}
+            setupStep={1}
+          />
+        </>
       ) : (
-        <div id="content" className="w-3/4 max-w-7xl mx-auto py-20 rounded-lg">
+        <div id="content" className="w-3/4 max-w-7xl mx-auto rounded-lg">
           <div className="text-4xl flex gap-10 flex-row justify-between rounded-lg">
             <div className="w-2/5">
               <div className="flex flex-col rounded-lg gap-10">

@@ -63,16 +63,6 @@ export default function Index() {
             )}
           </div>
           <Outlet />
-          {/* <div className="h-80 absolute bottom-0 w-screen bg-black flex justify-center align-middle">
-        <div id="nav-links" className="flex flex-row justify-evenly flex-1 text-white items-center">
-          <a href="https://docs.fether.xyz" target="_blank">
-            documentation
-          </a>
-          <a href="https://www.twitter.com/0xFloop" target="_blank">
-            contact
-          </a>
-        </div>
-      </div> */}
         </div>
       </RainbowKitProvider>
     </WagmiConfig>
