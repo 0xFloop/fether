@@ -14,6 +14,7 @@ import {
   sleep,
   getFunctionArgsFromInput,
   fetherChainFromKey,
+  determineSetupStep,
 } from "~/utils/helpers";
 import * as Accordion from "@radix-ui/react-accordion";
 import { useAccount, useBalance } from "wagmi";
@@ -230,14 +231,19 @@ export const loader = async ({ request }: LoaderArgs) => {
     },
   });
 
-  return userData;
+  const setupStep = determineSetupStep(userData);
+
+  return { userData, setupStep };
 };
 
 export default function Index() {
-  const userData = useLoaderData<typeof loader>();
+  const loaderData = useLoaderData<typeof loader>();
   const actionArgs = useActionData<typeof action>();
   const navigation = useNavigation();
   const submit = useSubmit();
+
+  const userData = loaderData.userData;
+  const setupStep = loaderData.setupStep;
 
   const { address, isConnected } = useAccount();
   const { data } = useBalance({ address });
@@ -278,10 +284,10 @@ export default function Index() {
         <>
           {/* <OldSetupWizard userData={userData} navigation={navigation} actionArgs={actionArgs} /> */}
           <NewSetupWizard
-            userData={userData}
+            loaderData={loaderData}
             navigation={navigation}
             actionArgs={actionArgs}
-            setupStep={1}
+            setupStep={setupStep}
           />
         </>
       ) : (

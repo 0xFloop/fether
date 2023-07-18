@@ -2,6 +2,7 @@ import { Abi, AbiFunction } from "abitype/zod";
 import { Chain, createPublicClient, createWalletClient, custom, http } from "viem";
 import { AbiFunction as AbiFunctionType } from "abitype";
 import { z } from "zod";
+import { UserWithKeyRepoActivity } from "~/types";
 
 export type ContractReturnItem = {
   name: string;
@@ -171,4 +172,32 @@ export const getFunctionArgsFromInput = (abiFunction: AbiFunctionType): any[] =>
   }
 
   return args;
+};
+
+export const determineSetupStep = (userData: UserWithKeyRepoActivity): number => {
+  enum SetupSteps {
+    "Error",
+    "GenerateApiKey",
+    "InstallFetherKitGithubApp",
+    "SelectRepository",
+    "SelectSmartContract",
+    "SetDeployerAddress",
+    "DeployContract",
+    "Done",
+  }
+
+  if (!userData) return SetupSteps.Error;
+
+  if (!userData.ApiKey) return SetupSteps.GenerateApiKey;
+
+  if (!userData.githubInstallationId) return SetupSteps.InstallFetherKitGithubApp;
+
+  if (!userData.Repository) return SetupSteps.SelectRepository;
+
+  if (!userData.Repository.filename) return SetupSteps.SelectSmartContract;
+
+  if (!userData.Repository.deployerAddress) return SetupSteps.SetDeployerAddress;
+
+  if (!userData.Repository.contractAddress) return SetupSteps.DeployContract;
+  else return SetupSteps.Error;
 };

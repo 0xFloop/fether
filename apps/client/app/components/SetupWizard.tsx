@@ -5,7 +5,7 @@ import { action, loader } from "~/routes/alpha.dashboard";
 import { setupSteps } from "./setupSteps";
 
 interface SetupWizardProps {
-  userData: ReturnType<typeof useLoaderData<typeof loader>>;
+  loaderData: ReturnType<typeof useLoaderData<typeof loader>>;
   actionArgs: ReturnType<typeof useActionData<typeof action>>;
   navigation: ReturnType<typeof useNavigation>;
   setupStep: number;
@@ -13,6 +13,7 @@ interface SetupWizardProps {
 
 const SetupWizard: React.FC<SetupWizardProps> = (props: SetupWizardProps) => {
   const [setupStep, setSetupStep] = useState(props.setupStep);
+  const userData = props.loaderData.userData;
   return (
     <div className="w-[1100px] max-w-7xl h-[750px] flex flex-row justify-between items-center">
       <div className="text-white rounded-l-3xl h-full w-1/3 p-4 bg-[#1E1E1E] flex flex-col gap-4">
