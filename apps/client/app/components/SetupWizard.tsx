@@ -1,5 +1,5 @@
 import { Form, useActionData, useLoaderData, useNavigation } from "@remix-run/react";
-import { Loader } from "lucide-react";
+import { Info, Loader } from "lucide-react";
 import { useState } from "react";
 import { action, loader } from "~/routes/alpha.dashboard";
 import { setupSteps } from "./setupSteps";
@@ -24,14 +24,18 @@ const SetupWizard: React.FC<SetupWizardProps> = (props: SetupWizardProps) => {
           {setupSteps.map((step, index) => (
             <button
               id={step.stepNumber}
-              onClick={() => setSetupStep(index + 1)}
+              onClick={() => {
+                // if (index < setupStep) {
+                setSetupStep(index);
+                // }
+              }}
               className={
-                (setupStep == index + 1 ? "bg-secondary-blue " : "") +
+                (setupStep == index ? "bg-secondary-blue " : "") +
                 "w-full p-4 flex flex-row items-center border rounded-lg border-[#6161FF]"
               }
             >
               <div className="ml-2 text-base">
-                {setupStep > index + 1 ? (
+                {setupStep > index ? (
                   <img
                     src="/images/setupCheck.svg"
                     alt="step complete checkmark"
@@ -46,7 +50,27 @@ const SetupWizard: React.FC<SetupWizardProps> = (props: SetupWizardProps) => {
           ))}
         </div>
       </div>
-      <div className="text-white rounded-r-3xl h-full bg-[#545454] flex-1 ">right</div>
+      <div className="text-white rounded-r-3xl h-full bg-[#545454] gap-4 flex flex-col flex-1 pt-10">
+        <div className="flex flex-row items-center px-10">
+          <img src={setupSteps[setupStep].iconUrl} alt="setup step icon"></img>
+          <h1 className="text-3xl ml-10">{setupSteps[setupStep].name}</h1>
+        </div>
+        <div className="text-2xl flex items-center min-h-[250px] px-10">
+          {setupSteps[setupStep].description}
+        </div>
+        <div className="flex-1 px-10">this is the actionable section</div>
+        <div className="h-28 border-t-2 border-[#6D6D6D] px-10 flex items-center justify-between">
+          <div>
+            <p className="text-lg">For more information, visit the documentation!</p>
+            <div className="flex flex-row items-center gap-2 text-sm">
+              <Info size={16} strokeWidth={3} /> <p> all selections can be updated after setup</p>
+            </div>
+          </div>
+          <button className="py-4 px-6 bg-secondary-blue border rounded-lg border-[#6161FF]">
+            NEXT
+          </button>
+        </div>
+      </div>
     </div>
   );
 };
