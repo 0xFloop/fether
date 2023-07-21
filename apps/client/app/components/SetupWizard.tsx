@@ -3,8 +3,9 @@ import { Info, Loader } from "lucide-react";
 import { useState } from "react";
 import { action, loader } from "~/routes/alpha.dashboard";
 import { setupSteps } from "./setupSteps";
+import { UserWithKeyRepoActivity } from "~/types";
 
-interface SetupWizardProps {
+export interface SetupWizardProps {
   loaderData: ReturnType<typeof useLoaderData<typeof loader>>;
   actionArgs: ReturnType<typeof useActionData<typeof action>>;
   navigation: ReturnType<typeof useNavigation>;
@@ -50,7 +51,7 @@ const SetupWizard: React.FC<SetupWizardProps> = (props: SetupWizardProps) => {
           ))}
         </div>
       </div>
-      <div className="text-white rounded-r-3xl h-full bg-[#545454] gap-4 flex flex-col flex-1 pt-10">
+      <div className="text-white relative rounded-r-3xl h-full bg-[#545454] gap-4 flex flex-col flex-1 pt-10">
         <div className="flex flex-row items-center px-10">
           <img src={setupSteps[setupStep].iconUrl} alt="setup step icon"></img>
           <h1 className="text-3xl ml-10">{setupSteps[setupStep].name}</h1>
@@ -58,7 +59,13 @@ const SetupWizard: React.FC<SetupWizardProps> = (props: SetupWizardProps) => {
         <div className="text-2xl flex items-center min-h-[250px] px-10">
           {setupSteps[setupStep].description}
         </div>
-        <div className="flex-1 px-10">this is the actionable section</div>
+        <div className="flex-1 px-10">
+          {setupSteps[setupStep].actionComponent({
+            userData: userData as UserWithKeyRepoActivity,
+            navigation: props.navigation,
+            actionArgs: props.actionArgs,
+          })}
+        </div>
         <div className="h-28 border-t-2 border-[#6D6D6D] px-10 flex items-center justify-between">
           <div>
             <p className="text-lg">For more information, visit the documentation!</p>
