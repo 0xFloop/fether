@@ -4,6 +4,7 @@ import { ReactComponentElement, useState } from "react";
 import { UserWithKeyRepoActivity } from "~/types";
 import { SetupWizardProps } from "./SetupWizard";
 import { action } from "~/routes/alpha.dashboard";
+import { isAddress } from "viem";
 
 type setupStep = {
   stepNumber: string;
@@ -68,7 +69,7 @@ const SelectRepoComponent: React.FC<setupProps> = (props: setupProps) => {
             <div className="flex flex-row items-center py-4 px-6 bg-secondary-blue border rounded-lg border-[#6161FF]">
               Loading repositories
               <div className="ml-5 animate-spin">
-                <Loader size={30} />
+                <Loader size={24} />
               </div>
             </div>
           ) : (
@@ -82,7 +83,7 @@ const SelectRepoComponent: React.FC<setupProps> = (props: setupProps) => {
         </Form>
       )}
       {props.actionArgs?.originCallForm == "getRepos" && (
-        <Form method="post" className=" ">
+        <Form method="post" reloadDocument={true}>
           <input
             type="hidden"
             name="githubInstallationId"
@@ -120,6 +121,163 @@ const SelectRepoComponent: React.FC<setupProps> = (props: setupProps) => {
           )}
         </Form>
       )}
+    </div>
+  );
+};
+
+const SelectSmartContract: React.FC<setupProps> = (props: setupProps) => {
+  const [fileChosen, setFileChosen] = useState(false);
+  return (
+    <div className="h-full w-full flex items-center align-middle justify-center">
+      {props.actionArgs?.originCallForm != "chooseFileToTrack" && props.userData?.Repository && (
+        <>
+          {props.actionArgs?.originCallForm != "getFilesOfChosenRepo" && (
+            <Form method="post">
+              <input
+                type="hidden"
+                name="githubInstallationId"
+                value={props.userData?.githubInstallationId?.toString()}
+              />
+              <input type="hidden" name="formType" value="getFilesOfChosenRepo" />
+              {props.navigation.state == "submitting" &&
+              props.navigation.formData.get("formType") == "getFilesOfChosenRepo" ? (
+                <div className="flex flex-row items-center py-4 px-6 bg-secondary-blue border rounded-lg border-[#6161FF]">
+                  Loading files
+                  <div className="ml-5 animate-spin">
+                    <Loader size={24} />
+                  </div>
+                </div>
+              ) : (
+                <button
+                  type="submit"
+                  className="py-4 px-6 bg-secondary-blue border rounded-lg border-[#6161FF]"
+                >
+                  Click to load solidity files
+                </button>
+              )}
+            </Form>
+          )}
+          {props.actionArgs?.originCallForm == "getFilesOfChosenRepo" && (
+            <>
+              <Form method="post" reloadDocument className="w-full">
+                <input
+                  type="hidden"
+                  name="githubInstallationId"
+                  value={props.userData?.githubInstallationId?.toString()}
+                />
+                <input type="hidden" name="formType" value="chooseFileToTrack" />
+                <fieldset className="grid grid-cols-2">
+                  {props.actionArgs.solFilesFromChosenRepo?.map((fileName: any, i: number) => (
+                    <label key={i} className="text-xl">
+                      <input
+                        onClick={() => setFileChosen(true)}
+                        type="radio"
+                        name="chosenFileName"
+                        value={fileName}
+                      />
+                      {fileName}
+                    </label>
+                  ))}
+                </fieldset>
+                {fileChosen && (
+                  <button
+                    type="submit"
+                    className="py-3 px-5 bg-secondary-blue border rounded-lg border-[#6161FF] absolute bottom-7 right-10"
+                  >
+                    {props.navigation.state == "submitting" &&
+                    props.navigation.formData.get("formType") == "chooseFileToTrack" ? (
+                      <p>Submitting....</p>
+                    ) : (
+                      <p>Submit</p>
+                    )}
+                  </button>
+                )}
+              </Form>
+            </>
+          )}
+        </>
+      )}
+    </div>
+  );
+};
+
+const SetDeployerComponent: React.FC<setupProps> = (props: setupProps) => {
+  const [addressValid, setAddressValid] = useState<boolean>(false);
+  const [addressError, setAddressError] = useState<string | null>(null);
+
+  const handleAddressChange = (event: any) => {
+    let valid = isAddress(event.target.value);
+    if (event.target.value == "") {
+      setAddressValid(false);
+      setAddressError(null);
+      return;
+    } else if (valid) {
+      setAddressValid(true);
+      setAddressError(null);
+      return;
+    } else {
+      setAddressValid(false);
+      setAddressError("Error: Invalid Address");
+    }
+  };
+
+  return (
+    <div className="h-full w-full flex flex-col items-center ">
+      <Form method="post" className="w-full" reloadDocument>
+        <input
+          type="hidden"
+          name="githubInstallationId"
+          value={props.userData?.githubInstallationId?.toString()}
+        />
+        <input type="hidden" name="formType" value="setDeployerAddress" />
+        <div className="flex flex-row items-center justify-between w-full h-14">
+          <input
+            className="text-lg h-full outline-none text-black rounded-l-lg px-2 flex-1 bg-[#D9D9D9]"
+            name="deployerAddress"
+            placeholder="Input desired contract deployer address"
+            onChange={handleAddressChange}
+          />
+          <button
+            className="text-white h-full text-xl disabled:bg-gray-400 bg-secondary-blue py-2 px-4 border rounded-r-lg"
+            type="submit"
+            disabled={!addressValid}
+          >
+            Confirm
+          </button>
+        </div>
+      </Form>
+      <p className="text-red-500 mt-10">{addressError}</p>
+    </div>
+  );
+};
+
+const DeployContractComponent: React.FC<setupProps> = (props: setupProps) => {
+  return (
+    <div className="h-full w-full flex items-center align-middle justify-center">
+      <Form method="post">
+        <input
+          type="hidden"
+          name="githubInstallationId"
+          value={props.userData?.githubInstallationId?.toString()}
+        />
+        <input type="hidden" name="formType" value="deployContract" />
+        {props.navigation.state == "submitting" &&
+        props.navigation.formData.get("formType") == "deployContract" ? (
+          <div className="flex flex-row items-center py-4 px-6 bg-secondary-blue border rounded-lg border-[#6161FF]">
+            Deploying...
+            <div className="ml-5 animate-spin">
+              <Loader size={24} />
+            </div>
+          </div>
+        ) : (
+          <button
+            type="submit"
+            className="py-4 px-6 bg-secondary-blue border rounded-lg border-[#6161FF]"
+          >
+            Click here to deploy your contract
+          </button>
+        )}
+      </Form>
     </div>
   );
 };
@@ -173,7 +331,13 @@ export const setupSteps: setupStep[] = [
     description:
       "Select which solidity file from your chosen repository that you would like Fether to be tracking for you.",
     iconUrl: "/images/file.svg",
-    actionComponent: (props: setupProps) => <div></div>,
+    actionComponent: (props: setupProps) => (
+      <SelectSmartContract
+        userData={props.userData}
+        navigation={props.navigation}
+        actionArgs={props.actionArgs}
+      />
+    ),
   },
   {
     stepNumber: "05",
@@ -181,7 +345,13 @@ export const setupSteps: setupStep[] = [
     description:
       "Set which Ethereum address you would like to be the deployer of your smart contract. This is the address that will have will have any deployer based ownership.",
     iconUrl: "/images/paperAirplane.svg",
-    actionComponent: (props: setupProps) => <div></div>,
+    actionComponent: (props: setupProps) => (
+      <SetDeployerComponent
+        userData={props.userData}
+        navigation={props.navigation}
+        actionArgs={props.actionArgs}
+      />
+    ),
   },
   {
     stepNumber: "06",
@@ -189,6 +359,12 @@ export const setupSteps: setupStep[] = [
     description:
       "You are all set up! Click below to deploy your first instance of a Fethered smart contract!",
     iconUrl: "/images/celebrate.svg",
-    actionComponent: (props: setupProps) => <div></div>,
+    actionComponent: (props: setupProps) => (
+      <DeployContractComponent
+        userData={props.userData}
+        navigation={props.navigation}
+        actionArgs={props.actionArgs}
+      />
+    ),
   },
 ];
