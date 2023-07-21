@@ -54,7 +54,7 @@ const InstallGithubAppComponent: React.FC<setupProps> = (props: setupProps) => {
 const SelectRepoComponent: React.FC<setupProps> = (props: setupProps) => {
   const [repoChosen, setRepoChosen] = useState(false);
   return (
-    <div>
+    <div className="h-full w-full flex items-center align-middle justify-center">
       {!(props.actionArgs?.originCallForm == "getRepos") && (
         <Form method="post">
           <input
@@ -65,14 +65,19 @@ const SelectRepoComponent: React.FC<setupProps> = (props: setupProps) => {
           <input type="hidden" name="formType" value="getAllRepos" />
           {props.navigation.state == "submitting" &&
           props.navigation.formData.get("formType") == "getAllRepos" ? (
-            <div className="flex flex-row items-center">
+            <div className="flex flex-row items-center py-4 px-6 bg-secondary-blue border rounded-lg border-[#6161FF]">
               Loading repositories
               <div className="ml-5 animate-spin">
                 <Loader size={30} />
               </div>
             </div>
           ) : (
-            <button type="submit">Click to load repositories</button>
+            <button
+              type="submit"
+              className="py-4 px-6 bg-secondary-blue border rounded-lg border-[#6161FF]"
+            >
+              Click to load repositories
+            </button>
           )}
         </Form>
       )}
