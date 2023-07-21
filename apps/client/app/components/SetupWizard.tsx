@@ -25,11 +25,11 @@ const SetupWizard: React.FC<SetupWizardProps> = (props: SetupWizardProps) => {
           {setupSteps.map((step, index) => (
             <button
               id={step.stepNumber}
-              onClick={() => {
-                // if (index < setupStep) {
-                setSetupStep(index);
-                // }
-              }}
+              // onClick={() => {
+              //   if (index < setupStep || index < 3) {
+              //     setSetupStep(index);
+              //   }
+              // }}
               className={
                 (setupStep == index ? "bg-secondary-blue " : "") +
                 "w-full p-4 flex flex-row items-center border rounded-lg border-[#6161FF]"
