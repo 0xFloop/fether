@@ -176,7 +176,6 @@ export const getFunctionArgsFromInput = (abiFunction: AbiFunctionType): any[] =>
 
 export const determineSetupStep = (userData: UserWithKeyRepoActivity): number => {
   enum SetupSteps {
-    "Error",
     "GenerateApiKey",
     "InstallFetherKitGithubApp",
     "SelectRepository",
@@ -184,6 +183,7 @@ export const determineSetupStep = (userData: UserWithKeyRepoActivity): number =>
     "SetDeployerAddress",
     "DeployContract",
     "Done",
+    "Error",
   }
 
   if (!userData) return SetupSteps.Error;
