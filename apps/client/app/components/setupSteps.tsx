@@ -1,6 +1,6 @@
 import { Form, useActionData, useNavigation } from "@remix-run/react";
 import { Loader } from "lucide-react";
-import { ReactComponentElement } from "react";
+import { ReactComponentElement, useState } from "react";
 import { UserWithKeyRepoActivity } from "~/types";
 import { SetupWizardProps } from "./SetupWizard";
 import { action } from "~/routes/alpha.dashboard";
@@ -52,6 +52,7 @@ const InstallGithubAppComponent: React.FC<setupProps> = (props: setupProps) => {
 };
 
 const SelectRepoComponent: React.FC<setupProps> = (props: setupProps) => {
+  const [repoChosen, setRepoChosen] = useState(false);
   return (
     <div>
       {!(props.actionArgs?.originCallForm == "getRepos") && (
@@ -84,27 +85,34 @@ const SelectRepoComponent: React.FC<setupProps> = (props: setupProps) => {
           />
           <input type="hidden" name="formType" value="getChosenRepo" />
 
-          <fieldset className="grid grid-cols-2">
+          <fieldset id="repoSelector" className="grid grid-cols-2">
             {props.actionArgs.repositories?.map((repo: any) => (
               <label key={repo.repoName} className="text-xl">
-                <input type="radio" name="chosenRepoData" value={[repo.repoName, repo.repoId]} />{" "}
+                <input
+                  type="radio"
+                  id="chosenRepoData"
+                  name="chosenRepoData"
+                  value={[repo.repoName, repo.repoId]}
+                  onClick={() => setRepoChosen(true)}
+                />{" "}
                 {repo.repoName}
               </label>
             ))}
           </fieldset>
           <br />
-
-          <button
-            type="submit"
-            className="py-4 px-6 bg-secondary-blue border rounded-lg border-[#6161FF] absolute bottom-8 right-10"
-          >
-            {props.navigation.state == "submitting" &&
-            props.navigation.formData.get("formType") == "getChosenRepo" ? (
-              <p>Submitting....</p>
-            ) : (
-              <p>Submit</p>
-            )}
-          </button>
+          {repoChosen && (
+            <button
+              type="submit"
+              className="py-3 px-5 bg-secondary-blue border rounded-lg border-[#6161FF] absolute bottom-7 right-10"
+            >
+              {props.navigation.state == "submitting" &&
+              props.navigation.formData.get("formType") == "getChosenRepo" ? (
+                <p>Submitting....</p>
+              ) : (
+                <p>Submit</p>
+              )}
+            </button>
+          )}
         </Form>
       )}
     </div>

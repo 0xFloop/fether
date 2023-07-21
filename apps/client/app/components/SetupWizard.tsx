@@ -73,9 +73,6 @@ const SetupWizard: React.FC<SetupWizardProps> = (props: SetupWizardProps) => {
               <Info size={16} strokeWidth={3} /> <p> all selections can be updated after setup</p>
             </div>
           </div>
-          <button className="py-4 px-6 bg-secondary-blue border rounded-lg border-[#6161FF]">
-            NEXT
-          </button>
         </div>
       </div>
     </div>
