@@ -28,7 +28,7 @@ export function links() {
 }
 
 import { CustomConnectButton } from "../components/ConnectButton";
-import { createTestClient, http, parseEther } from "viem";
+import { createTestClient, http, parseEther, isAddress } from "viem";
 import OldSetupWizard from "~/components/OldSetupWizard";
 import NewSetupWizard from "~/components/SetupWizard";
 
@@ -182,12 +182,15 @@ export const action = async ({ request }: ActionArgs) => {
       case "setDeployerAddress":
         let newDeployerAddress = body.get("deployerAddress") as string;
 
-        await db.repository.update({
-          where: { userId: associatedUser.id },
-          data: {
-            deployerAddress: newDeployerAddress,
-          },
-        });
+        let valid = isAddress(newDeployerAddress);
+        if (valid) {
+          await db.repository.update({
+            where: { userId: associatedUser.id },
+            data: {
+              deployerAddress: newDeployerAddress,
+            },
+          });
+        }
         return {
           originCallForm: "setDeployerAddress",
           chosenRepoName: null,
