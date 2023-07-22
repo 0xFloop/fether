@@ -700,8 +700,8 @@ select {
   bottom: 1rem;
 }
 
-.bottom-8 {
-  bottom: 2rem;
+.bottom-7 {
+  bottom: 1.75rem;
 }
 
 .left-0 {
@@ -738,18 +738,6 @@ select {
 
 .top-3 {
   top: 0.75rem;
-}
-
-.bottom-6 {
-  bottom: 1.5rem;
-}
-
-.bottom-7 {
-  bottom: 1.75rem;
-}
-
-.bottom-48 {
-  bottom: 12rem;
 }
 
 .z-10 {
@@ -809,6 +797,14 @@ select {
   margin-top: 1.25rem;
 }
 
+.mt-20 {
+  margin-top: 5rem;
+}
+
+.mt-40 {
+  margin-top: 10rem;
+}
+
 .block {
   display: block;
 }
@@ -837,6 +833,10 @@ select {
   height: 2.5rem;
 }
 
+.h-14 {
+  height: 3.5rem;
+}
+
 .h-20 {
   height: 5rem;
 }
@@ -863,10 +863,6 @@ select {
 
 .h-screen {
   height: 100vh;
-}
-
-.h-14 {
-  height: 3.5rem;
 }
 
 .min-h-\[250px\] {
@@ -931,10 +927,6 @@ select {
 
 .w-screen {
   width: 100vw;
-}
-
-.min-w-full {
-  min-width: 100%;
 }
 
 .max-w-7xl {
@@ -1020,14 +1012,14 @@ select {
   border-bottom-left-radius: 1.5rem;
 }
 
-.rounded-r-3xl {
-  border-top-right-radius: 1.5rem;
-  border-bottom-right-radius: 1.5rem;
-}
-
 .rounded-l-lg {
   border-top-left-radius: 0.5rem;
   border-bottom-left-radius: 0.5rem;
+}
+
+.rounded-r-3xl {
+  border-top-right-radius: 1.5rem;
+  border-bottom-right-radius: 1.5rem;
 }
 
 .rounded-r-lg {
@@ -1101,6 +1093,11 @@ select {
   background-color: rgb(84 84 84 / var(--tw-bg-opacity));
 }
 
+.bg-\[\#D9D9D9\] {
+  --tw-bg-opacity: 1;
+  background-color: rgb(217 217 217 / var(--tw-bg-opacity));
+}
+
 .bg-\[\#F5F5F5\] {
   --tw-bg-opacity: 1;
   background-color: rgb(245 245 245 / var(--tw-bg-opacity));
@@ -1123,11 +1120,6 @@ select {
 
 .bg-transparent {
   background-color: transparent;
-}
-
-.bg-\[\#D9D9D9\] {
-  --tw-bg-opacity: 1;
-  background-color: rgb(217 217 217 / var(--tw-bg-opacity));
 }
 
 .p-10 {
@@ -1155,9 +1147,19 @@ select {
   padding-right: 2.5rem;
 }
 
+.px-2 {
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+
 .px-4 {
   padding-left: 1rem;
   padding-right: 1rem;
+}
+
+.px-5 {
+  padding-left: 1.25rem;
+  padding-right: 1.25rem;
 }
 
 .px-6 {
@@ -1180,6 +1182,11 @@ select {
   padding-bottom: 5rem;
 }
 
+.py-3 {
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+}
+
 .py-4 {
   padding-top: 1rem;
   padding-bottom: 1rem;
@@ -1188,21 +1195,6 @@ select {
 .py-5 {
   padding-top: 1.25rem;
   padding-bottom: 1.25rem;
-}
-
-.px-5 {
-  padding-left: 1.25rem;
-  padding-right: 1.25rem;
-}
-
-.py-3 {
-  padding-top: 0.75rem;
-  padding-bottom: 0.75rem;
-}
-
-.px-2 {
-  padding-left: 0.5rem;
-  padding-right: 0.5rem;
 }
 
 .pb-2 {
@@ -1219,6 +1211,10 @@ select {
 
 .pt-10 {
   padding-top: 2.5rem;
+}
+
+.pb-40 {
+  padding-bottom: 10rem;
 }
 
 .text-left {
@@ -1299,6 +1295,11 @@ select {
   color: rgb(240 240 240 / var(--tw-text-opacity));
 }
 
+.text-black {
+  --tw-text-opacity: 1;
+  color: rgb(0 0 0 / var(--tw-text-opacity));
+}
+
 .text-red-500 {
   --tw-text-opacity: 1;
   color: rgb(239 68 68 / var(--tw-text-opacity));
@@ -1307,11 +1308,6 @@ select {
 .text-white {
   --tw-text-opacity: 1;
   color: rgb(255 255 255 / var(--tw-text-opacity));
-}
-
-.text-black {
-  --tw-text-opacity: 1;
-  color: rgb(0 0 0 / var(--tw-text-opacity));
 }
 
 .underline {

@@ -294,7 +294,7 @@ export default function Index() {
           />
         </>
       ) : (
-        <div id="content" className="w-3/4 max-w-7xl mx-auto rounded-lg">
+        <div id="content" className="w-3/4 max-w-7xl mx-auto rounded-lg mt-40 pb-40">
           <div className="text-4xl flex gap-10 flex-row justify-between rounded-lg">
             <div className="w-2/5">
               <div className="flex flex-col rounded-lg gap-10">
