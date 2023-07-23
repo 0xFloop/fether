@@ -25,57 +25,61 @@ export const getUserRepositories = async (githubInstallationId: string) => {
 };
 
 export const getRootDir = async (githubInstallationId: string): Promise<string> => {
-  const octokit = await octo.getInstallationOctokit(parseInt(githubInstallationId));
+  try {
+    const octokit = await octo.getInstallationOctokit(parseInt(githubInstallationId));
 
-  let repoData = await db.user.findUnique({
-    where: { githubInstallationId },
-    include: { Repository: true },
-  });
+    let repoData = await db.user.findUnique({
+      where: { githubInstallationId },
+      include: { Repository: true },
+    });
 
-  let ownerName = repoData?.Repository?.name.split("/")[0];
-  let repoName = repoData?.Repository?.name.split("/")[1];
+    let ownerName = repoData?.Repository?.name.split("/")[0];
+    let repoName = repoData?.Repository?.name.split("/")[1];
 
-  if (!ownerName || !repoName) throw new Error("No owner or repo name found");
+    if (!ownerName || !repoName) throw new Error("No owner or repo name found");
 
-  let repoRootFolder = await octokit.request("GET /repos/{owner}/{repo}/contents/", {
-    owner: ownerName,
-    repo: repoName,
-    headers: {
-      "X-GitHub-Api-Version": "2022-11-28",
-      Accept: "application/vnd.github.raw",
-    },
-  });
+    let repoRootFolder = await octokit.request("GET /repos/{owner}/{repo}/contents/", {
+      owner: ownerName,
+      repo: repoName,
+      headers: {
+        "X-GitHub-Api-Version": "2022-11-28",
+        Accept: "application/vnd.github.raw",
+      },
+    });
 
-  for (let i = 0; i < repoRootFolder.data.length; i++) {
-    if (repoRootFolder.data[i].type == "dir" && repoRootFolder.data[i].name == "apps") {
-      let appsFolder = await octokit.request("GET /repos/{owner}/{repo}/contents/{path}", {
-        owner: ownerName,
-        repo: repoName,
-        path: repoRootFolder.data[i].path,
-        headers: {
-          "X-GitHub-Api-Version": "2022-11-28",
-          Accept: "application/vnd.github.raw",
-        },
-      });
-      let zodAppsFolderArray = zodArrayOfGithubFiles.safeParse(appsFolder.data);
+    for (let i = 0; i < repoRootFolder.data.length; i++) {
+      if (repoRootFolder.data[i].type == "dir" && repoRootFolder.data[i].name == "apps") {
+        let appsFolder = await octokit.request("GET /repos/{owner}/{repo}/contents/{path}", {
+          owner: ownerName,
+          repo: repoName,
+          path: repoRootFolder.data[i].path,
+          headers: {
+            "X-GitHub-Api-Version": "2022-11-28",
+            Accept: "application/vnd.github.raw",
+          },
+        });
+        let zodAppsFolderArray = zodArrayOfGithubFiles.safeParse(appsFolder.data);
 
-      if (!zodAppsFolderArray.success) throw new Error("No solidity src folder found");
+        if (!zodAppsFolderArray.success) throw new Error("No solidity src folder found");
 
-      for (let j = 0; j < zodAppsFolderArray.data.length; j++) {
-        if (
-          zodAppsFolderArray.data[j].type == "dir" &&
-          zodAppsFolderArray.data[j].name == "solidity"
-        ) {
-          await db.repository.update({
-            where: { id: repoData?.Repository?.id },
-            data: { foundryRootDir: zodAppsFolderArray.data[j].path },
-          });
-          return zodAppsFolderArray.data[j].path;
+        for (let j = 0; j < zodAppsFolderArray.data.length; j++) {
+          if (
+            zodAppsFolderArray.data[j].type == "dir" &&
+            zodAppsFolderArray.data[j].name == "solidity"
+          ) {
+            await db.repository.update({
+              where: { id: repoData?.Repository?.id },
+              data: { foundryRootDir: zodAppsFolderArray.data[j].path },
+            });
+            return zodAppsFolderArray.data[j].path;
+          }
         }
       }
     }
+    return "";
+  } catch (e) {
+    throw e;
   }
-  return "";
 };
 
 export const getSolFileNames = async (
@@ -111,7 +115,9 @@ export const getSolFileNames = async (
   if (!zodFileArray.success) throw new Error("No solidity src folder found");
 
   for (let i = 0; i < zodFileArray.data.length; i++) {
-    fileNames.push(zodFileArray.data[i].name);
+    if (zodFileArray.data[i].name.endsWith(".sol")) {
+      fileNames.push(zodFileArray.data[i].name);
+    }
   }
 
   return fileNames;
