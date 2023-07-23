@@ -1,5 +1,13 @@
 import { ActionArgs, LoaderArgs, redirect } from "@vercel/remix";
-import { Form, useActionData, useLoaderData, useNavigation, useSubmit } from "@remix-run/react";
+import {
+  Form,
+  useActionData,
+  useLoaderData,
+  useNavigation,
+  useSubmit,
+  useRouteError,
+  isRouteErrorResponse,
+} from "@remix-run/react";
 import { db } from "../utils/db.server";
 import { getSession as userGetSession } from "../utils/alphaSession.server";
 import { getRootDir, getSolFileNames, getUserRepositories } from "../utils/octo.server";
@@ -55,158 +63,177 @@ export const action = async ({ request }: ActionArgs) => {
   });
 
   if (associatedUser) {
-    const formType = body.get("formType");
-    switch (formType) {
-      case "getAllRepos":
-        console.log("getAllRepos");
-        const repositories = await getUserRepositories(githubInstallationId as string);
-        const repoArray = repositories.data.repositories;
-        const repoObjArray: RepoData[] = [];
-        repoArray.map((repo: any) => {
-          repoObjArray.push({ repoName: repo.full_name, repoId: repo.id.toString() });
-        });
+    try {
+      const formType = body.get("formType");
+      switch (formType) {
+        case "getAllRepos":
+          console.log("getAllRepos");
+          const repositories = await getUserRepositories(githubInstallationId as string);
+          const repoArray = repositories.data.repositories;
+          const repoObjArray: RepoData[] = [];
+          repoArray.map((repo: any) => {
+            repoObjArray.push({ repoName: repo.full_name, repoId: repo.id.toString() });
+          });
 
-        return {
-          originCallForm: "getRepos",
-          chosenRepoName: null,
-          repositories: repoObjArray,
-          solFilesFromChosenRepo: null,
-          chosenFileName: null,
-        };
+          return {
+            originCallForm: "getRepos",
+            chosenRepoName: null,
+            repositories: repoObjArray,
+            solFilesFromChosenRepo: null,
+            chosenFileName: null,
+            error: null,
+          };
 
-      case "getChosenRepo":
-        console.log("getChosenRepo");
-        if (chosenRepoData) {
-          const chosenRepoName = chosenRepoData.toString().split(",")[0];
-          const chosenRepoId = chosenRepoData.toString().split(",")[1];
+        case "getChosenRepo":
+          console.log("getChosenRepo");
+          if (chosenRepoData) {
+            const chosenRepoName = chosenRepoData.toString().split(",")[0];
+            const chosenRepoId = chosenRepoData.toString().split(",")[1];
 
-          await db.repository.upsert({
+            await db.repository.upsert({
+              where: { userId: associatedUser.id },
+              create: {
+                id: chosenRepoId as string,
+                name: chosenRepoName as string,
+                userId: associatedUser.id,
+              },
+              update: {
+                name: chosenRepoName as string,
+                id: chosenRepoId as string,
+                contractAbi: null,
+                contractAddress: null,
+                filename: null,
+                foundryRootDir: null,
+              },
+            });
+            await db.transaction.deleteMany({
+              where: { repositoryId: associatedUser.Repository?.id as string },
+            });
+            return {
+              originCallForm: "chooseRepo",
+              chosenRepoName: chosenRepoName,
+              repositories: null,
+              solFilesFromChosenRepo: null,
+              chosenFileName: null,
+              error: null,
+            };
+          }
+
+        case "getFilesOfChosenRepo":
+          let foundryRootDir = associatedUser.Repository?.foundryRootDir;
+          if (!foundryRootDir) {
+            foundryRootDir = await getRootDir(githubInstallationId as string);
+          }
+          console.log("herererererer");
+          let fileNameArray: string[] = await getSolFileNames(
+            githubInstallationId as string,
+            foundryRootDir as string
+          );
+          return {
+            originCallForm: "getFilesOfChosenRepo",
+            chosenRepoName: null,
+            repositories: null,
+            solFilesFromChosenRepo: fileNameArray,
+            chosenFileName: null,
+            error: null,
+          };
+
+        case "chooseFileToTrack":
+          console.log("chooseFileToTrack");
+
+          await db.repository.update({
             where: { userId: associatedUser.id },
-            create: {
-              id: chosenRepoId as string,
-              name: chosenRepoName as string,
-              userId: associatedUser.id,
-            },
-            update: {
-              name: chosenRepoName as string,
-              id: chosenRepoId as string,
+            data: {
+              filename: body.get("chosenFileName") as string,
               contractAbi: null,
               contractAddress: null,
-              filename: null,
-              foundryRootDir: null,
             },
           });
           await db.transaction.deleteMany({
             where: { repositoryId: associatedUser.Repository?.id as string },
           });
+
           return {
-            originCallForm: "chooseRepo",
-            chosenRepoName: chosenRepoName,
+            originCallForm: "chooseFileToTrack",
+            chosenRepoName: null,
+            repositories: null,
+            solFilesFromChosenRepo: null,
+            chosenFileName: body.get("chosenFileName"),
+            error: null,
+          };
+
+        case "deployContract":
+          await deployContract(githubInstallationId as string, associatedUser);
+
+          return {
+            originCallForm: "deployContract",
+            chosenRepoName: null,
             repositories: null,
             solFilesFromChosenRepo: null,
             chosenFileName: null,
+            error: null,
           };
-        }
-
-      case "getFilesOfChosenRepo":
-        let foundryRootDir = associatedUser.Repository?.foundryRootDir;
-        if (!foundryRootDir) {
-          foundryRootDir = await getRootDir(githubInstallationId as string);
-        }
-
-        let fileNameArray: string[] = await getSolFileNames(
-          githubInstallationId as string,
-          foundryRootDir as string
-        );
-        return {
-          originCallForm: "getFilesOfChosenRepo",
-          chosenRepoName: null,
-          repositories: null,
-          solFilesFromChosenRepo: fileNameArray,
-          chosenFileName: null,
-        };
-
-      case "chooseFileToTrack":
-        console.log("chooseFileToTrack");
-
-        await db.repository.update({
-          where: { userId: associatedUser.id },
-          data: {
-            filename: body.get("chosenFileName") as string,
-            contractAbi: null,
-            contractAddress: null,
-          },
-        });
-        await db.transaction.deleteMany({
-          where: { repositoryId: associatedUser.Repository?.id as string },
-        });
-
-        return {
-          originCallForm: "chooseFileToTrack",
-          chosenRepoName: null,
-          repositories: null,
-          solFilesFromChosenRepo: null,
-          chosenFileName: body.get("chosenFileName"),
-        };
-
-      case "deployContract":
-        await deployContract(githubInstallationId as string, associatedUser);
-
-        return {
-          originCallForm: "deployContract",
-          chosenRepoName: null,
-          repositories: null,
-          solFilesFromChosenRepo: null,
-          chosenFileName: null,
-        };
-      case "fundWallet":
-        let currentBalance = body.get("currentBalance") as `${number}`;
-        console.log("fundWallet");
-        const adminClient = createTestClient({
-          chain: fetherChainFromKey(associatedUser.ApiKey?.key as string),
-          mode: "anvil",
-          transport: http(),
-        });
-        await adminClient.setBalance({
-          address: body.get("walletAddress") as `0x${string}`,
-          value: parseEther("1") + parseEther(currentBalance),
-        });
-        return {
-          originCallForm: "fundWallet",
-          chosenRepoName: null,
-          repositories: null,
-          solFilesFromChosenRepo: null,
-          chosenFileName: null,
-        };
-
-      case "setDeployerAddress":
-        let newDeployerAddress = body.get("deployerAddress") as string;
-
-        let valid = isAddress(newDeployerAddress);
-        if (valid) {
-          await db.repository.update({
-            where: { userId: associatedUser.id },
-            data: {
-              deployerAddress: newDeployerAddress,
-            },
+        case "fundWallet":
+          let currentBalance = body.get("currentBalance") as `${number}`;
+          console.log("fundWallet");
+          const adminClient = createTestClient({
+            chain: fetherChainFromKey(associatedUser.ApiKey?.key as string),
+            mode: "anvil",
+            transport: http(),
           });
-        }
-        return {
-          originCallForm: "setDeployerAddress",
-          chosenRepoName: null,
-          repositories: null,
-          solFilesFromChosenRepo: null,
-          chosenFileName: null,
-        };
+          await adminClient.setBalance({
+            address: body.get("walletAddress") as `0x${string}`,
+            value: parseEther("1") + parseEther(currentBalance),
+          });
+          return {
+            originCallForm: "fundWallet",
+            chosenRepoName: null,
+            repositories: null,
+            solFilesFromChosenRepo: null,
+            chosenFileName: null,
+            error: null,
+          };
 
-      default:
-        return {
-          originCallForm: "",
-          chosenRepoName: null,
-          repositories: null,
-          solFilesFromChosenRepo: null,
-          chosenFileName: null,
-        };
+        case "setDeployerAddress":
+          let newDeployerAddress = body.get("deployerAddress") as string;
+
+          let valid = isAddress(newDeployerAddress);
+          if (valid) {
+            await db.repository.update({
+              where: { userId: associatedUser.id },
+              data: {
+                deployerAddress: newDeployerAddress,
+              },
+            });
+          }
+          return {
+            originCallForm: "setDeployerAddress",
+            chosenRepoName: null,
+            repositories: null,
+            solFilesFromChosenRepo: null,
+            chosenFileName: null,
+            error: null,
+          };
+
+        default:
+          return {
+            originCallForm: "",
+            chosenRepoName: null,
+            repositories: null,
+            solFilesFromChosenRepo: null,
+            chosenFileName: null,
+            error: null,
+          };
+      }
+    } catch (e: any) {
+      return {
+        originCallForm: "",
+        chosenRepoName: null,
+        repositories: null,
+        solFilesFromChosenRepo: null,
+        chosenFileName: null,
+        error: e.message as string,
+      };
     }
   } else {
     console.log("user not found");
@@ -235,6 +262,8 @@ export const loader = async ({ request }: LoaderArgs) => {
   });
 
   const setupStep = determineSetupStep(userData);
+
+  console.log(setupStep);
 
   return { userData, setupStep };
 };
@@ -879,6 +908,33 @@ export default function Index() {
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+export function ErrorBoundary() {
+  const error = useRouteError();
+
+  // when true, this is what used to go to `CatchBoundary`
+  if (isRouteErrorResponse(error)) {
+    return (
+      <div className="h-80">
+        <h1>Oops</h1>
+        <p>Status: {error.status}</p>
+        <p>{error.data.message}</p>
+      </div>
+    );
+  }
+
+  // Don't forget to typecheck with your own logic.
+  // Any value can be thrown, not just errors!
+  let errorMessage = error.message;
+
+  return (
+    <div className="pt-48 h-80">
+      <h1>Uh oh ...</h1>
+      <p>Something went wrong.</p>
+      <pre>{errorMessage}</pre>
     </div>
   );
 }
