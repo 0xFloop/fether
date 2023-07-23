@@ -26,13 +26,25 @@ const GenerateKeyComponent: React.FC<setupProps> = (props: setupProps) => {
       <Form method="post" action="/keygen">
         <input type="hidden" name="userId" value={props.userData?.id} />
         <input type="hidden" name="formType" value="generateApiKey" />
+
         <button
+          disabled={props.navigation.state === "submitting"}
           type="submit"
-          className="py-4 px-6 bg-secondary-blue border rounded-lg border-[#6161FF]"
+          className="py-4 px-6 bg-secondary-blue border rounded-lg flex flex-row border-[#6161FF]"
         >
-          Generate Key
-        </button>{" "}
+          {props.navigation.state == "submitting" ? (
+            <div className="flex flex-row items-center">
+              <p>Generating</p>
+              <div className="ml-5 animate-spin">
+                <Loader size={24} />
+              </div>
+            </div>
+          ) : (
+            "Generate Key"
+          )}
+        </button>
       </Form>
+      {props.actionArgs?.error && <div className="text-black">error</div>}
     </div>
   );
 };
@@ -55,7 +67,7 @@ const InstallGithubAppComponent: React.FC<setupProps> = (props: setupProps) => {
 const SelectRepoComponent: React.FC<setupProps> = (props: setupProps) => {
   const [repoChosen, setRepoChosen] = useState(false);
   return (
-    <div className="h-full w-full flex items-center align-middle justify-center">
+    <div className="h-full w-full max-h-full flex items-center align-middle justify-center">
       {!(props.actionArgs?.originCallForm == "getRepos") && (
         <Form method="post">
           <input
@@ -83,7 +95,7 @@ const SelectRepoComponent: React.FC<setupProps> = (props: setupProps) => {
         </Form>
       )}
       {props.actionArgs?.originCallForm == "getRepos" && (
-        <Form method="post" reloadDocument={true}>
+        <Form className="max-h-full" method="post" reloadDocument={true}>
           <input
             type="hidden"
             name="githubInstallationId"
@@ -91,7 +103,7 @@ const SelectRepoComponent: React.FC<setupProps> = (props: setupProps) => {
           />
           <input type="hidden" name="formType" value="getChosenRepo" />
 
-          <fieldset id="repoSelector" className="grid grid-cols-2">
+          <fieldset id="repoSelector" className="grid grid-cols-2 overflow-y-auto max-h-56">
             {props.actionArgs.repositories?.map((repo: any) => (
               <label key={repo.repoName} className="text-xl">
                 <input
@@ -128,73 +140,69 @@ const SelectRepoComponent: React.FC<setupProps> = (props: setupProps) => {
 const SelectSmartContract: React.FC<setupProps> = (props: setupProps) => {
   const [fileChosen, setFileChosen] = useState(false);
   return (
-    <div className="h-full w-full flex items-center align-middle justify-center">
-      {props.actionArgs?.originCallForm != "chooseFileToTrack" && props.userData?.Repository && (
+    <div className="h-full w-full flex flex-col items-center align-middle justify-center">
+      {props.actionArgs?.originCallForm != "getFilesOfChosenRepo" && (
+        <Form method="post">
+          <input
+            type="hidden"
+            name="githubInstallationId"
+            value={props.userData?.githubInstallationId?.toString()}
+          />
+          <input type="hidden" name="formType" value="getFilesOfChosenRepo" />
+          {props.navigation.state == "submitting" &&
+          props.navigation.formData.get("formType") == "getFilesOfChosenRepo" ? (
+            <div className="flex flex-row items-center py-4 px-6 bg-secondary-blue border rounded-lg border-[#6161FF]">
+              Loading files
+              <div className="ml-5 animate-spin">
+                <Loader size={24} />
+              </div>
+            </div>
+          ) : (
+            <button
+              type="submit"
+              className="py-4 px-6 bg-secondary-blue border rounded-lg border-[#6161FF]"
+            >
+              Click to load solidity files
+            </button>
+          )}
+        </Form>
+      )}
+      {props.actionArgs?.originCallForm == "getFilesOfChosenRepo" && (
         <>
-          {props.actionArgs?.originCallForm != "getFilesOfChosenRepo" && (
-            <Form method="post">
-              <input
-                type="hidden"
-                name="githubInstallationId"
-                value={props.userData?.githubInstallationId?.toString()}
-              />
-              <input type="hidden" name="formType" value="getFilesOfChosenRepo" />
-              {props.navigation.state == "submitting" &&
-              props.navigation.formData.get("formType") == "getFilesOfChosenRepo" ? (
-                <div className="flex flex-row items-center py-4 px-6 bg-secondary-blue border rounded-lg border-[#6161FF]">
-                  Loading files
-                  <div className="ml-5 animate-spin">
-                    <Loader size={24} />
-                  </div>
-                </div>
-              ) : (
-                <button
-                  type="submit"
-                  className="py-4 px-6 bg-secondary-blue border rounded-lg border-[#6161FF]"
-                >
-                  Click to load solidity files
-                </button>
-              )}
-            </Form>
-          )}
-          {props.actionArgs?.originCallForm == "getFilesOfChosenRepo" && (
-            <>
-              <Form method="post" reloadDocument className="w-full">
-                <input
-                  type="hidden"
-                  name="githubInstallationId"
-                  value={props.userData?.githubInstallationId?.toString()}
-                />
-                <input type="hidden" name="formType" value="chooseFileToTrack" />
-                <fieldset className="grid grid-cols-2">
-                  {props.actionArgs.solFilesFromChosenRepo?.map((fileName: any, i: number) => (
-                    <label key={i} className="text-xl">
-                      <input
-                        onClick={() => setFileChosen(true)}
-                        type="radio"
-                        name="chosenFileName"
-                        value={fileName}
-                      />
-                      {fileName}
-                    </label>
-                  ))}
-                </fieldset>
-                {fileChosen && (
-                  <button
-                    type="submit"
-                    className="py-3 px-5 bg-secondary-blue border rounded-lg border-[#6161FF] absolute bottom-7 right-10"
-                  >
-                    {props.navigation.state == "submitting" &&
-                    props.navigation.formData.get("formType") == "chooseFileToTrack" ? (
-                      <p>Submitting....</p>
-                    ) : (
-                      <p>Submit</p>
-                    )}
-                  </button>
+          <Form method="post" reloadDocument className="w-full">
+            <input
+              type="hidden"
+              name="githubInstallationId"
+              value={props.userData?.githubInstallationId?.toString()}
+            />
+            <input type="hidden" name="formType" value="chooseFileToTrack" />
+            <fieldset className="grid grid-cols-2">
+              {props.actionArgs.solFilesFromChosenRepo?.map((fileName: any, i: number) => (
+                <label key={i} className="text-xl">
+                  <input
+                    onClick={() => setFileChosen(true)}
+                    type="radio"
+                    name="chosenFileName"
+                    value={fileName}
+                  />
+                  {fileName}
+                </label>
+              ))}
+            </fieldset>
+            {fileChosen && (
+              <button
+                type="submit"
+                className="py-3 px-5 bg-secondary-blue border rounded-lg border-[#6161FF] absolute bottom-7 right-10"
+              >
+                {props.navigation.state == "submitting" &&
+                props.navigation.formData.get("formType") == "chooseFileToTrack" ? (
+                  <p>Submitting....</p>
+                ) : (
+                  <p>Submit</p>
                 )}
-              </Form>
-            </>
-          )}
+              </button>
+            )}
+          </Form>
         </>
       )}
     </div>
