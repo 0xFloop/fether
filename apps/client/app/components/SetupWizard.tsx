@@ -25,11 +25,11 @@ const SetupWizard: React.FC<SetupWizardProps> = (props: SetupWizardProps) => {
           {setupSteps.map((step, index) => (
             <button
               id={step.stepNumber}
-              // onClick={() => {
-              //   if (index < setupStep || index < 3) {
-              //     setSetupStep(index);
-              //   }
-              // }}
+              onClick={() => {
+                if (index > 1) {
+                  setSetupStep(index);
+                }
+              }}
               className={
                 (setupStep == index ? "bg-secondary-blue " : "") +
                 "w-full p-4 flex flex-row items-center border rounded-lg border-[#6161FF]"
@@ -59,13 +59,16 @@ const SetupWizard: React.FC<SetupWizardProps> = (props: SetupWizardProps) => {
         <div className="text-2xl flex items-center min-h-[250px] px-10">
           {setupSteps[setupStep].description}
         </div>
-        <div className="flex-1 px-10">
+        <div className="flex-1 px-10 ">
           {setupSteps[setupStep].actionComponent({
             userData: userData as UserWithKeyRepoActivity,
             navigation: props.navigation,
             actionArgs: props.actionArgs,
           })}
         </div>
+        {props.actionArgs?.error && (
+          <div className="text-red-500">Error: {props.actionArgs?.error}</div>
+        )}
         <div className="h-28 border-t-2 border-[#6D6D6D] px-10 flex items-center justify-between">
           <div>
             <p className="text-lg">For more information, visit the documentation!</p>
