@@ -189,6 +189,9 @@ const SelectSmartContract: React.FC<setupProps> = (props: setupProps) => {
                 </label>
               ))}
             </fieldset>
+            {props.actionArgs.solFilesFromChosenRepo?.length == 0 && (
+              <>No Solidity files found in selected repository.</>
+            )}
             {fileChosen && (
               <button
                 type="submit"
