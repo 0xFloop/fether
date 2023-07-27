@@ -67,7 +67,6 @@ export const action = async ({ request }: ActionArgs) => {
       const formType = body.get("formType");
       switch (formType) {
         case "getAllRepos":
-          console.log("getAllRepos");
           const repositories = await getUserRepositories(githubInstallationId as string);
           const repoArray = repositories.data.repositories;
           const repoObjArray: RepoData[] = [];
@@ -85,7 +84,6 @@ export const action = async ({ request }: ActionArgs) => {
           };
 
         case "getChosenRepo":
-          console.log("getChosenRepo");
           if (chosenRepoData) {
             const chosenRepoName = chosenRepoData.toString().split(",")[0];
             const chosenRepoId = chosenRepoData.toString().split(",")[1];
@@ -124,7 +122,6 @@ export const action = async ({ request }: ActionArgs) => {
           if (!foundryRootDir) {
             foundryRootDir = await getRootDir(githubInstallationId as string);
           }
-          console.log("herererererer");
           let fileNameArray: string[] = await getSolFileNames(
             githubInstallationId as string,
             foundryRootDir as string
@@ -139,8 +136,6 @@ export const action = async ({ request }: ActionArgs) => {
           };
 
         case "chooseFileToTrack":
-          console.log("chooseFileToTrack");
-
           await db.repository.update({
             where: { userId: associatedUser.id },
             data: {
@@ -175,7 +170,6 @@ export const action = async ({ request }: ActionArgs) => {
           };
         case "fundWallet":
           let currentBalance = body.get("currentBalance") as `${number}`;
-          console.log("fundWallet");
           const adminClient = createTestClient({
             chain: fetherChainFromKey(associatedUser.ApiKey?.key as string),
             mode: "anvil",
@@ -262,8 +256,6 @@ export const loader = async ({ request }: LoaderArgs) => {
   });
 
   const setupStep = determineSetupStep(userData);
-
-  console.log(setupStep);
 
   return { userData, setupStep };
 };
