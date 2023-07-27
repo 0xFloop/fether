@@ -26,7 +26,7 @@ const SetupWizard: React.FC<SetupWizardProps> = (props: SetupWizardProps) => {
             <button
               id={step.stepNumber}
               onClick={() => {
-                if (index > 1) {
+                if (index > 1 && setupStep > index) {
                   setSetupStep(index);
                 }
               }}
@@ -64,6 +64,7 @@ const SetupWizard: React.FC<SetupWizardProps> = (props: SetupWizardProps) => {
             userData: userData as UserWithKeyRepoActivity,
             navigation: props.navigation,
             actionArgs: props.actionArgs,
+            updateStep: setSetupStep,
           })}
         </div>
         {props.actionArgs?.error && (

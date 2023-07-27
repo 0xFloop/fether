@@ -18,6 +18,7 @@ type setupProps = {
   userData: UserWithKeyRepoActivity;
   navigation: ReturnType<typeof useNavigation>;
   actionArgs: ReturnType<typeof useActionData<typeof action>>;
+  updateStep: (step: number) => void;
 };
 
 const GenerateKeyComponent: React.FC<setupProps> = (props: setupProps) => {
@@ -67,32 +68,45 @@ const InstallGithubAppComponent: React.FC<setupProps> = (props: setupProps) => {
 const SelectRepoComponent: React.FC<setupProps> = (props: setupProps) => {
   const [repoChosen, setRepoChosen] = useState(false);
   return (
-    <div className="h-full w-full max-h-full flex items-center align-middle justify-center">
+    <div className="h-full w-full max-h-full flex flex-col gap-4 items-center align-middle justify-center">
       {!(props.actionArgs?.originCallForm == "getRepos") && (
-        <Form method="post">
-          <input
-            type="hidden"
-            name="githubInstallationId"
-            value={props.userData?.githubInstallationId?.toString()}
-          />
-          <input type="hidden" name="formType" value="getAllRepos" />
-          {props.navigation.state == "submitting" &&
-          props.navigation.formData.get("formType") == "getAllRepos" ? (
-            <div className="flex flex-row items-center py-4 px-6 bg-secondary-blue border rounded-lg border-[#6161FF]">
-              Loading repositories
-              <div className="ml-5 animate-spin">
-                <Loader size={24} />
+        <>
+          <Form method="post">
+            <input
+              type="hidden"
+              name="githubInstallationId"
+              value={props.userData?.githubInstallationId?.toString()}
+            />
+            <input type="hidden" name="formType" value="getAllRepos" />
+            {props.navigation.state == "submitting" &&
+            props.navigation.formData.get("formType") == "getAllRepos" ? (
+              <div className="flex flex-row items-center py-4 px-6 bg-secondary-blue border rounded-lg border-[#6161FF]">
+                Loading repositories
+                <div className="ml-5 animate-spin">
+                  <Loader size={24} />
+                </div>
               </div>
-            </div>
-          ) : (
+            ) : (
+              <button
+                type="submit"
+                className="py-4 px-6 bg-secondary-blue border rounded-lg border-[#6161FF]"
+              >
+                Click to load repositories
+              </button>
+            )}
+          </Form>
+          {props.userData?.Repository?.name && (
+            <div>Current Repo: {props.userData?.Repository?.name}</div>
+          )}
+          {props.userData?.Repository?.name && (
             <button
-              type="submit"
-              className="py-4 px-6 bg-secondary-blue border rounded-lg border-[#6161FF]"
+              onClick={() => props.updateStep(3)}
+              className="py-3 px-5 bg-secondary-blue border rounded-lg border-[#6161FF] absolute bottom-7 right-10"
             >
-              Click to load repositories
+              <p>Next</p>
             </button>
           )}
-        </Form>
+        </>
       )}
       {props.actionArgs?.originCallForm == "getRepos" && (
         <Form className="max-h-full" method="post" reloadDocument={true}>
@@ -121,7 +135,7 @@ const SelectRepoComponent: React.FC<setupProps> = (props: setupProps) => {
           {repoChosen && (
             <button
               type="submit"
-              className="py-3 px-5 bg-secondary-blue border rounded-lg border-[#6161FF] absolute bottom-7 right-10"
+              className="py-3 px-5 bg-secondary-blue border rounded-lg border-[#6161FF]  absolute bottom-7 right-10"
             >
               {props.navigation.state == "submitting" &&
               props.navigation.formData.get("formType") == "getChosenRepo" ? (
@@ -140,32 +154,45 @@ const SelectRepoComponent: React.FC<setupProps> = (props: setupProps) => {
 const SelectSmartContract: React.FC<setupProps> = (props: setupProps) => {
   const [fileChosen, setFileChosen] = useState(false);
   return (
-    <div className="h-full w-full flex flex-col items-center align-middle justify-center">
+    <div className="h-full w-full flex flex-col gap-4 items-center align-middle justify-center">
       {props.actionArgs?.originCallForm != "getFilesOfChosenRepo" && (
-        <Form method="post">
-          <input
-            type="hidden"
-            name="githubInstallationId"
-            value={props.userData?.githubInstallationId?.toString()}
-          />
-          <input type="hidden" name="formType" value="getFilesOfChosenRepo" />
-          {props.navigation.state == "submitting" &&
-          props.navigation.formData.get("formType") == "getFilesOfChosenRepo" ? (
-            <div className="flex flex-row items-center py-4 px-6 bg-secondary-blue border rounded-lg border-[#6161FF]">
-              Loading files
-              <div className="ml-5 animate-spin">
-                <Loader size={24} />
+        <>
+          <Form method="post">
+            <input
+              type="hidden"
+              name="githubInstallationId"
+              value={props.userData?.githubInstallationId?.toString()}
+            />
+            <input type="hidden" name="formType" value="getFilesOfChosenRepo" />
+            {props.navigation.state == "submitting" &&
+            props.navigation.formData.get("formType") == "getFilesOfChosenRepo" ? (
+              <div className="flex flex-row items-center py-4 px-6 bg-secondary-blue border rounded-lg border-[#6161FF]">
+                Loading files
+                <div className="ml-5 animate-spin">
+                  <Loader size={24} />
+                </div>
               </div>
-            </div>
-          ) : (
+            ) : (
+              <button
+                type="submit"
+                className="py-4 px-6 bg-secondary-blue border rounded-lg border-[#6161FF]"
+              >
+                Click to load solidity files
+              </button>
+            )}
+          </Form>
+          {props.userData?.Repository?.filename && (
+            <div>Current File: {props.userData?.Repository?.filename}</div>
+          )}
+          {props.userData?.Repository?.filename && (
             <button
-              type="submit"
-              className="py-4 px-6 bg-secondary-blue border rounded-lg border-[#6161FF]"
+              onClick={() => props.updateStep(4)}
+              className="py-3 px-5 bg-secondary-blue border rounded-lg border-[#6161FF] absolute bottom-7 right-10"
             >
-              Click to load solidity files
+              <p>Next</p>
             </button>
           )}
-        </Form>
+        </>
       )}
       {props.actionArgs?.originCallForm == "getFilesOfChosenRepo" && (
         <>
@@ -258,6 +285,17 @@ const SetDeployerComponent: React.FC<setupProps> = (props: setupProps) => {
         </div>
       </Form>
       <p className="text-red-500 mt-10">{addressError}</p>
+      {props.userData?.Repository?.deployerAddress && (
+        <div>Current Deployer: {props.userData?.Repository?.deployerAddress}</div>
+      )}
+      {props.userData?.Repository?.deployerAddress && (
+        <button
+          onClick={() => props.updateStep(5)}
+          className="py-3 px-5 bg-secondary-blue border rounded-lg border-[#6161FF] absolute bottom-7 right-10"
+        >
+          <p>Next</p>
+        </button>
+      )}
     </div>
   );
 };
@@ -305,6 +343,7 @@ export const setupSteps: setupStep[] = [
         userData={props.userData}
         navigation={props.navigation}
         actionArgs={props.actionArgs}
+        updateStep={props.updateStep}
       />
     ),
   },
@@ -319,6 +358,7 @@ export const setupSteps: setupStep[] = [
         userData={props.userData}
         navigation={props.navigation}
         actionArgs={props.actionArgs}
+        updateStep={props.updateStep}
       />
     ),
   },
@@ -333,6 +373,7 @@ export const setupSteps: setupStep[] = [
         userData={props.userData}
         navigation={props.navigation}
         actionArgs={props.actionArgs}
+        updateStep={props.updateStep}
       />
     ),
   },
@@ -347,6 +388,7 @@ export const setupSteps: setupStep[] = [
         userData={props.userData}
         navigation={props.navigation}
         actionArgs={props.actionArgs}
+        updateStep={props.updateStep}
       />
     ),
   },
@@ -361,6 +403,7 @@ export const setupSteps: setupStep[] = [
         userData={props.userData}
         navigation={props.navigation}
         actionArgs={props.actionArgs}
+        updateStep={props.updateStep}
       />
     ),
   },
@@ -375,6 +418,7 @@ export const setupSteps: setupStep[] = [
         userData={props.userData}
         navigation={props.navigation}
         actionArgs={props.actionArgs}
+        updateStep={props.updateStep}
       />
     ),
   },
