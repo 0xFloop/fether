@@ -16,13 +16,11 @@ module.exports = {
   server: process.env.NODE_ENV === "development" ? undefined : "./server.ts",
   serverBuildPath: "api/index.js",
   serverDependenciesToBundle: [
-    /^@?connectkit.*/,
     /^@?wagmi.*/,
     /^@?rainbow-me.*/,
     "@rainbow-me/rainbowkit",
     "@rainbow-me/rainbowkit/wallets",
     "wagmi",
-    "@wagmi/core",
   ],
   tailwind: true,
 };

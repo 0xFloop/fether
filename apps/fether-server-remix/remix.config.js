@@ -13,7 +13,6 @@ module.exports = {
     "@rainbow-me/rainbowkit",
     "@rainbow-me/rainbowkit/wallets",
     /^@?wagmi.*/,
-    /^@?connectkit.*/,
     /^@?rainbow-me.*/,
   ],
   watchPaths: async () => {
