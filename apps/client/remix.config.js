@@ -10,11 +10,13 @@ module.exports = {
   serverBuildTarget: "vercel",
   serverDependenciesToBundle: [
     "database",
+    /^@?connectkit.*/,
+    /^@?wagmi.*/,
+    /^@?rainbow-me.*/,
     "@rainbow-me/rainbowkit",
     "@rainbow-me/rainbowkit/wallets",
-    /^@?wagmi.*/,
-    /^@?connectkit.*/,
-    /^@?rainbow-me.*/,
+    "wagmi",
+    "@wagmi/core",
   ],
   watchPaths: async () => {
     return ["../../packages/database/prisma/schema.prisma"];
@@ -25,6 +27,8 @@ module.exports = {
     v2_routeConvention: true,
     v2_meta: true,
     v2_dev: true,
-    v2_errorBoundary: true,
+    v2_headers: true,
+    v2_normalizeFormMethod: true,
   },
+  tailwind: true,
 };
