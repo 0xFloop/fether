@@ -121,7 +121,7 @@ export const BaseFetherChain: Chain = {
           process.env.NODE_ENV == "production"
             ? "fether-server.vercel.app"
             : "fether-testing.ngrok.app"
-        }/rpc/`,
+        }/rpc/GlobalLoader`,
       ],
     },
     public: {
@@ -130,7 +130,7 @@ export const BaseFetherChain: Chain = {
           process.env.NODE_ENV == "production"
             ? "fether-server.vercel.app"
             : "fether-testing.ngrok.app"
-        }/rpc/`,
+        }/rpc/GlobalLoader`,
       ],
     },
   },
