@@ -6,11 +6,7 @@ import {
   getSession as userGetSession,
   commitSession as userCommitSession,
 } from "../utils/alphaSession.server";
-import { WagmiConfig, configureChains, createConfig } from "wagmi";
-import { RainbowKitProvider, getDefaultWallets } from "@rainbow-me/rainbowkit";
-import { alchemyProvider } from "wagmi/providers/alchemy";
-import { publicProvider } from "wagmi/providers/public";
-import { fetherChainFromKey } from "~/utils/helpers";
+import { WalletProvider } from "~/components/WalletProvider";
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   const session = await getSession(request.headers.get("Cookie"));
@@ -24,47 +20,28 @@ export const loader = async ({ request, params }: LoaderArgs) => {
   return user.has("userId");
 };
 
-const { chains, publicClient } = configureChains(
-  [fetherChainFromKey("GlobalLoader")],
-  [alchemyProvider({ apiKey: "NOTNEEDED" }), publicProvider()]
-);
-
-const { connectors } = getDefaultWallets({
-  appName: "Fether",
-  projectId: "42490798ad26dff0d5bfc67ee7abf1fb",
-  chains,
-});
-
-const wagmiConfig = createConfig({
-  autoConnect: true,
-  connectors,
-  publicClient,
-});
-
 export default function Index() {
   const userHasId = useLoaderData<typeof loader>();
   return (
-    <WagmiConfig config={wagmiConfig}>
-      <RainbowKitProvider chains={chains}>
-        <div className="relative min-h-screen">
-          <div
-            id="navbar"
-            className="absolute w-full h-20 border-b border-b-black flex flex-row justify-between items-center z-50 bg-[#f0f0f0]"
-          >
-            <Link to="/" id="logo" className="text-5xl flex-1 pl-8 ">
-              fether
-            </Link>
-            {userHasId && (
-              <div className="flex-1  pr-8">
-                <a id="signout" href="/alpha/sign-out" className="float-right">
-                  signout
-                </a>
-              </div>
-            )}
+    <div className="relative min-h-screen">
+      <div
+        id="navbar"
+        className="absolute w-full h-20 border-b border-b-black flex flex-row justify-between items-center z-50 bg-[#f0f0f0]"
+      >
+        <Link to="/" id="logo" className="text-5xl flex-1 pl-8 ">
+          fether
+        </Link>
+        {userHasId && (
+          <div className="flex-1  pr-8">
+            <a id="signout" href="/alpha/sign-out" className="float-right">
+              signout
+            </a>
           </div>
-          <Outlet />
-        </div>
-      </RainbowKitProvider>
-    </WagmiConfig>
+        )}
+      </div>
+      <WalletProvider>
+        <Outlet />
+      </WalletProvider>
+    </div>
   );
 }

@@ -9,6 +9,7 @@ import { getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { configureChains, createConfig, WagmiConfig } from "wagmi";
 import { alchemyProvider } from "wagmi/providers/alchemy";
 import { publicProvider } from "wagmi/providers/public";
+import { WalletProvider } from "./components/WalletProvider";
 
 export function links() {
   return [{ rel: "stylesheet", href: rainbowStylesUrl }];
@@ -35,22 +36,6 @@ export const meta: V2_MetaFunction = () => {
 export default function App() {
   // const fetherChain = fetherChainFromKey(apiKey);
   const fetherKey = "clkemlcko000s1j2do01iitwp";
-  const { chains, publicClient } = configureChains(
-    [fetherChainFromKey(fetherKey)],
-    [alchemyProvider({ apiKey: "not needed" }), publicProvider()]
-  );
-
-  const { connectors } = getDefaultWallets({
-    appName: "My RainbowKit App",
-    projectId: "42490798ad26dff0d5bfc67ee7abf1fb",
-    chains,
-  });
-
-  const wagmiConfig = createConfig({
-    autoConnect: true,
-    connectors,
-    publicClient,
-  });
 
   return (
     <html lang="en">
@@ -60,11 +45,9 @@ export default function App() {
       </head>
       <body>
         <FetherProvider apiKey={fetherKey}>
-          <WagmiConfig config={wagmiConfig}>
-            <RainbowKitProvider chains={chains}>
-              <Outlet />
-            </RainbowKitProvider>
-          </WagmiConfig>
+          <WalletProvider>
+            <Outlet />
+          </WalletProvider>
         </FetherProvider>
         <ScrollRestoration />
         <Scripts />
