@@ -1,15 +1,7 @@
 import type { LoaderArgs, MetaFunction, V2_MetaFunction } from "@remix-run/node";
-import {
-  Links,
-  LiveReload,
-  Meta,
-  Outlet,
-  Scripts,
-  ScrollRestoration,
-  useLoaderData,
-} from "@remix-run/react";
+import { Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration } from "@remix-run/react";
 
-import { FetherProvider, BaseFetherChain } from "fetherkit";
+import { BaseFetherChain, FetherProvider, fetherChainFromKey } from "fetherkit";
 
 import rainbowStylesUrl from "@rainbow-me/rainbowkit/styles.css";
 
@@ -39,24 +31,18 @@ export const meta: V2_MetaFunction = () => {
     { name: "charset", content: "utf-8" },
   ];
 };
-export const loader = async ({ request }: LoaderArgs) => {
-  //validate session cookie
 
-  const apiKey = process.env.API_KEY as string;
-
-  return apiKey;
-};
 export default function App() {
-  const apiKey = useLoaderData<typeof loader>();
-
+  // const fetherChain = fetherChainFromKey(apiKey);
+  const fetherKey = "clkemlcko000s1j2do01iitwp";
   const { chains, publicClient } = configureChains(
-    [BaseFetherChain],
-    [alchemyProvider({ apiKey: "THIS ISNT NEEDED" }), publicProvider()]
+    [fetherChainFromKey(fetherKey)],
+    [alchemyProvider({ apiKey: "not needed" }), publicProvider()]
   );
 
   const { connectors } = getDefaultWallets({
     appName: "My RainbowKit App",
-    projectId: "YOUR_PROJECT_ID",
+    projectId: "42490798ad26dff0d5bfc67ee7abf1fb",
     chains,
   });
 
@@ -73,7 +59,7 @@ export default function App() {
         <Links />
       </head>
       <body>
-        <FetherProvider apiKey={apiKey}>
+        <FetherProvider apiKey={fetherKey}>
           <WagmiConfig config={wagmiConfig}>
             <RainbowKitProvider chains={chains}>
               <Outlet />

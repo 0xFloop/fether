@@ -14,7 +14,6 @@ import { useFether } from "fetherkit";
 export default function Index() {
   const fether = useFether();
   const [number, setNumber] = useState<number>();
-  const [windowEthereum, setWindowEthereum] = useState();
 
   let publicClient = createPublicClient({
     chain: fether.chain,
