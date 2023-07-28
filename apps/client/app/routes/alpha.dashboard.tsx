@@ -37,7 +37,6 @@ export function links() {
 
 import { CustomConnectButton } from "../components/ConnectButton";
 import { createTestClient, http, parseEther, isAddress } from "viem";
-import OldSetupWizard from "~/components/OldSetupWizard";
 import NewSetupWizard from "~/components/SetupWizard";
 
 //TODO: fix compatibility with other repo's. display dirs and files in a tree structure
@@ -353,7 +352,7 @@ export default function Index() {
                         <input type="hidden" name="formType" value="getAllRepos" />
                         <button type="submit">
                           {navigation.state == "submitting" &&
-                          navigation.formData.get("formType") == "getAllRepos" ? (
+                          navigation.formData?.get("formType") == "getAllRepos" ? (
                             <div className="animate-spin">
                               <Loader size={20} />
                             </div>
@@ -408,7 +407,7 @@ export default function Index() {
                             className="text-[#f0f0f0] bg-[#121212] py-2 px-4 border rounded-lg"
                           >
                             {navigation.state == "submitting" &&
-                            navigation.formData.get("formType") == "getChosenRepo" ? (
+                            navigation.formData?.get("formType") == "getChosenRepo" ? (
                               <p>Submitting....</p>
                             ) : (
                               <p>Submit</p>
@@ -432,7 +431,7 @@ export default function Index() {
                           <input type="hidden" name="formType" value="getFilesOfChosenRepo" />
                           <button type="submit">
                             {navigation.state == "submitting" &&
-                            navigation.formData.get("formType") == "getFilesOfChosenRepo" ? (
+                            navigation.formData?.get("formType") == "getFilesOfChosenRepo" ? (
                               <div className="animate-spin">
                                 <Loader size={20} />
                               </div>
@@ -480,7 +479,7 @@ export default function Index() {
                                 className="text-[#f0f0f0] bg-[#121212] py-2 px-4 border rounded-lg"
                               >
                                 {navigation.state == "submitting" &&
-                                navigation.formData.get("formType") == "chooseFileToTrack" ? (
+                                navigation.formData?.get("formType") == "chooseFileToTrack" ? (
                                   <p>Submitting....</p>
                                 ) : (
                                   <p>Submit</p>
@@ -532,7 +531,7 @@ export default function Index() {
                             />
                             <input type="hidden" name="formType" value="setDeployerAddress" />
                             {navigation.state == "submitting" &&
-                            navigation.formData.get("formType") == "setDeployerAddress" ? (
+                            navigation.formData?.get("formType") == "setDeployerAddress" ? (
                               <div className="flex flex-row items-center">
                                 Setting Deployer Address....
                                 <div className="ml-5 animate-spin">
@@ -590,7 +589,7 @@ export default function Index() {
                           <input type="hidden" name="currentBalance" value={data?.formatted} />
 
                           {navigation.state == "submitting" &&
-                          navigation.formData.get("formType") == "fundWallet" ? (
+                          navigation.formData?.get("formType") == "fundWallet" ? (
                             <div className="text-[#f0f0f0] bg-[#121212] py-2 mt-2 px-4 text-xl border rounded-lg flex flex-row items-center  float-right">
                               +1 FEth
                               <div className="animate-spin items-center ml-3">
@@ -851,7 +850,7 @@ export default function Index() {
                       type="submit"
                     >
                       {navigation.state == "submitting" &&
-                      navigation.formData.get("formType") == "deployContract" ? (
+                      navigation.formData?.get("formType") == "deployContract" ? (
                         <div className="flex flex-row items-center">
                           <p>Deploying</p>{" "}
                           <div className="animate-spin ml-2">
@@ -920,6 +919,7 @@ export function ErrorBoundary() {
 
   // Don't forget to typecheck with your own logic.
   // Any value can be thrown, not just errors!
+  // @ts-ignore
   let errorMessage = error.message;
 
   return (
