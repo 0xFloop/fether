@@ -14,7 +14,7 @@ export async function validateSender(
       where: { key: apiKey },
       include: { associatedUser: { include: { Repository: true } } },
     });
-    if (apiKeyData) {
+    if (apiKeyData?.associatedUser.Repository) {
       return { success: true, apiKeyData };
     } else {
       return { success: false, apiKeyData: null };
