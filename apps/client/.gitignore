@@ -9,6 +9,8 @@ node_modules
 /public/build
 .env
 api/index*
+/api/*
+
 
 /prisma/data.db
 /prisma/data.db-journal
