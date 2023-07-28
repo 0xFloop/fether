@@ -1,12 +1,10 @@
-import { ActionArgs, redirect } from "@vercel/remix";
-import { db } from "../utils/db.server";
+import { LoaderArgs } from "@vercel/remix";
 import { zodApiKey } from "~/utils/config";
 import { validateSender } from "~/utils/validate";
 
-export const action = async ({ request, params }: ActionArgs) => {
+export const loader = async ({ request, params }: LoaderArgs) => {
   try {
     let api_key = zodApiKey.parse(params.api_key);
-    const reqBody = await request.json();
 
     let validated = await validateSender(api_key);
     if (!validated.success) {
