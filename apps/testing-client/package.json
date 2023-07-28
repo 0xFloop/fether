@@ -4,37 +4,36 @@
   "sideEffects": false,
   "scripts": {
     "build": "remix build",
-    "dev": "PORT=3002 remix dev",
+    "dev": "PORT=3002 remix dev --port 3102",
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@rainbow-me/rainbowkit": "^1.0.2",
-    "@remix-run/node": "^1.14.1",
-    "@remix-run/react": "^1.14.1",
-    "@remix-run/vercel": "^1.14.1",
-    "@vercel/node": "^2.6.2",
-    "@wagmi/core": "latest",
-    "connectkit": "^1.2.2",
+    "@rainbow-me/rainbowkit": "1.0.7",
+    "@remix-run/css-bundle": "^1.19.1",
+    "@remix-run/node": "^1.19.1",
+    "@remix-run/react": "^1.19.1",
+    "@remix-run/vercel": "^1.19.1",
+    "@vercel/node": "^2.10.3",
     "database": "workspace:*",
-    "ethers": "^5",
     "fetherkit": "workspace:*",
-    "isbot": "latest",
+    "isbot": "^3.6.8",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-is": "^18.2.0",
-    "viem": "1.1.2",
-    "wagmi": "1.2.1"
+    "remix-utils": "^6.6.0",
+    "viem": "1.4.2",
+    "wagmi": "1.3.9"
   },
   "devDependencies": {
-    "@remix-run/dev": "^1.14.1",
-    "@remix-run/eslint-config": "^1.14.1",
-    "@remix-run/serve": "^1.14.1",
-    "@types/react": "^18.0.25",
-    "@types/react-dom": "^18.0.8",
-    "eslint": "^8.27.0",
+    "@remix-run/dev": "^1.19.1",
+    "@remix-run/eslint-config": "^1.19.1",
+    "@remix-run/serve": "^1.19.1",
+    "@types/react": "^18.0.35",
+    "@types/react-dom": "^18.0.11",
+    "eslint": "^8.38.0",
     "typescript": "^5.0.4"
   },
   "engines": {
-    "node": ">=14"
+    "node": ">=18"
   }
 }
