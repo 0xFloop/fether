@@ -1,7 +1,6 @@
 import { Chain } from "wagmi";
-import { ExtractAbiFunctionNames, Narrow } from "abitype";
-import { AbiFunction } from "abitype";
-import React, { Suspense, createContext, useContext, useEffect } from "react";
+import { Narrow } from "abitype";
+import React, { createContext, useContext, useEffect } from "react";
 
 export default class Fether {
   chain: Chain;
@@ -55,6 +54,7 @@ export default class Fether {
     this.methods = {};
   }
   async init() {
+    console.log("key: " + this.key);
     let data = await fetch(`https://fether-testing.ngrok.app/fetherkit/${this.key}`).then((res) =>
       res.json()
     );
@@ -69,6 +69,40 @@ export default class Fether {
 
     this.address = data.contractAddress;
   }
+}
+
+export function fetherChainFromKey(apikey: string): Chain {
+  return {
+    id: 696969,
+    name: "Fether",
+    network: "fether",
+    nativeCurrency: {
+      decimals: 18,
+      name: "Fether",
+      symbol: "FEth",
+    },
+    rpcUrls: {
+      default: {
+        http: [
+          `https://${
+            process.env.NODE_ENV == "production"
+              ? "fether-server.vercel.app"
+              : "fether-testing.ngrok.app"
+          }/rpc/${apikey}`,
+        ],
+      },
+      public: {
+        http: [
+          `https://${
+            process.env.NODE_ENV == "production"
+              ? "fether-server.vercel.app"
+              : "fether-testing.ngrok.app"
+          }/rpc/${apikey}`,
+        ],
+      },
+    },
+    testnet: false,
+  };
 }
 
 export const BaseFetherChain: Chain = {
