@@ -39,7 +39,7 @@ export const action = async ({ request, params }: ActionArgs) => {
         id: "1",
       };
 
-      return new Response(null, {
+      return new Response(JSON.stringify(error), {
         status: 469,
         statusText: JSON.stringify(error),
         headers: { "Access-Control-Allow-Origin": "*" },
