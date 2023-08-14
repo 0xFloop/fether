@@ -20,3 +20,4 @@ api/index*
 /coverage
 .vercel
 
+.cache
