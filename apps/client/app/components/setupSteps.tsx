@@ -24,7 +24,7 @@ type setupProps = {
 const GenerateKeyComponent: React.FC<setupProps> = (props: setupProps) => {
   return (
     <div className="h-full w-full flex items-center align-middle justify-center">
-      <Form method="post" action="/keygen">
+      <Form method="post" action="/keygen" reloadDocument>
         <input type="hidden" name="userId" value={props.userData?.id} />
         <input type="hidden" name="formType" value="generateApiKey" />
 
