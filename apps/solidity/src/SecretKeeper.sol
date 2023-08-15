@@ -2,7 +2,7 @@
 pragma solidity ^0.8.13;
 
 contract SecretKeeper {
-    string secretPhrase = "joe is super duper cool";
+    string secretPhrase = "joe is very super duper cool";
     uint256 secretNumber = 99;
 
     function updateJoesLeastrFavNumber(string memory _secretPhrase) public {
