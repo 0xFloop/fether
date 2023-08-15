@@ -157,7 +157,17 @@ export const action = async ({ request }: ActionArgs) => {
           };
 
         case "deployContract":
-          await deployContract(githubInstallationId as string, associatedUser);
+          try {
+            await deployContract(githubInstallationId as string, associatedUser);
+          } catch (e) {
+            if (e.message == "Not Found") {
+              throw new Error(
+                "`/out` directory not found. Build project and push build files to github to proceed."
+              );
+            } else {
+              throw e;
+            }
+          }
 
           return {
             originCallForm: "deployContract",
@@ -219,14 +229,26 @@ export const action = async ({ request }: ActionArgs) => {
           };
       }
     } catch (e: any) {
-      return {
-        originCallForm: "",
-        chosenRepoName: null,
-        repositories: null,
-        solFilesFromChosenRepo: null,
-        chosenFileName: null,
-        error: e.message as string,
-      };
+      if (e.message == "Not Found") {
+        return {
+          originCallForm: "",
+          chosenRepoName: null,
+          repositories: null,
+          solFilesFromChosenRepo: null,
+          chosenFileName: null,
+          error:
+            "Could not find files, ensure you are using a compatible repository and your forge build files are present.",
+        };
+      } else {
+        return {
+          originCallForm: "",
+          chosenRepoName: null,
+          repositories: null,
+          solFilesFromChosenRepo: null,
+          chosenFileName: null,
+          error: e.message as string,
+        };
+      }
     }
   } else {
     console.log("user not found");
