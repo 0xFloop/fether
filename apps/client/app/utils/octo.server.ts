@@ -74,6 +74,11 @@ export const getRootDir = async (githubInstallationId: string): Promise<string> 
             return zodAppsFolderArray.data[j].path;
           }
         }
+      } else if (repoRootFolder.data[i].name == "foundry.toml") {
+        await db.repository.update({
+          where: { id: repoData?.Repository?.id },
+          data: { foundryRootDir: "" },
+        });
       }
     }
     return "";
