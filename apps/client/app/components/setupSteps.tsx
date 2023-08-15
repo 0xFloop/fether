@@ -45,7 +45,6 @@ const GenerateKeyComponent: React.FC<setupProps> = (props: setupProps) => {
           )}
         </button>
       </Form>
-      {props.actionArgs?.error && <div className="text-black">error</div>}
     </div>
   );
 };

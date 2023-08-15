@@ -70,7 +70,7 @@ const SetupWizard: React.FC<SetupWizardProps> = (props: SetupWizardProps) => {
               })}
             </div>
             {props.actionArgs?.error && (
-              <div className="text-red-500">Error: {props.actionArgs?.error}</div>
+              <div className="text-red-500 px-10">Error: {props.actionArgs?.error}</div>
             )}
             <div className="h-28 border-t-2 border-[#6D6D6D] px-10 flex items-center justify-between">
               <div>
