@@ -78,6 +78,7 @@ const SelectRepoComponent: React.FC<setupProps> = (props: setupProps) => {
             />
             <input type="hidden" name="formType" value="getAllRepos" />
             {props.navigation.state == "submitting" &&
+            props.navigation.formData &&
             props.navigation.formData.get("formType") == "getAllRepos" ? (
               <div className="flex flex-row items-center py-4 px-6 bg-secondary-blue border rounded-lg border-[#6161FF]">
                 Loading repositories
@@ -137,6 +138,7 @@ const SelectRepoComponent: React.FC<setupProps> = (props: setupProps) => {
               className="py-3 px-5 bg-secondary-blue border rounded-lg border-[#6161FF]  absolute bottom-7 right-10"
             >
               {props.navigation.state == "submitting" &&
+              props.navigation.formData &&
               props.navigation.formData.get("formType") == "getChosenRepo" ? (
                 <p>Submitting....</p>
               ) : (
@@ -164,6 +166,7 @@ const SelectSmartContract: React.FC<setupProps> = (props: setupProps) => {
             />
             <input type="hidden" name="formType" value="getFilesOfChosenRepo" />
             {props.navigation.state == "submitting" &&
+            props.navigation.formData &&
             props.navigation.formData.get("formType") == "getFilesOfChosenRepo" ? (
               <div className="flex flex-row items-center py-4 px-6 bg-secondary-blue border rounded-lg border-[#6161FF]">
                 Loading files
@@ -224,6 +227,7 @@ const SelectSmartContract: React.FC<setupProps> = (props: setupProps) => {
                 className="py-3 px-5 bg-secondary-blue border rounded-lg border-[#6161FF] absolute bottom-7 right-10"
               >
                 {props.navigation.state == "submitting" &&
+                props.navigation.formData &&
                 props.navigation.formData.get("formType") == "chooseFileToTrack" ? (
                   <p>Submitting....</p>
                 ) : (
@@ -310,6 +314,7 @@ const DeployContractComponent: React.FC<setupProps> = (props: setupProps) => {
         />
         <input type="hidden" name="formType" value="deployContract" />
         {props.navigation.state == "submitting" &&
+        props.navigation.formData &&
         props.navigation.formData.get("formType") == "deployContract" ? (
           <div className="flex flex-row items-center py-4 px-6 bg-secondary-blue border rounded-lg border-[#6161FF]">
             Deploying...

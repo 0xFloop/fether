@@ -159,7 +159,7 @@ export const action = async ({ request }: ActionArgs) => {
         case "deployContract":
           try {
             await deployContract(githubInstallationId as string, associatedUser);
-          } catch (e) {
+          } catch (e: any) {
             if (e.message == "Not Found") {
               throw new Error(
                 "`/out` directory not found. Build project and push build files to github to proceed."
