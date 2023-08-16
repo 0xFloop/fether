@@ -5,7 +5,7 @@ import { ClientOnly } from "remix-utils";
 import type { LoaderArgs, MetaFunction, V2_MetaFunction } from "@remix-run/node";
 import { Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration } from "@remix-run/react";
 
-import { BaseFetherChain, FetherProvider, fetherChainFromKey } from "fetherkit";
+import { fetherChainFromKey } from "fetherkit";
 
 import rainbowStylesUrl from "@rainbow-me/rainbowkit/styles.css";
 
@@ -22,13 +22,15 @@ export function WalletProvider({
     if (typeof window === "undefined") {
       return { wagmiConfig: null, chains: null };
     }
+    const chain = fetherChainFromKey("GlobalLoader");
 
     const { chains, publicClient } = configureChains(
-      [BaseFetherChain],
+      [chain],
       [alchemyProvider({ apiKey: "window.ENV.ALCHEMY_ID" }), publicProvider()]
     );
+
     const { connectors } = getDefaultWallets({
-      appName: "Americana",
+      appName: "Fether",
       projectId: "42490798ad26dff0d5bfc67ee7abf1fb",
       chains,
     });
@@ -50,7 +52,7 @@ export function WalletProvider({
               chains={chains}
               modalSize="compact"
               theme={darkTheme()}
-              appInfo={{ appName: "Americana" }}
+              appInfo={{ appName: "Fether" }}
             >
               {children}
             </RainbowKitProvider>

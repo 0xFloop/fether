@@ -94,16 +94,18 @@ export function fetherChainFromKey(apikey: string): Chain {
       default: {
         http: [
           `https://${
-            // process.env.NODE_ENV == "production"
-            true ? "fether-server.vercel.app" : "fether-testing.ngrok.app"
+            process.env.NODE_ENV == "production"
+              ? "fether-server.vercel.app"
+              : "fether-testing.ngrok.app"
           }/rpc/${apikey}`,
         ],
       },
       public: {
         http: [
           `https://${
-            // process.env.NODE_ENV == "production"
-            true ? "fether-server.vercel.app" : "fether-testing.ngrok.app"
+            process.env.NODE_ENV == "production"
+              ? "fether-server.vercel.app"
+              : "fether-testing.ngrok.app"
           }/rpc/${apikey}`,
         ],
       },
@@ -125,16 +127,18 @@ export const BaseFetherChain: Chain = {
     default: {
       http: [
         `https://${
-          // process.env.NODE_ENV == "production"
-          true ? "fether-server.vercel.app" : "fether-testing.ngrok.app"
+          process.env.NODE_ENV == "production"
+            ? "fether-server.vercel.app"
+            : "fether-testing.ngrok.app"
         }/rpc/GlobalLoader`,
       ],
     },
     public: {
       http: [
         `https://${
-          // process.env.NODE_ENV == "production"
-          true ? "fether-server.vercel.app" : "fether-testing.ngrok.app"
+          process.env.NODE_ENV == "production"
+            ? "fether-server.vercel.app"
+            : "fether-testing.ngrok.app"
         }/rpc/GlobalLoader`,
       ],
     },
