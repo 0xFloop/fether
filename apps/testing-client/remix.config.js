@@ -14,7 +14,6 @@ module.exports = {
   },
   serverModuleFormat: "cjs",
   server: process.env.NODE_ENV === "development" ? undefined : "./server.ts",
-  serverBuildPath: "api/index.js",
   serverDependenciesToBundle: [
     /^@?wagmi.*/,
     /^@?rainbow-me.*/,
