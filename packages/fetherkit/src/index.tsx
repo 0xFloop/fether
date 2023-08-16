@@ -44,8 +44,8 @@ export default class Fether {
         symbol: "FEth",
       },
       rpcUrls: {
-        default: { http: [`https://fether-testing.ngrok.app/rpc/${this.key}`] },
-        public: { http: [`https://fether-testing.ngrok.app/rpc/${this.key}`] },
+        default: { http: [`https://fether-server.vercel.app/rpc/${this.key}`] },
+        public: { http: [`https://fether-server.vercel.app/rpc/${this.key}`] },
       },
       testnet: false,
     };
@@ -54,20 +54,29 @@ export default class Fether {
     this.methods = {};
   }
   async init() {
-    console.log("key: " + this.key);
-    let data = await fetch(`https://fether-testing.ngrok.app/fetherkit/${this.key}`).then((res) =>
-      res.json()
-    );
-    const _abi = JSON.parse(data.contractAbi);
+    try {
+      let data = await fetch(`https://fether-server.vercel.app/fetherkit/${this.key}`).then(
+        async (res) => {
+          if (res.status > 400) {
+            throw new Error(await res.json());
+          }
+          return res.json();
+        }
+      );
 
-    this.abi = _abi;
+      const _abi = JSON.parse(data.contractAbi);
 
-    this.abi.map((method) => {
-      let name = method.name;
-      this.methods[name] = name;
-    });
+      this.abi = _abi;
 
-    this.address = data.contractAddress;
+      this.abi.map((method) => {
+        let name = method.name;
+        this.methods[name] = name;
+      });
+
+      this.address = data.contractAddress;
+    } catch (err) {
+      console.error(err);
+    }
   }
 }
 
@@ -85,18 +94,16 @@ export function fetherChainFromKey(apikey: string): Chain {
       default: {
         http: [
           `https://${
-            process.env.NODE_ENV == "production"
-              ? "fether-server.vercel.app"
-              : "fether-testing.ngrok.app"
+            // process.env.NODE_ENV == "production"
+            true ? "fether-server.vercel.app" : "fether-testing.ngrok.app"
           }/rpc/${apikey}`,
         ],
       },
       public: {
         http: [
           `https://${
-            process.env.NODE_ENV == "production"
-              ? "fether-server.vercel.app"
-              : "fether-testing.ngrok.app"
+            // process.env.NODE_ENV == "production"
+            true ? "fether-server.vercel.app" : "fether-testing.ngrok.app"
           }/rpc/${apikey}`,
         ],
       },
@@ -118,18 +125,16 @@ export const BaseFetherChain: Chain = {
     default: {
       http: [
         `https://${
-          process.env.NODE_ENV == "production"
-            ? "fether-server.vercel.app"
-            : "fether-testing.ngrok.app"
+          // process.env.NODE_ENV == "production"
+          true ? "fether-server.vercel.app" : "fether-testing.ngrok.app"
         }/rpc/GlobalLoader`,
       ],
     },
     public: {
       http: [
         `https://${
-          process.env.NODE_ENV == "production"
-            ? "fether-server.vercel.app"
-            : "fether-testing.ngrok.app"
+          // process.env.NODE_ENV == "production"
+          true ? "fether-server.vercel.app" : "fether-testing.ngrok.app"
         }/rpc/GlobalLoader`,
       ],
     },
@@ -160,7 +165,7 @@ export function FetherProvider(props: FetherProviderProps) {
 
   useEffect(() => {
     fetherInstance.init();
-  }, [fetherInstance]);
+  }, []);
 
   return (
     <div>

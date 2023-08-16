@@ -24,7 +24,7 @@ export function WalletProvider({
     }
 
     const { chains, publicClient } = configureChains(
-      [fetherChainFromKey("clkemlcko000s1j2do01iitwp")],
+      [fetherChainFromKey("cllb25eqq0002jw08ddgvy1lz")],
       [alchemyProvider({ apiKey: "window.ENV.ALCHEMY_ID" }), publicProvider()]
     );
     const { connectors } = getDefaultWallets({

@@ -81,6 +81,7 @@ export const callContractFunction = async (
 
     let tx = await walletClient.writeContract(request);
 
+    //TODO idk wtf is going on here lol
     return { returnItems: [{ name: "numbuh", value: 4 }], methodName: method.name };
   }
 };

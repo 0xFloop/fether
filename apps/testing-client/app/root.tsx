@@ -35,7 +35,7 @@ export const meta: V2_MetaFunction = () => {
 
 export default function App() {
   // const fetherChain = fetherChainFromKey(apiKey);
-  const fetherKey = "clkemlcko000s1j2do01iitwp";
+  const fetherKey = "cllcvsb8a0002jo090kwx8trd";
 
   return (
     <html lang="en">
