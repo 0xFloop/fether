@@ -3,8 +3,8 @@ pragma solidity ^0.8.13;
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract SecretKeeper is Ownable {
-    string public secretPhrase = "asdfsdf";
-    uint256 public secretNumber = 99;
+    string public secretPhrase = "asdfsdff";
+    uint256 public secretNumber = 100;
 
     function updateNumber(string memory _secretPhrase) public {
         secretPhrase = _secretPhrase;
