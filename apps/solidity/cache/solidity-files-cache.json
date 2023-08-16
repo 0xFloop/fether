@@ -813,6 +813,90 @@
         }
       }
     },
+    "lib/openzeppelin-contracts/contracts/access/Ownable.sol": {
+      "lastModificationDate": 1692198066627,
+      "contentHash": "5a20b2cad87ddb61c7a3a6af21289e28",
+      "sourceName": "lib/openzeppelin-contracts/contracts/access/Ownable.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "useLiteralContent": false,
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "paris",
+          "libraries": {}
+        }
+      },
+      "imports": [
+        "lib/openzeppelin-contracts/contracts/utils/Context.sol"
+      ],
+      "versionRequirement": "^0.8.0",
+      "artifacts": {
+        "Ownable": {
+          "0.8.18+commit.87f61d96.Darwin.appleclang": "Ownable.sol/Ownable.json"
+        }
+      }
+    },
+    "lib/openzeppelin-contracts/contracts/utils/Context.sol": {
+      "lastModificationDate": 1692198066656,
+      "contentHash": "5f2c5c4b6af2dd4551027144797bc8be",
+      "sourceName": "lib/openzeppelin-contracts/contracts/utils/Context.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "useLiteralContent": false,
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "paris",
+          "libraries": {}
+        }
+      },
+      "imports": [],
+      "versionRequirement": "^0.8.0",
+      "artifacts": {
+        "Context": {
+          "0.8.18+commit.87f61d96.Darwin.appleclang": "Context.sol/Context.json"
+        }
+      }
+    },
     "script/Counter.s.sol": {
       "lastModificationDate": 1678153432221,
       "contentHash": "0705c52104730a78aef4aa6694175c81",
@@ -909,8 +993,8 @@
       }
     },
     "src/SecretKeeper.sol": {
-      "lastModificationDate": 1692196638507,
-      "contentHash": "153559d4df3033732ff391f449abd591",
+      "lastModificationDate": 1692198230818,
+      "contentHash": "968ca4ea15ec6af603c4a70d15a5c7fc",
       "sourceName": "src/SecretKeeper.sol",
       "solcConfig": {
         "settings": {
@@ -941,7 +1025,10 @@
           "libraries": {}
         }
       },
-      "imports": [],
+      "imports": [
+        "lib/openzeppelin-contracts/contracts/access/Ownable.sol",
+        "lib/openzeppelin-contracts/contracts/utils/Context.sol"
+      ],
       "versionRequirement": "^0.8.13",
       "artifacts": {
         "SecretKeeper": {

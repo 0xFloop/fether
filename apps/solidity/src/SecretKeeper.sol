@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract SecretKeeper {
-    string secretPhrase = "asdfsdf";
-    uint256 secretNumber = 99;
+contract SecretKeeper is Ownable {
+    string public secretPhrase = "asdfsdf";
+    uint256 public secretNumber = 99;
 
     function updateNumber(string memory _secretPhrase) public {
         secretPhrase = _secretPhrase;
