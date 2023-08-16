@@ -3,7 +3,8 @@ import { db } from "../utils/db.server";
 import { zodContractBuildFileSchema, formattedGithubAppPk } from "~/utils/config";
 import { App as Octo } from "octokit";
 import { Abi } from "abitype/zod";
-import { publicClient, walletClient } from "~/utils/viemClients";
+import { fetherChainFromKey, publicClient, walletClient } from "~/utils/viemClients";
+import { createPublicClient, createTestClient, createWalletClient, http, parseEther } from "viem";
 
 const octo = new Octo({
   appId: process.env.fetherGithubAppId as string,
@@ -19,8 +20,15 @@ export const action = async ({ request }: ActionArgs) => {
     const octokit = await octo.getInstallationOctokit(installId);
 
     let associatedUserData = await db.user.findUnique({
-      where: { githubInstallationId: installId },
-      include: { ApiKey: true, Repository: true },
+      where: { githubInstallationId: installId as string },
+      include: {
+        ApiKey: true,
+        Repository: {
+          include: {
+            Activity: true,
+          },
+        },
+      },
     });
 
     if (
@@ -63,17 +71,47 @@ export const action = async ({ request }: ActionArgs) => {
               let fileJSON = JSON.parse(contentsReq.data.toString());
               let validatedJSON = zodContractBuildFileSchema.parse(fileJSON);
 
-              let byteCode = validatedJSON.bytecode.object as `0x${string}`;
+              let bytecode = validatedJSON.bytecode.object as `0x${string}`;
               let abi = Abi.parse(fileJSON.abi);
               let dbAbi = JSON.stringify(fileJSON.abi);
+              let deployerAddress = associatedUserData.Repository.deployerAddress as `0x${string}`;
 
-              let deployHash = await walletClient.deployContract({
-                bytecode: byteCode,
-                abi: abi,
+              ///
+              const fetherChain = fetherChainFromKey(associatedUserData.ApiKey?.key as string);
+
+              const walletClient = createWalletClient({
+                chain: fetherChain,
+                transport: http(),
               });
 
-              await new Promise((r) => setTimeout(r, 5500));
+              const publicClient = createPublicClient({
+                chain: fetherChain,
+                transport: http(),
+              });
 
+              const adminClient = createTestClient({
+                chain: fetherChain,
+                mode: "anvil",
+                transport: http(),
+              });
+
+              if ((await publicClient.getBalance({ address: deployerAddress })) < 1) {
+                await adminClient.setBalance({ address: deployerAddress, value: parseEther("1") });
+              }
+
+              await adminClient.impersonateAccount({
+                address: deployerAddress,
+              });
+
+              let deployHash = await walletClient.deployContract({
+                abi,
+                account: deployerAddress,
+                bytecode,
+              });
+
+              await adminClient.stopImpersonatingAccount({ address: deployerAddress });
+
+              await new Promise((r) => setTimeout(r, 5500));
               const transaction = await publicClient.getTransactionReceipt({
                 hash: deployHash,
               });

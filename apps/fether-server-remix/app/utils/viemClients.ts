@@ -1,4 +1,11 @@
-import { PublicClient, createPublicClient, createTestClient, createWalletClient, http } from "viem";
+import {
+  Chain,
+  PublicClient,
+  createPublicClient,
+  createTestClient,
+  createWalletClient,
+  http,
+} from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { fetherChain } from "./config";
 
@@ -23,3 +30,37 @@ export const adminClient = createTestClient({
   mode: "anvil",
   transport: http(),
 });
+
+export function fetherChainFromKey(apikey: string): Chain {
+  return {
+    id: 696969,
+    name: "Fether",
+    network: "fether",
+    nativeCurrency: {
+      decimals: 18,
+      name: "Fether",
+      symbol: "FEth",
+    },
+    rpcUrls: {
+      default: {
+        http: [
+          `https://${
+            process.env.NODE_ENV == "production"
+              ? "fether-server.vercel.app"
+              : "fether-testing.ngrok.app"
+          }/rpc/${apikey}`,
+        ],
+      },
+      public: {
+        http: [
+          `https://${
+            process.env.NODE_ENV == "production"
+              ? "fether-server.vercel.app"
+              : "fether-testing.ngrok.app"
+          }/rpc/${apikey}`,
+        ],
+      },
+    },
+    testnet: false,
+  };
+}
