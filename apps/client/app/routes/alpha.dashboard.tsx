@@ -36,7 +36,7 @@ export function links() {
 }
 
 import { CustomConnectButton } from "../components/ConnectButton";
-import { createTestClient, http, parseEther, isAddress } from "viem";
+import { createTestClient, http, parseEther, isAddress, createPublicClient } from "viem";
 import NewSetupWizard from "~/components/SetupWizard";
 
 //TODO: fix compatibility with other repo's. display dirs and files in a tree structure
@@ -184,9 +184,18 @@ export const action = async ({ request }: ActionArgs) => {
             mode: "anvil",
             transport: http(),
           });
+          const publicClient = createPublicClient({
+            chain: fetherChainFromKey(associatedUser.ApiKey?.key as string),
+            transport: http(),
+          });
+
+          let balance = await publicClient.getBalance({
+            address: body.get("walletAddress") as `0x${string}`,
+          });
+
           await adminClient.setBalance({
             address: body.get("walletAddress") as `0x${string}`,
-            value: parseEther("1") + parseEther(currentBalance),
+            value: parseEther("1") + balance,
           });
           return {
             originCallForm: "fundWallet",
