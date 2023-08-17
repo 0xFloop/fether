@@ -24,7 +24,7 @@ type setupProps = {
 const GenerateKeyComponent: React.FC<setupProps> = (props: setupProps) => {
   return (
     <div className="h-full w-full flex items-center align-middle justify-center">
-      <Form method="post" action="/keygen" reloadDocument>
+      <Form method="post" action="/api/keygen" reloadDocument>
         <input type="hidden" name="userId" value={props.userData?.id} />
         <input type="hidden" name="formType" value="generateApiKey" />
 
@@ -52,7 +52,7 @@ const GenerateKeyComponent: React.FC<setupProps> = (props: setupProps) => {
 const InstallGithubAppComponent: React.FC<setupProps> = (props: setupProps) => {
   return (
     <div className="h-full w-full flex items-center align-middle justify-center">
-      <Form method="post" action="/gh-app-install">
+      <Form method="post" action="/api/gh-app-install">
         <button
           type="submit"
           className="py-4 px-6 bg-secondary-blue border rounded-lg border-[#6161FF]"

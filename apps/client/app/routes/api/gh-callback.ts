@@ -1,9 +1,9 @@
 import { LoaderArgs, redirect } from "@vercel/remix";
-import { db } from "../utils/db.server";
+import { db } from "../../utils/db.server";
 import {
   getSession as userGetSession,
   commitSession as userCommitSession,
-} from "../utils/alphaSession.server";
+} from "../../utils/alphaSession.server";
 
 async function handleAuthentication(
   code: string,
