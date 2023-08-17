@@ -12,7 +12,7 @@ import { App as Octo } from "octokit";
 import { zodContractBuildFileSchema } from "./octo.server";
 import { Abi } from "abitype/zod";
 import { UserWithKeyRepoActivity } from "~/types";
-import { fetherChainFromKey } from "./helpers";
+import { fetherChainFromKey } from "./helpers.server";
 
 function getGithubPk() {
   const githubAppPk = process.env.appPK as string;

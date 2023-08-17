@@ -2,13 +2,7 @@ import { Abi, AbiFunction } from "abitype/zod";
 import { Chain, createPublicClient, createWalletClient, custom, http } from "viem";
 import { AbiFunction as AbiFunctionType } from "abitype";
 import { z } from "zod";
-import { UserWithKeyRepoActivity } from "~/types";
-
-export type ContractReturnItem = {
-  name: string;
-  value: any;
-};
-export type ContractReturn = { methodName: string; returnItems: ContractReturnItem[] };
+import { ContractReturn, ContractReturnItem, TxDetails, UserWithKeyRepoActivity } from "~/types";
 
 export const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -18,6 +12,23 @@ export function truncateToDecimals(num: number, dec = 2) {
   const calcDec = Math.pow(10, dec);
   return Math.trunc(num * calcDec) / calcDec;
 }
+
+export const getTransactionDetails = async (
+  txHash: string,
+  apiKey: string
+): Promise<TxDetails | null> => {
+  const publicClient = createPublicClient({
+    chain: fetherChainFromKey(apiKey as string),
+    transport: http(),
+  });
+
+  let txReciept = await publicClient.getTransactionReceipt({
+    hash: txHash as `0x${string}`,
+  });
+  console.log(txReciept);
+
+  return null;
+};
 
 export const callContractFunction = async (
   methodString: AbiFunctionType,
