@@ -333,7 +333,7 @@ export default function Index() {
   };
 
   return (
-    <div className="w-screen h-auto min-h-screen overflow-hidden display flex flex-col items-center justify-center text-[#121212]">
+    <div className="max-w-screen h-auto min-h-screen overflow-hidden display flex flex-col items-center justify-center text-[#121212]">
       {!userData?.Repository?.contractAbi ? (
         <>
           {/* <OldSetupWizard userData={userData} navigation={navigation} actionArgs={actionArgs} /> */}
@@ -883,7 +883,6 @@ export default function Index() {
                         <div className="flex flex-row items-center">
                           <p>Deploying</p>{" "}
                           <div className="animate-spin ml-2">
-                            {" "}
                             <Loader size={20} />
                           </div>
                         </div>
