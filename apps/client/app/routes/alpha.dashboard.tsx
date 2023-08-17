@@ -16,18 +16,23 @@ import { deployContract } from "~/utils/viem.server";
 import { AbiFunction as AbiFunctionType } from "abitype";
 import { useState } from "react";
 import {
-  ContractReturn,
   callContractFunction,
-  timeSince,
   sleep,
   getFunctionArgsFromInput,
   fetherChainFromKey,
   determineSetupStep,
-} from "~/utils/helpers";
+  getTransactionDetails,
+} from "~/utils/helpers.server";
 import * as Accordion from "@radix-ui/react-accordion";
 import { useAccount, useBalance } from "wagmi";
 
-import { RepoData, UserWithKeyRepoActivity } from "~/types";
+import {
+  ContractReturn,
+  DashboardActionReturn,
+  RepoData,
+  TxDetails,
+  UserWithKeyRepoActivity,
+} from "~/types";
 
 import rainbowStylesUrl from "@rainbow-me/rainbowkit/styles.css";
 
@@ -42,10 +47,9 @@ import NewSetupWizard from "~/components/SetupWizard";
 //TODO: fix compatibility with other repo's. display dirs and files in a tree structure
 //TODO: create error page
 //TODO: allow updates within signup page, prevents lockup bug state
-//TODO: make setup wizard better ui
 //TODO: fix call trace ui
 
-export const action = async ({ request }: ActionArgs) => {
+export const action = async ({ request }: ActionArgs): Promise<DashboardActionReturn> => {
   const body = await request.formData();
   const githubInstallationId = body.get("githubInstallationId");
   const chosenRepoData = body.get("chosenRepoData");
@@ -79,9 +83,9 @@ export const action = async ({ request }: ActionArgs) => {
             repositories: repoObjArray,
             solFilesFromChosenRepo: null,
             chosenFileName: null,
+            txDetails: null,
             error: null,
           };
-
         case "getChosenRepo":
           if (chosenRepoData) {
             const chosenRepoName = chosenRepoData.toString().split(",")[0];
@@ -112,10 +116,10 @@ export const action = async ({ request }: ActionArgs) => {
               repositories: null,
               solFilesFromChosenRepo: null,
               chosenFileName: null,
+              txDetails: null,
               error: null,
             };
           }
-
         case "getFilesOfChosenRepo":
           let foundryRootDir = associatedUser.Repository?.foundryRootDir;
           if (!foundryRootDir) {
@@ -131,9 +135,9 @@ export const action = async ({ request }: ActionArgs) => {
             repositories: null,
             solFilesFromChosenRepo: fileNameArray,
             chosenFileName: null,
+            txDetails: null,
             error: null,
           };
-
         case "chooseFileToTrack":
           await db.repository.update({
             where: { userId: associatedUser.id },
@@ -152,10 +156,10 @@ export const action = async ({ request }: ActionArgs) => {
             chosenRepoName: null,
             repositories: null,
             solFilesFromChosenRepo: null,
-            chosenFileName: body.get("chosenFileName"),
+            chosenFileName: body.get("chosenFileName") as string,
+            txDetails: null,
             error: null,
           };
-
         case "deployContract":
           try {
             await deployContract(githubInstallationId as string, associatedUser);
@@ -175,6 +179,7 @@ export const action = async ({ request }: ActionArgs) => {
             repositories: null,
             solFilesFromChosenRepo: null,
             chosenFileName: null,
+            txDetails: null,
             error: null,
           };
         case "fundWallet":
@@ -203,9 +208,9 @@ export const action = async ({ request }: ActionArgs) => {
             repositories: null,
             solFilesFromChosenRepo: null,
             chosenFileName: null,
+            txDetails: null,
             error: null,
           };
-
         case "setDeployerAddress":
           let newDeployerAddress = body.get("deployerAddress") as string;
 
@@ -224,9 +229,33 @@ export const action = async ({ request }: ActionArgs) => {
             repositories: null,
             solFilesFromChosenRepo: null,
             chosenFileName: null,
+            txDetails: null,
             error: null,
           };
-
+        case "getTransaction":
+          const txHash = body.get("txHash");
+          const apiKey = body.get("apiKey");
+          if (!txHash || !apiKey) {
+            return {
+              originCallForm: "getTransaction",
+              chosenRepoName: null,
+              repositories: null,
+              solFilesFromChosenRepo: null,
+              chosenFileName: null,
+              txDetails: null,
+              error: "null txHash or apiKey",
+            };
+          }
+          let txDetails = getTransactionDetails(txHash as `0x${string}`, apiKey as string);
+          return {
+            originCallForm: "getTransaction",
+            chosenRepoName: null,
+            repositories: null,
+            solFilesFromChosenRepo: null,
+            chosenFileName: null,
+            txDetails: null,
+            error: null,
+          };
         default:
           return {
             originCallForm: "",
@@ -234,9 +263,19 @@ export const action = async ({ request }: ActionArgs) => {
             repositories: null,
             solFilesFromChosenRepo: null,
             chosenFileName: null,
+            txDetails: null,
             error: null,
           };
       }
+      return {
+        originCallForm: "",
+        chosenRepoName: null,
+        repositories: null,
+        solFilesFromChosenRepo: null,
+        chosenFileName: null,
+        txDetails: null,
+        error: null,
+      };
     } catch (e: any) {
       if (e.message == "Not Found") {
         return {
@@ -245,22 +284,33 @@ export const action = async ({ request }: ActionArgs) => {
           repositories: null,
           solFilesFromChosenRepo: null,
           chosenFileName: null,
+          txDetails: null,
           error:
             "Could not find files, ensure you are using a compatible repository and your forge build files are present.",
         };
       } else {
         return {
-          originCallForm: "",
+          originCallForm: null,
           chosenRepoName: null,
           repositories: null,
           solFilesFromChosenRepo: null,
           chosenFileName: null,
+          txDetails: null,
           error: e.message as string,
         };
       }
     }
   } else {
-    console.log("user not found");
+    console.error("user not found");
+    return {
+      originCallForm: "",
+      chosenRepoName: null,
+      repositories: null,
+      solFilesFromChosenRepo: null,
+      chosenFileName: null,
+      txDetails: null,
+      error: null,
+    };
   }
 };
 
@@ -305,10 +355,8 @@ export default function Index() {
   const [deployerModal, setDeployerModal] = useState(false);
   const [copied, setCopied] = useState(false);
   const [functionCalled, setFunctionCalled] = useState<string | null>(null);
-  const [functionReturn, setFunctionReturn] = useState<ContractReturn>({
-    methodName: "",
-    returnItems: [],
-  });
+  const [functionReturn, setFunctionReturn] = useState<ContractReturn | null>(null);
+  const [txView, setTxView] = useState<TxDetails | null>(null);
 
   let deployStatus = "Deploy";
 
@@ -330,6 +378,54 @@ export default function Index() {
       await sleep(2000);
       setCopied(false);
     }
+  };
+  const timeSince = (_date: any) => {
+    var date = Date.parse(_date);
+    //@ts-ignore
+    var seconds = Math.floor((new Date() - date) / 1000);
+    var intervalType;
+
+    var interval = Math.floor(seconds / 31536000);
+    if (interval >= 1) {
+      intervalType = "year";
+    } else {
+      interval = Math.floor(seconds / 2592000);
+      if (interval >= 1) {
+        intervalType = "month";
+      } else {
+        interval = Math.floor(seconds / 86400);
+        if (interval >= 1) {
+          intervalType = "day";
+        } else {
+          interval = Math.floor(seconds / 3600);
+          if (interval >= 1) {
+            intervalType = "hour";
+          } else {
+            interval = Math.floor(seconds / 60);
+            if (interval >= 1) {
+              intervalType = "minute";
+            } else {
+              interval = seconds;
+              intervalType = "second";
+            }
+          }
+        }
+      }
+    }
+
+    if (interval > 1 || interval === 0) {
+      intervalType += "s";
+    }
+
+    return interval + " " + intervalType;
+  };
+
+  const viewTx = async (index: number) => {
+    const activity = userData?.Repository?.Activity;
+    if (!activity) return;
+    const tx = activity[index];
+    if (!tx) return;
+    console.log(tx.txHash);
   };
 
   return (
@@ -680,7 +776,7 @@ export default function Index() {
                                       )}
                                     </button>
                                   </div>
-                                  {functionReturn.methodName == method.name &&
+                                  {functionReturn?.methodName == method.name &&
                                     method.outputs.length > 0 && (
                                       <>
                                         <p>Returned:</p>
@@ -831,7 +927,7 @@ export default function Index() {
                                     </Accordion.Item>
                                   </Accordion.Root>
                                 </>
-                                {functionReturn.methodName == method.name &&
+                                {functionReturn?.methodName == method.name &&
                                   method.outputs.length > 0 && (
                                     <>
                                       <p>Returned:</p>
@@ -904,13 +1000,25 @@ export default function Index() {
                     {userData?.Repository?.Activity?.map((transaction: any, i) => (
                       <tr key={i} className="">
                         <td>
-                          <a
-                            href={`http://localhost:3003/${transaction.txHash}`}
-                            target="_blank"
-                            className="text-lg block underline"
-                          >
-                            {transaction.txHash.slice(0, 12)}...
-                          </a>
+                          <Form method="post">
+                            <input
+                              type="hidden"
+                              name="githubInstallationId"
+                              value={userData.githubInstallationId?.toString() as string}
+                            />
+                            <input type="hidden" name="formType" value="getTransaction" />
+                            <input type="hidden" name="apiKey" value={userData.ApiKey?.key} />
+                            <input type="hidden" name="txHash" value={transaction.txHash} />
+                            <button
+                              // href={`http://localhost:3003/${transaction.txHash}`}
+                              // target="_blank"
+
+                              className="text-lg block underline"
+                              type="submit"
+                            >
+                              {transaction.txHash.slice(0, 12)}...
+                            </button>
+                          </Form>
                         </td>
                         <td>
                           <p className="text-lg">{transaction.functionName}</p>
@@ -922,6 +1030,7 @@ export default function Index() {
                     ))}
                   </tbody>
                 </table>
+                {actionArgs?.originCallForm == "getTransaction" && <>{actionArgs.txDetails}</>}
               </div>
             </div>
           </div>
