@@ -346,8 +346,8 @@ export default function Index() {
         </>
       ) : (
         <div id="content" className="w-3/4 max-w-7xl mx-auto rounded-lg mt-40 pb-40">
-          <div className="text-4xl flex gap-10 flex-row justify-between rounded-lg">
-            <div className="w-2/5">
+          <div className="text-4xl flex gap-10 flex-col xl:flex-row justify-between rounded-lg">
+            <div className="w-full xl:w-2/5">
               <div className="flex flex-col rounded-lg gap-10">
                 <div className="text-xl gap-2 bg-[#F5F5F5] shadow-md	 p-5 flex flex-col rounded-lg">
                   <p className="pb-2 text-4xl">Details:</p>
@@ -647,63 +647,62 @@ export default function Index() {
                         (method: AbiFunctionType, i: number) => (
                           <div key={i}>
                             {(method.stateMutability == "view" ||
-                              method.stateMutability == "pure") && (
-                              <li className="text-lg py-1">
-                                <div className="flex flex-row justify-between items-center">
-                                  {JSON.stringify(method["name"]).replace(/['"]+/g, "")}
-                                  <button
-                                    onClick={async () => {
-                                      setFunctionCalled(method.name);
+                              method.stateMutability == "pure") &&
+                              method.type == "function" && (
+                                <li className="text-lg py-1">
+                                  <div className="flex flex-row justify-between items-center">
+                                    {JSON.stringify(method["name"]).replace(/['"]+/g, "")}
+                                    <button
+                                      onClick={async () => {
+                                        setFunctionCalled(method.name);
 
-                                      let returnedData = await callContractFunction(
-                                        method,
-                                        userData?.Repository?.contractAbi as string,
-                                        userData?.Repository?.contractAddress as `0x${string}`,
-                                        getFunctionArgsFromInput(method),
-                                        userData?.ApiKey?.key as string
-                                      );
-                                      setFunctionCalled(null);
+                                        let returnedData = await callContractFunction(
+                                          method,
+                                          userData?.Repository?.contractAbi as string,
+                                          userData?.Repository?.contractAddress as `0x${string}`,
+                                          getFunctionArgsFromInput(method),
+                                          userData?.ApiKey?.key as string
+                                        );
+                                        setFunctionCalled(null);
 
-                                      setFunctionReturn(returnedData);
-                                    }}
-                                    className="text-[#f0f0f0] bg-[#121212] py-2 px-4 border rounded-lg"
-                                  >
-                                    {functionCalled == method.name ? (
-                                      <div className="flex flex-row items-center">
-                                        <p>Calling</p>{" "}
-                                        <div className="animate-spin ml-2">
-                                          {" "}
-                                          <Loader size={20} />
+                                        setFunctionReturn(returnedData);
+                                      }}
+                                      className="text-[#f0f0f0] bg-[#121212] py-2 px-4 border rounded-lg"
+                                    >
+                                      {functionCalled == method.name ? (
+                                        <div className="flex flex-row items-center">
+                                          <div className="animate-spin">
+                                            <Loader size={20} />
+                                          </div>
                                         </div>
-                                      </div>
-                                    ) : (
-                                      <>Call</>
+                                      ) : (
+                                        <>Call</>
+                                      )}
+                                    </button>
+                                  </div>
+                                  {functionReturn.methodName == method.name &&
+                                    method.outputs.length > 0 && (
+                                      <>
+                                        <p>Returned:</p>
+                                        {method.outputs.map((output, index) => (
+                                          <div
+                                            key={index}
+                                            className="bg-transparent w-1/3 rounded-lg flex flex-row"
+                                          >
+                                            <p>
+                                              &nbsp;&nbsp;
+                                              {functionReturn.returnItems[index].name}:{" "}
+                                            </p>
+                                            <p>
+                                              &nbsp;&nbsp;
+                                              {functionReturn.returnItems[index].value}
+                                            </p>
+                                          </div>
+                                        ))}
+                                      </>
                                     )}
-                                  </button>
-                                </div>
-                                {functionReturn.methodName == method.name &&
-                                  method.outputs.length > 0 && (
-                                    <>
-                                      <p>Returned:</p>
-                                      {method.outputs.map((output, index) => (
-                                        <div
-                                          key={index}
-                                          className="bg-transparent w-1/3 rounded-lg flex flex-row"
-                                        >
-                                          <p>
-                                            &nbsp;&nbsp;
-                                            {functionReturn.returnItems[index].name}:{" "}
-                                          </p>
-                                          <p>
-                                            &nbsp;&nbsp;
-                                            {functionReturn.returnItems[index].value}
-                                          </p>
-                                        </div>
-                                      ))}
-                                    </>
-                                  )}
-                              </li>
-                            )}
+                                </li>
+                              )}
                           </div>
                         )
                       )}
@@ -712,85 +711,34 @@ export default function Index() {
 
                     {JSON.parse(userData?.Repository?.contractAbi).map(
                       (method: AbiFunctionType, i: number) => (
-                        <div key={i}>
+                        <>
                           {!(
                             method.stateMutability == "view" || method.stateMutability == "pure"
-                          ) && (
-                            <li className="text-lg">
-                              <>
-                                <Accordion.Root type="multiple" className="w-full relative py-2">
-                                  <Accordion.Item
-                                    key={method.name}
-                                    value={method.name as string}
-                                    className=""
-                                  >
-                                    {method.inputs.length > 0 ? (
-                                      <Accordion.Trigger className="group">
-                                        <p>{method.name}</p>
-                                        <div className="absolute  right-0 top-0  transition-transform group-data-[state=open]:rotate-180">
-                                          <ChevronDown
-                                            size={40}
-                                            strokeWidth={1.25}
-                                            strokeLinecap="round"
-                                            className="w-16"
-                                          />
-                                        </div>
-                                      </Accordion.Trigger>
-                                    ) : (
-                                      <div className="flex flex-row justify-between items-center">
-                                        <p>{method.name}</p>
-                                        <button
-                                          onClick={async () => {
-                                            if (Boolean(address)) {
-                                              setFunctionCalled(method.name);
-                                              try {
-                                                let returnedData = await callContractFunction(
-                                                  method,
-                                                  userData?.Repository?.contractAbi as string,
-                                                  userData?.Repository
-                                                    ?.contractAddress as `0x${string}`,
-                                                  getFunctionArgsFromInput(method),
-                                                  userData?.ApiKey?.key as string
-                                                );
-                                                setFunctionCalled(null);
-
-                                                setFunctionReturn(returnedData);
-                                              } catch (error) {
-                                                setFunctionCalled(null);
-                                              }
-                                            }
-                                          }}
-                                          className="text-[#f0f0f0] bg-[#121212] py-2 px-4 border rounded-lg disabled:bg-[#cbcbcb]"
-                                          disabled={!Boolean(address)}
-                                        >
-                                          {functionCalled == method.name ? (
-                                            <div className="flex flex-row items-center">
-                                              <p>Calling</p>{" "}
-                                              <div className="animate-spin ml-2">
-                                                {" "}
-                                                <Loader size={20} />
-                                              </div>
-                                            </div>
-                                          ) : (
-                                            <>Call</>
-                                          )}
-                                        </button>
-                                      </div>
-                                    )}
-                                    {method.inputs.length > 0 && (
-                                      <Accordion.Content>
-                                        <div className="flex flex-row justify-between mt-4">
-                                          <div className="flex flex-col mt-2 gap-2">
-                                            {method.inputs.map((input) => (
-                                              <input
-                                                key={input.name}
-                                                id={`${method.name}-${input.name}`}
-                                                className="bg-transparent rounded-lg"
-                                                type="text"
-                                                placeholder={`${input.type}: ${input.name}`}
-                                              />
-                                            ))}{" "}
+                          ) &&
+                            method.type == "function" && (
+                              <li className="text-lg">
+                                <>
+                                  <Accordion.Root type="multiple" className="w-full relative py-2">
+                                    <Accordion.Item
+                                      key={method.name}
+                                      value={method.name as string}
+                                      className=""
+                                    >
+                                      {method.inputs.length > 0 ? (
+                                        <Accordion.Trigger className="group">
+                                          <p>{method.name}</p>
+                                          <div className="absolute  right-0 top-0  transition-transform group-data-[state=open]:rotate-180">
+                                            <ChevronDown
+                                              size={40}
+                                              strokeWidth={1.25}
+                                              strokeLinecap="round"
+                                              className="w-16"
+                                            />
                                           </div>
+                                        </Accordion.Trigger>
+                                      ) : (
+                                        <div className="flex flex-row justify-between items-center">
+                                          <p>{method.name}</p>
                                           <button
                                             onClick={async () => {
                                               if (Boolean(address)) {
@@ -817,9 +765,7 @@ export default function Index() {
                                           >
                                             {functionCalled == method.name ? (
                                               <div className="flex flex-row items-center">
-                                                <p>Calling</p>{" "}
-                                                <div className="animate-spin ml-2">
-                                                  {" "}
+                                                <div className="animate-spin">
                                                   <Loader size={20} />
                                                 </div>
                                               </div>
@@ -828,42 +774,94 @@ export default function Index() {
                                             )}
                                           </button>
                                         </div>
-                                      </Accordion.Content>
-                                    )}
-                                  </Accordion.Item>
-                                </Accordion.Root>
-                              </>
-                              {functionReturn.methodName == method.name &&
-                                method.outputs.length > 0 && (
-                                  <>
-                                    <p>Returned:</p>
-                                    {method.outputs.map((output, index) => (
-                                      <div
-                                        key={index}
-                                        className="bg-transparent w-1/3 rounded-lg flex flex-row"
-                                      >
-                                        <p>
-                                          &nbsp;&nbsp;
-                                          {functionReturn.returnItems[index].name}:{" "}
-                                        </p>
-                                        <p>
-                                          &nbsp;&nbsp;
-                                          {functionReturn.returnItems[index].value}
-                                        </p>
-                                      </div>
-                                    ))}
-                                  </>
-                                )}
-                            </li>
-                          )}
-                        </div>
+                                      )}
+                                      {method.inputs.length > 0 && (
+                                        <Accordion.Content>
+                                          <div className="flex flex-row justify-between mt-4">
+                                            <div className="flex flex-col mt-2 gap-2">
+                                              {method.inputs.map((input) => (
+                                                <input
+                                                  key={input.name}
+                                                  id={`${method.name}-${input.name}`}
+                                                  className="bg-transparent rounded-lg"
+                                                  type="text"
+                                                  placeholder={`${input.type}: ${input.name}`}
+                                                />
+                                              ))}
+                                            </div>
+                                            <button
+                                              onClick={async () => {
+                                                if (Boolean(address)) {
+                                                  setFunctionCalled(method.name);
+                                                  try {
+                                                    let returnedData = await callContractFunction(
+                                                      method,
+                                                      userData?.Repository?.contractAbi as string,
+                                                      userData?.Repository
+                                                        ?.contractAddress as `0x${string}`,
+                                                      getFunctionArgsFromInput(method),
+                                                      userData?.ApiKey?.key as string
+                                                    );
+                                                    setFunctionCalled(null);
+
+                                                    setFunctionReturn(returnedData);
+                                                  } catch (error) {
+                                                    setFunctionCalled(null);
+                                                  }
+                                                }
+                                              }}
+                                              className="text-[#f0f0f0] bg-[#121212] py-2 px-4 border rounded-lg disabled:bg-[#cbcbcb]"
+                                              disabled={!Boolean(address)}
+                                            >
+                                              {functionCalled == method.name ? (
+                                                <div className="flex flex-row items-center">
+                                                  <p>Calling</p>{" "}
+                                                  <div className="animate-spin">
+                                                    {" "}
+                                                    <Loader size={20} />
+                                                  </div>
+                                                </div>
+                                              ) : (
+                                                <>Call</>
+                                              )}
+                                            </button>
+                                          </div>
+                                        </Accordion.Content>
+                                      )}
+                                    </Accordion.Item>
+                                  </Accordion.Root>
+                                </>
+                                {functionReturn.methodName == method.name &&
+                                  method.outputs.length > 0 && (
+                                    <>
+                                      <p>Returned:</p>
+                                      {method.outputs.map((output, index) => (
+                                        <div
+                                          key={index}
+                                          className="bg-transparent w-1/3 rounded-lg flex flex-row"
+                                        >
+                                          <p>
+                                            &nbsp;&nbsp;
+                                            {functionReturn.returnItems[index].name}:{" "}
+                                          </p>
+                                          <p>
+                                            &nbsp;&nbsp;
+                                            {functionReturn.returnItems[index].value}
+                                          </p>
+                                        </div>
+                                      ))}
+                                    </>
+                                  )}
+                              </li>
+                            )}
+                        </>
                       )
                     )}
                   </ul>
                 </div>
               </div>
             </div>
-            <div className="flex flex-col w-3/5 gap-10">
+            <div className="flex flex-col w-full xl:w-3/5 gap-10">
               <div className="flex-1  bg-[#F5F5F5] shadow-md	 p-5 rounded-lg ">
                 <div className="flex flex-row justify-between items-center">
                   <p className="pb-2">Transactions:</p>
