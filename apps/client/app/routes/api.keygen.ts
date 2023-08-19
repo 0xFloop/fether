@@ -1,5 +1,5 @@
 import { ActionArgs, redirect } from "@vercel/remix";
-import { db } from "../../utils/db.server";
+import { db } from "../utils/db.server";
 import { KeyTier } from "database";
 
 export const action = async ({ request }: ActionArgs) => {
