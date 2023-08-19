@@ -12,7 +12,7 @@ import { App as Octo } from "octokit";
 import { zodContractBuildFileSchema } from "./octo.server";
 import { Abi } from "abitype/zod";
 import { UserWithKeyRepoActivity } from "~/types";
-import { fetherChainFromKey } from "./helpers.server";
+import { fetherChainFromKey } from "./helpers";
 
 function getGithubPk() {
   const githubAppPk = process.env.appPK as string;
@@ -162,4 +162,47 @@ export const BaseFetherChain: Chain = {
     },
   },
   testnet: false,
+};
+export const timeSince = (_date: any) => {
+  var date = Date.parse(_date);
+  if (isNaN(date)) {
+    date = new Date(_date * 1000).getTime();
+  }
+  //@ts-ignore
+  var seconds = Math.floor((new Date() - date) / 1000);
+  var intervalType;
+
+  var interval = Math.floor(seconds / 31536000);
+  if (interval >= 1) {
+    intervalType = "year";
+  } else {
+    interval = Math.floor(seconds / 2592000);
+    if (interval >= 1) {
+      intervalType = "month";
+    } else {
+      interval = Math.floor(seconds / 86400);
+      if (interval >= 1) {
+        intervalType = "day";
+      } else {
+        interval = Math.floor(seconds / 3600);
+        if (interval >= 1) {
+          intervalType = "hour";
+        } else {
+          interval = Math.floor(seconds / 60);
+          if (interval >= 1) {
+            intervalType = "minute";
+          } else {
+            interval = seconds;
+            intervalType = "second";
+          }
+        }
+      }
+    }
+  }
+
+  if (interval > 1 || interval === 0) {
+    intervalType += "s";
+  }
+
+  return interval + " " + intervalType;
 };

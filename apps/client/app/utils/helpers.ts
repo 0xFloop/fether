@@ -25,7 +25,25 @@ export const getTransactionDetails = async (
   let txReciept = await publicClient.getTransactionReceipt({
     hash: txHash as `0x${string}`,
   });
-  console.log(txReciept);
+
+  if (txReciept) {
+    return {
+      hash: txReciept.transactionHash,
+      blockNumber: Number(txReciept.blockNumber),
+      from: txReciept.from,
+      to: txReciept.to,
+      created: txReciept.contractAddress,
+      gasUsed: Number(txReciept.cumulativeGasUsed),
+      maxPriorityFee: Number(txReciept.effectiveGasPrice),
+      maxFee: Number(txReciept.effectiveGasPrice),
+      gasPrice: Number(txReciept.effectiveGasPrice),
+      transactionFeeWei: Number(txReciept.effectiveGasPrice) * Number(txReciept.cumulativeGasUsed),
+      status: txReciept.status,
+      timestamp: Number(
+        (await publicClient.getBlock({ blockNumber: txReciept.blockNumber })).timestamp
+      ),
+    };
+  }
 
   return null;
 };
@@ -38,6 +56,7 @@ export const callContractFunction = async (
   apiKey: string
 ): Promise<ContractReturn> => {
   let parsedAbi = Abi.parse(JSON.parse(contractAbi));
+
   let method = AbiFunction.parse(methodString);
 
   let fetherChainFromApiKey = fetherChainFromKey(apiKey);
@@ -81,7 +100,7 @@ export const callContractFunction = async (
       chain: fetherChainFromApiKey,
       transport: http(),
     });
-
+    console.log(method.name);
     const { request } = await publicClient.simulateContract({
       account: address,
       address: contractAddress,
@@ -89,7 +108,7 @@ export const callContractFunction = async (
       functionName: method.name,
       args: args,
     });
-
+    console.log("request exists: " + Boolean(request));
     let tx = await walletClient.writeContract(request);
 
     //TODO idk wtf is going on here lol
