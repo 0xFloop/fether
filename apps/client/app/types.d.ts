@@ -21,17 +21,17 @@ export type ContractReturn = { methodName: string; returnItems: ContractReturnIt
 
 export type TxDetails = {
   hash: string;
-  status: "Succeded" | "Failed" | "Pending" | "Unknown";
+  status: "success" | "reverted";
   timestamp: number;
   blockNumber: number;
   from: string;
   to: string | null;
   created: string | null;
-  gasUsed: string;
-  maxPriorityFee: string;
-  maxFee: string;
-  nonce: number;
-  transactionFee: string;
+  gasUsed: number;
+  gasPrice: number;
+  maxPriorityFee: number;
+  maxFee: number;
+  transactionFeeWei: number;
 };
 
 export type DashboardActionReturn = {
