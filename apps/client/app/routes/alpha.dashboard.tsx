@@ -22,7 +22,8 @@ import {
   fetherChainFromKey,
   determineSetupStep,
   getTransactionDetails,
-} from "~/utils/helpers.server";
+  timeSince,
+} from "~/utils/helpers";
 import * as Accordion from "@radix-ui/react-accordion";
 import { useAccount, useBalance } from "wagmi";
 
@@ -43,6 +44,7 @@ export function links() {
 import { CustomConnectButton } from "../components/ConnectButton";
 import { createTestClient, http, parseEther, isAddress, createPublicClient } from "viem";
 import NewSetupWizard from "~/components/SetupWizard";
+import TxViewer from "~/components/TxViewer";
 
 //TODO: fix compatibility with other repo's. display dirs and files in a tree structure
 //TODO: create error page
@@ -246,14 +248,15 @@ export const action = async ({ request }: ActionArgs): Promise<DashboardActionRe
               error: "null txHash or apiKey",
             };
           }
-          let txDetails = getTransactionDetails(txHash as `0x${string}`, apiKey as string);
+          let txDetails = await getTransactionDetails(txHash as `0x${string}`, apiKey as string);
+
           return {
             originCallForm: "getTransaction",
             chosenRepoName: null,
             repositories: null,
             solFilesFromChosenRepo: null,
             chosenFileName: null,
-            txDetails: null,
+            txDetails: txDetails,
             error: null,
           };
         default:
@@ -267,15 +270,6 @@ export const action = async ({ request }: ActionArgs): Promise<DashboardActionRe
             error: null,
           };
       }
-      return {
-        originCallForm: "",
-        chosenRepoName: null,
-        repositories: null,
-        solFilesFromChosenRepo: null,
-        chosenFileName: null,
-        txDetails: null,
-        error: null,
-      };
     } catch (e: any) {
       if (e.message == "Not Found") {
         return {
@@ -379,52 +373,11 @@ export default function Index() {
       setCopied(false);
     }
   };
-  const timeSince = (_date: any) => {
-    var date = Date.parse(_date);
-    //@ts-ignore
-    var seconds = Math.floor((new Date() - date) / 1000);
-    var intervalType;
-
-    var interval = Math.floor(seconds / 31536000);
-    if (interval >= 1) {
-      intervalType = "year";
-    } else {
-      interval = Math.floor(seconds / 2592000);
-      if (interval >= 1) {
-        intervalType = "month";
-      } else {
-        interval = Math.floor(seconds / 86400);
-        if (interval >= 1) {
-          intervalType = "day";
-        } else {
-          interval = Math.floor(seconds / 3600);
-          if (interval >= 1) {
-            intervalType = "hour";
-          } else {
-            interval = Math.floor(seconds / 60);
-            if (interval >= 1) {
-              intervalType = "minute";
-            } else {
-              interval = seconds;
-              intervalType = "second";
-            }
-          }
-        }
-      }
-    }
-
-    if (interval > 1 || interval === 0) {
-      intervalType += "s";
-    }
-
-    return interval + " " + intervalType;
-  };
 
   return (
     <div className="selection:bg-accent selection:text-primary-gray max-w-screen h-auto min-h-screen overflow-hidden display flex flex-col items-center justify-center text-[#121212]">
       {!userData?.Repository?.contractAbi ? (
         <>
-          {/* <OldSetupWizard userData={userData} navigation={navigation} actionArgs={actionArgs} /> */}
           <NewSetupWizard
             loaderData={loaderData}
             navigation={navigation}
@@ -1022,7 +975,9 @@ export default function Index() {
                     ))}
                   </tbody>
                 </table>
-                {actionArgs?.originCallForm == "getTransaction" && <>{actionArgs.txDetails}</>}
+                {actionArgs?.originCallForm == "getTransaction" && actionArgs.txDetails && (
+                  <TxViewer txDetails={actionArgs.txDetails} />
+                )}
               </div>
             </div>
           </div>
