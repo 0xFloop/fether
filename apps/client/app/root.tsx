@@ -18,13 +18,13 @@ export const meta: V2_MetaFunction = () => {
 
 export default function App() {
   return (
-    <html lang="en" className="h-full">
+    <html lang="en" className="h-full bg-primary-gray">
       <head>
         <Meta />
         <Links />
       </head>
       <body>
-        <div className="mx-auto min-h-screen bg-[#f0f0f0]">
+        <div className="mx-auto min-h-screen">
           <Outlet />
         </div>
         <ScrollRestoration />

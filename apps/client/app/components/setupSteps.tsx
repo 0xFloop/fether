@@ -31,7 +31,7 @@ const GenerateKeyComponent: React.FC<setupProps> = (props: setupProps) => {
         <button
           disabled={props.navigation.state === "submitting"}
           type="submit"
-          className="py-4 px-6 bg-secondary-blue border rounded-lg flex flex-row border-[#6161FF]"
+          className="py-4 px-6 bg-accent border rounded-lg flex flex-row border-[#6161FF]"
         >
           {props.navigation.state == "submitting" ? (
             <div className="flex flex-row items-center">
@@ -53,10 +53,7 @@ const InstallGithubAppComponent: React.FC<setupProps> = (props: setupProps) => {
   return (
     <div className="h-full w-full flex items-center align-middle justify-center">
       <Form method="post" action="/api/gh-app-install">
-        <button
-          type="submit"
-          className="py-4 px-6 bg-secondary-blue border rounded-lg border-[#6161FF]"
-        >
+        <button type="submit" className="py-4 px-6 bg-accent border rounded-lg border-[#6161FF]">
           Click to add github FetherKit app
         </button>
       </Form>
@@ -80,7 +77,7 @@ const SelectRepoComponent: React.FC<setupProps> = (props: setupProps) => {
             {props.navigation.state == "submitting" &&
             props.navigation.formData &&
             props.navigation.formData.get("formType") == "getAllRepos" ? (
-              <div className="flex flex-row items-center py-4 px-6 bg-secondary-blue border rounded-lg border-[#6161FF]">
+              <div className="flex flex-row items-center py-4 px-6 bg-accent border rounded-lg border-[#6161FF]">
                 Loading repositories
                 <div className="ml-5 animate-spin">
                   <Loader size={24} />
@@ -89,7 +86,7 @@ const SelectRepoComponent: React.FC<setupProps> = (props: setupProps) => {
             ) : (
               <button
                 type="submit"
-                className="py-4 px-6 bg-secondary-blue border rounded-lg border-[#6161FF]"
+                className="py-4 px-6 bg-accent border rounded-lg border-[#6161FF]"
               >
                 Click to load repositories
               </button>
@@ -101,7 +98,7 @@ const SelectRepoComponent: React.FC<setupProps> = (props: setupProps) => {
           {props.userData?.Repository?.name && (
             <button
               onClick={() => props.updateStep(3)}
-              className="py-3 px-5 bg-secondary-blue border rounded-lg border-[#6161FF] absolute bottom-7 right-10"
+              className="py-3 px-5 bg-accent border rounded-lg border-[#6161FF] absolute bottom-7 right-10"
             >
               <p>Next</p>
             </button>
@@ -135,7 +132,7 @@ const SelectRepoComponent: React.FC<setupProps> = (props: setupProps) => {
           {repoChosen && (
             <button
               type="submit"
-              className="py-3 px-5 bg-secondary-blue border rounded-lg border-[#6161FF]  absolute bottom-7 right-10"
+              className="py-3 px-5 bg-accent border rounded-lg border-[#6161FF]  absolute bottom-7 right-10"
             >
               {props.navigation.state == "submitting" &&
               props.navigation.formData &&
@@ -168,7 +165,7 @@ const SelectSmartContract: React.FC<setupProps> = (props: setupProps) => {
             {props.navigation.state == "submitting" &&
             props.navigation.formData &&
             props.navigation.formData.get("formType") == "getFilesOfChosenRepo" ? (
-              <div className="flex flex-row items-center py-4 px-6 bg-secondary-blue border rounded-lg border-[#6161FF]">
+              <div className="flex flex-row items-center py-4 px-6 bg-accent border rounded-lg border-[#6161FF]">
                 Loading files
                 <div className="ml-5 animate-spin">
                   <Loader size={24} />
@@ -177,7 +174,7 @@ const SelectSmartContract: React.FC<setupProps> = (props: setupProps) => {
             ) : (
               <button
                 type="submit"
-                className="py-4 px-6 bg-secondary-blue border rounded-lg border-[#6161FF]"
+                className="py-4 px-6 bg-accent border rounded-lg border-[#6161FF]"
               >
                 Click to load solidity files
               </button>
@@ -189,7 +186,7 @@ const SelectSmartContract: React.FC<setupProps> = (props: setupProps) => {
           {props.userData?.Repository?.filename && (
             <button
               onClick={() => props.updateStep(4)}
-              className="py-3 px-5 bg-secondary-blue border rounded-lg border-[#6161FF] absolute bottom-7 right-10"
+              className="py-3 px-5 bg-accent border rounded-lg border-[#6161FF] absolute bottom-7 right-10"
             >
               <p>Next</p>
             </button>
@@ -224,7 +221,7 @@ const SelectSmartContract: React.FC<setupProps> = (props: setupProps) => {
             {fileChosen && (
               <button
                 type="submit"
-                className="py-3 px-5 bg-secondary-blue border rounded-lg border-[#6161FF] absolute bottom-7 right-10"
+                className="py-3 px-5 bg-accent border rounded-lg border-[#6161FF] absolute bottom-7 right-10"
               >
                 {props.navigation.state == "submitting" &&
                 props.navigation.formData &&
@@ -279,7 +276,7 @@ const SetDeployerComponent: React.FC<setupProps> = (props: setupProps) => {
             onChange={handleAddressChange}
           />
           <button
-            className="text-white h-full text-xl disabled:bg-gray-400 bg-secondary-blue py-2 px-4 border rounded-r-lg"
+            className="text-white h-full text-xl disabled:bg-gray-400 bg-accent py-2 px-4 border rounded-r-lg"
             type="submit"
             disabled={!addressValid}
           >
@@ -294,7 +291,7 @@ const SetDeployerComponent: React.FC<setupProps> = (props: setupProps) => {
       {props.userData?.Repository?.deployerAddress && (
         <button
           onClick={() => props.updateStep(5)}
-          className="py-3 px-5 bg-secondary-blue border rounded-lg border-[#6161FF] absolute bottom-7 right-10"
+          className="py-3 px-5 bg-accent border rounded-lg border-[#6161FF] absolute bottom-7 right-10"
         >
           <p>Next</p>
         </button>
@@ -316,17 +313,14 @@ const DeployContractComponent: React.FC<setupProps> = (props: setupProps) => {
         {props.navigation.state == "submitting" &&
         props.navigation.formData &&
         props.navigation.formData.get("formType") == "deployContract" ? (
-          <div className="flex flex-row items-center py-4 px-6 bg-secondary-blue border rounded-lg border-[#6161FF]">
+          <div className="flex flex-row items-center py-4 px-6 bg-accent border rounded-lg border-[#6161FF]">
             Deploying...
             <div className="ml-5 animate-spin">
               <Loader size={24} />
             </div>
           </div>
         ) : (
-          <button
-            type="submit"
-            className="py-4 px-6 bg-secondary-blue border rounded-lg border-[#6161FF]"
-          >
+          <button type="submit" className="py-4 px-6 bg-accent border rounded-lg border-[#6161FF]">
             Click here to deploy your contract
           </button>
         )}

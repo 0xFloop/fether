@@ -2,14 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-@font-face {
-  font-family: "HelveticaNeue";
-  font-style: normal;
-  font-weight: normal;
-  font-display: swap;
-  src: url("/fonts/HelveticaNeue.woff2") format("woff2");
-}
-
 @layer utilities {
   /* Chrome, Safari, and Opera */
   .no-scrollbar::-webkit-scrollbar {

@@ -20,7 +20,7 @@ const SetupWizard: React.FC<SetupWizardProps> = (props: SetupWizardProps) => {
       {setupSteps[setupStep].iconUrl && (
         <div className="w-[1100px] max-w-7xl h-[750px] flex flex-row justify-between items-center">
           <div className="text-white rounded-l-3xl h-full w-1/3 p-4 bg-[#1E1E1E] flex flex-col gap-4">
-            <p className="text-lg mt-4 bg-secondary-blue w-20 rounded-lg text-center">Alpha</p>
+            <p className="text-lg mt-4 bg-accent w-20 rounded-lg text-center">Alpha</p>
             <h1 className="text-5xl">Welcome to Fether setup wizard</h1>
             <p className="text-lg">Let's get things set up for you!</p>
             <div id="step-selector" className="flex flex-col justify-between flex-1">
@@ -33,7 +33,7 @@ const SetupWizard: React.FC<SetupWizardProps> = (props: SetupWizardProps) => {
                     }
                   }}
                   className={
-                    (setupStep == index ? "bg-secondary-blue " : "") +
+                    (setupStep == index ? "bg-accent " : "") +
                     "w-full p-4 flex flex-row items-center border rounded-lg border-[#6161FF]"
                   }
                 >

@@ -420,16 +420,8 @@ export default function Index() {
     return interval + " " + intervalType;
   };
 
-  const viewTx = async (index: number) => {
-    const activity = userData?.Repository?.Activity;
-    if (!activity) return;
-    const tx = activity[index];
-    if (!tx) return;
-    console.log(tx.txHash);
-  };
-
   return (
-    <div className="max-w-screen h-auto min-h-screen overflow-hidden display flex flex-col items-center justify-center text-[#121212]">
+    <div className="selection:bg-accent selection:text-primary-gray max-w-screen h-auto min-h-screen overflow-hidden display flex flex-col items-center justify-center text-[#121212]">
       {!userData?.Repository?.contractAbi ? (
         <>
           {/* <OldSetupWizard userData={userData} navigation={navigation} actionArgs={actionArgs} /> */}
@@ -441,11 +433,11 @@ export default function Index() {
           />
         </>
       ) : (
-        <div id="content" className="w-3/4 max-w-7xl mx-auto rounded-lg mt-40 pb-40">
+        <div id="content" className="w-3/4 max-w-7xl mx-auto rounded-lg mt-40 pb-40 text-white">
           <div className="text-4xl flex gap-10 flex-col xl:flex-row justify-between rounded-lg">
-            <div className="w-full xl:w-2/5">
+            <div className="w-full xl:w-2/5 ">
               <div className="flex flex-col rounded-lg gap-10">
-                <div className="text-xl gap-2 bg-[#F5F5F5] shadow-md	 p-5 flex flex-col rounded-lg">
+                <div className="text-xl gap-2 bg-secondary-gray border border-secondary-border shadow-md	 p-5 flex flex-col rounded-lg">
                   <p className="pb-2 text-4xl">Details:</p>
                   <div className="flex flex-row justify-between rounded-lg">
                     <p className="text-2xl ">Api Key:</p>
@@ -493,7 +485,7 @@ export default function Index() {
                       </Form>
                     </div>
                     {actionArgs?.originCallForm == "getRepos" && (
-                      <div className="absolute left-1/4 w-1/2 p-5 z-10 bg-[#f0f0f0] border border-[#121212] rounded-lg">
+                      <div className="absolute left-1/4 w-1/2 p-5 z-10 bg-secondary-gray border border-white rounded-lg">
                         <div className="w-full justify-between flex flex-row">
                           <p className="text-2xl">Choose Repository:</p>
                           <Form method="post">
@@ -531,7 +523,7 @@ export default function Index() {
 
                           <button
                             type="submit"
-                            className="text-[#f0f0f0] bg-[#121212] py-2 px-4 border rounded-lg"
+                            className="text-black bg-accent py-2 px-4 border rounded-lg"
                           >
                             {navigation.state == "submitting" &&
                             navigation.formData?.get("formType") == "getChosenRepo" ? (
@@ -603,7 +595,7 @@ export default function Index() {
                               <br />
                               <button
                                 type="submit"
-                                className="text-[#f0f0f0] bg-[#121212] py-2 px-4 border rounded-lg"
+                                className="text-[#f0f0f0] bg-black py-2 px-4 border rounded-lg"
                               >
                                 {navigation.state == "submitting" &&
                                 navigation.formData?.get("formType") == "chooseFileToTrack" ? (
@@ -673,7 +665,7 @@ export default function Index() {
                                   placeholder="Input desired contract deployer address"
                                 />
                                 <button
-                                  className="text-[#f0f0f0] text-xl bg-[#121212] py-2 px-4 border rounded-lg"
+                                  className="text-[#f0f0f0] text-xl bg-black py-2 px-4 border rounded-lg"
                                   type="submit"
                                 >
                                   Set Deployer Address
@@ -695,7 +687,7 @@ export default function Index() {
                   </div>
                 </div>
 
-                <div className="flex flex-col bg-[#F5F5F5] shadow-md	 p-5 rounded-lg">
+                <div className="flex flex-col bg-secondary-gray  border border-secondary-border  shadow-md	 p-5 rounded-lg">
                   <div className="flex flex-row justify-between">
                     <p>Functions: </p>
                     <div className="text-lg">
@@ -717,7 +709,7 @@ export default function Index() {
 
                           {navigation.state == "submitting" &&
                           navigation.formData?.get("formType") == "fundWallet" ? (
-                            <div className="text-[#f0f0f0] bg-[#121212] py-2 mt-2 px-4 text-xl border rounded-lg flex flex-row items-center  float-right">
+                            <div className="text-[#f0f0f0] bg-black py-2 mt-2 px-4 text-xl border rounded-lg flex flex-row items-center  float-right">
                               +1 FEth
                               <div className="animate-spin items-center ml-3">
                                 <Loader size={20} />
@@ -726,7 +718,7 @@ export default function Index() {
                           ) : (
                             <button
                               type="submit"
-                              className="text-[#f0f0f0] bg-[#121212] py-2 px-4 border rounded-lg mt-2 text-xl float-right"
+                              className="text-[#f0f0f0] bg-black py-2 px-4 rounded-lg mt-2 text-xl float-right"
                             >
                               Add FEth
                             </button>
@@ -736,8 +728,8 @@ export default function Index() {
                     </div>
                   )}
 
-                  <ul className="flex flex-col gap-2 bg-[#F5F5F5]  rounded-lg">
-                    <p className="text-2xl border-b border-b-[#121212]">Read</p>
+                  <ul className="flex flex-col gap-2 rounded-lg">
+                    <p className="text-2xl border-b border-b-[#363636]">Read</p>
                     <div className="py-2">
                       {JSON.parse(userData?.Repository?.contractAbi as string).map(
                         (method: AbiFunctionType, i: number) => (
@@ -763,7 +755,7 @@ export default function Index() {
 
                                         setFunctionReturn(returnedData);
                                       }}
-                                      className="text-[#f0f0f0] bg-[#121212] py-2 px-4 border rounded-lg"
+                                      className="text-[#f0f0f0] bg-black py-2 px-4 rounded-lg"
                                     >
                                       {functionCalled == method.name ? (
                                         <div className="flex flex-row items-center">
@@ -803,7 +795,7 @@ export default function Index() {
                         )
                       )}
                     </div>
-                    <p className="text-2xl border-b border-b-[#121212]">Write</p>
+                    <p className="text-2xl border-b border-b-[#363636]">Write</p>
 
                     {JSON.parse(userData?.Repository?.contractAbi).map(
                       (method: AbiFunctionType, i: number) => (
@@ -856,7 +848,7 @@ export default function Index() {
                                                 }
                                               }
                                             }}
-                                            className="text-[#f0f0f0] bg-[#121212] py-2 px-4 border rounded-lg disabled:bg-[#cbcbcb]"
+                                            className="text-[#f0f0f0] bg-black py-2 px-4 rounded-lg disabled:bg-[#cbcbcb]"
                                             disabled={!Boolean(address)}
                                           >
                                             {functionCalled == method.name ? (
@@ -906,7 +898,7 @@ export default function Index() {
                                                   }
                                                 }
                                               }}
-                                              className="text-[#f0f0f0] bg-[#121212] py-2 px-4 border rounded-lg disabled:bg-[#cbcbcb]"
+                                              className="text-[#f0f0f0] bg-black py-2 px-4  rounded-lg disabled:bg-[#cbcbcb]"
                                               disabled={!Boolean(address)}
                                             >
                                               {functionCalled == method.name ? (
@@ -958,7 +950,7 @@ export default function Index() {
               </div>
             </div>
             <div className="flex flex-col w-full xl:w-3/5 gap-10">
-              <div className="flex-1  bg-[#F5F5F5] shadow-md	 p-5 rounded-lg ">
+              <div className="flex-1  bg-secondary-gray border border-secondary-border  shadow-md	 p-5 rounded-lg ">
                 <div className="flex flex-row justify-between items-center">
                   <p className="pb-2">Transactions:</p>
 
@@ -971,7 +963,7 @@ export default function Index() {
                     <input type="hidden" name="formType" value="deployContract" />
 
                     <button
-                      className="text-xl text-[#f0f0f0] bg-[#121212] py-2 px-4 rounded-lg"
+                      className="text-xl text-[#f0f0f0] bg-black py-2 px-4 rounded-lg"
                       type="submit"
                     >
                       {navigation.state == "submitting" &&

@@ -60,7 +60,7 @@ export default function Index() {
   const data = useActionData<typeof action>();
   const { hasAccess } = useLoaderData<typeof loader>();
   return (
-    <div className="w-screen h-screen overflow-hidden bg-[#f0f0f0]">
+    <div className="w-screen h-screen overflow-hidden text-white selection:bg-accent selection:text-primary-gray">
       <div className="m-auto relative flex flex-col justify-center items-center p-6 text-center w-full h-full">
         <div className="font-display flex flex-row absolute bottom-4 left-6 align-bottom items-baseline">
           <h1 className="text-[100px] leading-[80px] md:text-[150px] md:leading-[120px]">fether</h1>

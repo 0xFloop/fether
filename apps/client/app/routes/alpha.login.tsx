@@ -24,11 +24,11 @@ export const action = async ({ request }: ActionArgs) => {
 };
 export default function Index() {
   return (
-    <div className="w-screen h-screen relative flex items-center justify-center">
-      <div className="w-[500px] relative flex flex-col items-center px-10 py-20 border-x-2 border-black">
+    <div className="w-screen h-screen relative flex items-center justify-center text-white">
+      <div className="w-[500px] relative flex flex-col items-center px-10 py-20 border-x-2 border-white">
         <img
           className="w-16 absolute top-0 left-0"
-          src="/images/fetherBlackTransparent.svg"
+          src="/images/fetherWhiteTransparent.svg"
           alt="fether logo"
         />
         <h1 className="text-xl mt-10">
@@ -36,7 +36,7 @@ export default function Index() {
           continuous contract tracking.
         </h1>
         <Form method="post">
-          <button className="mt-10 px-10 py-5 border-2 border-black rounded" type="submit">
+          <button className="mt-10 px-10 py-5 border-2 border-white rounded" type="submit">
             Log in with GitHub
           </button>
         </Form>
