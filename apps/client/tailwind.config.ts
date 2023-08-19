@@ -12,6 +12,7 @@ export default {
         accent: "#20C20E",
         "primary-gray": "#16161a",
         "secondary-gray": "#1d1d21",
+        "tertiary-gray": "#373740",
         "secondary-border": "#28282e",
         "almost-black": "#121212",
       },
