@@ -6,7 +6,7 @@ contract SecretKeeper is Ownable {
     string public secretPhrase = "asdfsdff";
     uint256 public secretNumber = 100;
 
-    function updateNumber(string memory _secretPhrase) public {
+    function updateSecretPhrase(string memory _secretPhrase) public {
         secretPhrase = _secretPhrase;
     }
 
