@@ -101,7 +101,7 @@ export default function Index() {
             <Typewriter
               options={{
                 strings: [
-                  "Enabling frictionless smart contract <—> frontend relationships.",
+                  "Enabling frictionless smart contract <—> frontend testing.",
                   "Coming soon.",
                 ],
                 autoStart: true,
