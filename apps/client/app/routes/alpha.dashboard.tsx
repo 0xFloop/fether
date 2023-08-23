@@ -375,7 +375,7 @@ export default function Index() {
   };
 
   return (
-    <div className="selection:bg-accent selection:text-primary-gray max-w-screen h-auto min-h-screen overflow-hidden display flex flex-col items-center justify-center text-[#121212]">
+    <div className="selection:bg-accent selection:text-primary-gray max-w-screen h-auto min-h-screen overflow-hidden display flex flex-col items-center justify-center text-[#121212]  ">
       {!userData?.Repository?.contractAbi ? (
         <>
           <NewSetupWizard
@@ -391,7 +391,7 @@ export default function Index() {
             <div className="w-full xl:w-2/5 ">
               <div className="flex flex-col rounded-lg gap-10">
                 <div className="text-xl gap-2 bg-secondary-gray border border-secondary-border shadow-md	 p-5 flex flex-col rounded-lg">
-                  <p className="pb-2 text-4xl">Details:</p>
+                  <p className="pb-2 text-4xl font-primary">Details:</p>
                   <div className="flex flex-row justify-between rounded-lg">
                     <p className="text-2xl ">Api Key:</p>
                     <p className="flex flex-row items-center gap-2">
@@ -642,7 +642,7 @@ export default function Index() {
 
                 <div className="flex flex-col bg-secondary-gray  border border-secondary-border  shadow-md	 p-5 rounded-lg">
                   <div className="flex flex-row justify-between">
-                    <p>Functions: </p>
+                    <p className="font-primary">Functions: </p>
                     <div className="text-lg">
                       <CustomConnectButton />
                     </div>
@@ -905,7 +905,7 @@ export default function Index() {
             <div className="flex flex-col w-full xl:w-3/5 gap-10">
               <div className="flex-1  bg-secondary-gray border border-secondary-border  shadow-md	 p-5 rounded-lg ">
                 <div className="flex flex-row justify-between items-center">
-                  <p className="pb-2">Transactions:</p>
+                  <p className="pb-2 font-primary">Transactions:</p>
 
                   <Form method="post">
                     <input

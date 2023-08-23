@@ -28,7 +28,7 @@ export default function Index() {
         id="navbar"
         className="absolute w-full h-20 border-b text-white border-b-white flex flex-row justify-between items-center z-50 "
       >
-        <Link to="/" id="logo" className="text-5xl flex-1 pl-8 ">
+        <Link to="/" id="logo" className="text-5xl flex-1 pl-8 font-primary">
           fether
         </Link>
         {userHasId && (

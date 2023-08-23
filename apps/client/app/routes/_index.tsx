@@ -63,7 +63,9 @@ export default function Index() {
     <div className="w-screen h-screen overflow-hidden text-white selection:bg-accent selection:text-primary-gray">
       <div className="m-auto relative flex flex-col justify-center items-center p-6 text-center w-full h-full">
         <div className="font-display flex flex-row absolute bottom-4 left-6 align-bottom items-baseline">
-          <h1 className="text-[100px] leading-[80px] md:text-[150px] md:leading-[120px]">fether</h1>
+          <h1 className="text-[100px] leading-[80px] md:text-[150px] md:leading-[120px] font-primary">
+            fether
+          </h1>
         </div>
         <div className="font-display flex flex-row absolute bottom-4 right-6 align-bottom items-baseline">
           {hasAccess && <Link to="/alpha">Access Alpha</Link>}
