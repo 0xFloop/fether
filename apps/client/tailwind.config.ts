@@ -8,12 +8,15 @@ export default {
       body: ["Inter var", "sans-serif"],
     },
     extend: {
+      fontFamily: {
+        primary: ["Poppins"],
+      },
       colors: {
         accent: "#20C20E",
         "primary-gray": "#16161a",
-        "secondary-gray": "#1d1d21",
+        "secondary-gray": "#2a2a2f",
         "tertiary-gray": "#373740",
-        "secondary-border": "#28282e",
+        "secondary-border": "#3b3b3b",
         "almost-black": "#121212",
       },
       keyframes: {},
