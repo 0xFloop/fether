@@ -14,7 +14,7 @@ import { getRootDir, getSolFileNames, getUserRepositories } from "../utils/octo.
 import { Loader, X, ChevronDown, Copy, Edit, CheckCircle } from "lucide-react";
 import { deployContract } from "~/utils/viem.server";
 import { AbiFunction as AbiFunctionType } from "abitype";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   callContractFunction,
   sleep,
@@ -43,8 +43,9 @@ export function links() {
 
 import { CustomConnectButton } from "../components/ConnectButton";
 import { createTestClient, http, parseEther, isAddress, createPublicClient } from "viem";
-import NewSetupWizard from "~/components/SetupWizard";
+import SetupWizard from "~/components/SetupWizard";
 import TxViewer from "~/components/TxViewer";
+import React from "react";
 
 //TODO: fix compatibility with other repo's. display dirs and files in a tree structure
 //TODO: create error page
@@ -147,6 +148,7 @@ export const action = async ({ request }: ActionArgs): Promise<DashboardActionRe
               filename: body.get("chosenFileName") as string,
               contractAbi: null,
               contractAddress: null,
+              deployerAddress: null,
             },
           });
           await db.transaction.deleteMany({
@@ -328,8 +330,11 @@ export const loader = async ({ request }: LoaderArgs) => {
       },
     },
   });
-
-  const setupStep = determineSetupStep(userData);
+  console.log("params");
+  let setupStep = 6;
+  if (!userData?.Repository?.contractAbi) {
+    setupStep = determineSetupStep(userData);
+  }
 
   return { userData, setupStep };
 };
@@ -341,7 +346,7 @@ export default function Index() {
   const submit = useSubmit();
 
   const userData = loaderData.userData;
-  const setupStep = loaderData.setupStep;
+  // const setupStep = loaderData.setupStep;
 
   const { address, isConnected } = useAccount();
   const { data } = useBalance({ address });
@@ -350,7 +355,7 @@ export default function Index() {
   const [copied, setCopied] = useState(false);
   const [functionCalled, setFunctionCalled] = useState<string | null>(null);
   const [functionReturn, setFunctionReturn] = useState<ContractReturn | null>(null);
-  const [txView, setTxView] = useState<TxDetails | null>(null);
+  const [setupStep, setSetupStep] = useState<number>(loaderData.setupStep);
 
   let deployStatus = "Deploy";
 
@@ -373,18 +378,26 @@ export default function Index() {
       setCopied(false);
     }
   };
+  useEffect(() => {
+    setSetupStep(loaderData.setupStep);
+  }, [
+    loaderData.userData?.Repository?.filename,
+    loaderData.userData?.Repository?.name,
+    loaderData.userData?.Repository?.deployerAddress,
+  ]);
 
   return (
-    <div className="selection:bg-accent selection:text-primary-gray max-w-screen h-auto min-h-screen overflow-hidden display flex flex-col items-center justify-center text-[#121212]  ">
+    <div className="selection:bg-accent selection:text-primary-gray max-w-screen h-auto min-h-screen display flex flex-col items-center justify-center text-[#121212]  ">
       {!userData?.Repository?.contractAbi ? (
-        <>
-          <NewSetupWizard
+        <div key={loaderData.setupStep}>
+          <SetupWizard
             loaderData={loaderData}
             navigation={navigation}
             actionArgs={actionArgs}
-            setupStep={setupStep}
+            step={setupStep}
+            updateStep={(step: number) => setSetupStep(step)}
           />
-        </>
+        </div>
       ) : (
         <div id="content" className="w-3/4 max-w-7xl mx-auto rounded-lg mt-40 pb-40 text-white">
           <div className="text-4xl flex gap-10 flex-col xl:flex-row justify-between rounded-lg">
@@ -772,7 +785,7 @@ export default function Index() {
 
                     {JSON.parse(userData?.Repository?.contractAbi).map(
                       (method: AbiFunctionType, i: number) => (
-                        <>
+                        <React.Fragment key={i}>
                           {!(
                             method.stateMutability == "view" || method.stateMutability == "pure"
                           ) &&
@@ -915,7 +928,7 @@ export default function Index() {
                                   )}
                               </li>
                             )}
-                        </>
+                        </React.Fragment>
                       )
                     )}
                   </ul>
@@ -1034,3 +1047,68 @@ export function ErrorBoundary() {
     </div>
   );
 }
+// {
+//   "id": "clldw4v9a00001jsz8h2ha3lm",
+//   "email": null,
+//   "username": "0xFloop",
+//   "passwordHash": null,
+//   "githubId": 95703085,
+//   "githubInstallationId": "40783140",
+//   "createdAt": "2023-08-16T15:31:50.206Z",
+//   "updatedAt": "2023-08-16T15:32:22.258Z",
+//   "ApiKey": {
+//     "key": "clldw4zri00021jszadz5aypp",
+//     "userId": "clldw4v9a00001jsz8h2ha3lm",
+//     "keyTier": "FREE",
+//     "expires": "2023-08-16T16:15:08.043Z",
+//     "createdAt": "2023-08-16T15:31:56.046Z",
+//     "updatedAt": "2023-08-16T15:31:56.046Z"
+//   },
+//   "Repository": {
+//     "id": "610809559",
+//     "name": "0xFloop/fether",
+//     "userId": "clldw4v9a00001jsz8h2ha3lm",
+//     "filename": null,
+//     "contractAddress": null,
+//     "contractAbi": null,
+//     "foundryRootDir": "apps/solidity",
+//     "deployerAddress": null,
+//     "lastDeployed": null,
+//     "createdAt": "2023-08-24T13:56:31.388Z",
+//     "updatedAt": "2023-08-24T17:19:26.489Z",
+//     "Activity": []
+//   }
+// }
+
+// {
+//   "id": "clldw4v9a00001jsz8h2ha3lm",
+//   "email": null,
+//   "username": "0xFloop",
+//   "passwordHash": null,
+//   "githubId": 95703085,
+//   "githubInstallationId": "40783140",
+//   "createdAt": "2023-08-16T15:31:50.206Z",
+//   "updatedAt": "2023-08-16T15:32:22.258Z",
+//   "ApiKey": {
+//     "key": "clldw4zri00021jszadz5aypp",
+//     "userId": "clldw4v9a00001jsz8h2ha3lm",
+//     "keyTier": "FREE",
+//     "expires": "2023-08-16T16:15:08.043Z",
+//     "createdAt": "2023-08-16T15:31:56.046Z",
+//     "updatedAt": "2023-08-16T15:31:56.046Z"
+//   },
+//   "Repository": {
+//     "id": "610809559",
+//     "name": "0xFloop/fether",
+//     "userId": "clldw4v9a00001jsz8h2ha3lm",
+//     "filename": "SecretKeeper.sol",
+//     "contractAddress": null,
+//     "contractAbi": null,
+//     "foundryRootDir": "apps/solidity",
+//     "deployerAddress": null,
+//     "lastDeployed": null,
+//     "createdAt": "2023-08-24T13:56:31.388Z",
+//     "updatedAt": "2023-08-24T17:24:37.415Z",
+//     "Activity": []
+//   }
+// }

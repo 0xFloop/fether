@@ -2,22 +2,22 @@ import { Form, useActionData, useLoaderData, useNavigation } from "@remix-run/re
 import { Info, Loader } from "lucide-react";
 import { useState } from "react";
 import { action, loader } from "~/routes/alpha.dashboard";
-import { setupSteps } from "./setupSteps";
+import { setupSteps } from "./SetupSteps";
 import { UserWithKeyRepoActivity } from "~/types";
 
 export interface SetupWizardProps {
   loaderData: ReturnType<typeof useLoaderData<typeof loader>>;
   actionArgs: ReturnType<typeof useActionData<typeof action>>;
   navigation: ReturnType<typeof useNavigation>;
-  setupStep: number;
+  step: number;
+  updateStep: (step: number) => void;
 }
 
 const SetupWizard: React.FC<SetupWizardProps> = (props: SetupWizardProps) => {
-  const [setupStep, setSetupStep] = useState(props.setupStep);
   const userData = props.loaderData.userData;
   return (
     <>
-      {setupSteps[setupStep].iconUrl && (
+      {setupSteps[props.step].iconUrl && (
         <div className="w-[1100px] max-w-7xl h-[750px] flex flex-row justify-between items-center">
           <div className="text-white border border-secondary-border rounded-l-3xl h-full w-1/3 p-4 bg-[#1E1E1E] flex flex-col gap-4">
             <p className="text-lg mt-4 bg-accent w-20 rounded-lg text-center">Alpha</p>
@@ -26,19 +26,20 @@ const SetupWizard: React.FC<SetupWizardProps> = (props: SetupWizardProps) => {
             <div id="step-selector" className="flex flex-col justify-between flex-1">
               {setupSteps.map((step, index) => (
                 <button
+                  key={step.stepNumber}
                   id={step.stepNumber}
                   onClick={() => {
-                    if (index > 1 && setupStep > index) {
-                      setSetupStep(index);
+                    if (index > 1 && props.step > index) {
+                      props.updateStep(index);
                     }
                   }}
                   className={
-                    (setupStep == index ? "bg-accent " : "") +
+                    (props.step == index ? "bg-accent " : "") +
                     "w-full p-4 flex flex-row items-center border rounded-lg border-[#6161FF]"
                   }
                 >
                   <div className="ml-2 text-base">
-                    {setupStep > index ? (
+                    {props.step > index ? (
                       <img
                         src="/images/setupCheck.svg"
                         alt="step complete checkmark"
@@ -55,18 +56,18 @@ const SetupWizard: React.FC<SetupWizardProps> = (props: SetupWizardProps) => {
           </div>
           <div className="text-white relative rounded-r-3xl h-full bg-[#545454] gap-4 flex flex-col flex-1 pt-10">
             <div className="flex flex-row items-center px-10">
-              <img src={setupSteps[setupStep].iconUrl} alt="setup step icon"></img>
-              <h1 className="text-3xl ml-10">{setupSteps[setupStep].name}</h1>
+              <img src={setupSteps[props.step].iconUrl} alt="setup step icon"></img>
+              <h1 className="text-3xl ml-10">{setupSteps[props.step].name}</h1>
             </div>
             <div className="text-2xl flex items-center min-h-[250px] px-10">
-              {setupSteps[setupStep].description}
+              {setupSteps[props.step].description}
             </div>
-            <div className="flex-1 px-10 ">
-              {setupSteps[setupStep].actionComponent({
+            <div className="flex-1 px-10 overflow-hidden">
+              {setupSteps[props.step].actionComponent({
                 userData: userData as UserWithKeyRepoActivity,
                 navigation: props.navigation,
                 actionArgs: props.actionArgs,
-                updateStep: setSetupStep,
+                updateStep: props.updateStep,
               })}
             </div>
             {props.actionArgs?.error && (
