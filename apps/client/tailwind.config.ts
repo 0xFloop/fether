@@ -12,10 +12,10 @@ export default {
         primary: ["Poppins"],
       },
       colors: {
-        accent: "#20C20E",
+        accent: "#3232FF",
         "primary-gray": "#16161a",
         "secondary-gray": "#2a2a2f",
-        "tertiary-gray": "#373740",
+        "tertiary-gray": "rgb(156 163 175)",
         "secondary-border": "#3b3b3b",
         "almost-black": "#121212",
       },
