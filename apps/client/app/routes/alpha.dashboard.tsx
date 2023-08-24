@@ -391,9 +391,9 @@ export default function Index() {
             <div className="w-full xl:w-2/5 ">
               <div className="flex flex-col rounded-lg gap-10">
                 <div className="text-xl gap-2 bg-secondary-gray border border-secondary-border shadow-md	 p-5 flex flex-col rounded-lg">
-                  <p className="pb-2 text-4xl font-primary">Details:</p>
+                  <p className="pb-2 text-4xl font-primary">Details :</p>
                   <div className="flex flex-row justify-between rounded-lg">
-                    <p className="text-2xl ">Api Key:</p>
+                    <p className="text-2xl font-primary text-tertiary-gray">Api Key :</p>
                     <p className="flex flex-row items-center gap-2">
                       {userData?.ApiKey?.key.slice(0, 10)}••••
                       {userData?.ApiKey?.key.slice(20)}
@@ -412,7 +412,7 @@ export default function Index() {
                     </p>
                   </div>
                   <div className="flex flex-row justify-between rounded-lg">
-                    <p className="text-2xl">Repository:</p>
+                    <p className="text-2xl font-primary text-tertiary-gray">Repository :</p>
                     <div className="flex flex-row items-center">
                       <p>{userData.Repository.name} &nbsp;</p>{" "}
                       <Form method="post">
@@ -440,7 +440,7 @@ export default function Index() {
                     {actionArgs?.originCallForm == "getRepos" && (
                       <div className="absolute left-1/4 w-1/2 p-5 z-10 bg-secondary-gray border border-white rounded-lg">
                         <div className="w-full justify-between flex flex-row">
-                          <p className="text-2xl">Choose Repository:</p>
+                          <p className="text-2xl">Choose Repository :</p>
                           <Form method="post">
                             <input
                               type="hidden"
@@ -474,10 +474,7 @@ export default function Index() {
                           </fieldset>
                           <br />
 
-                          <button
-                            type="submit"
-                            className="text-black bg-accent py-2 px-4 border rounded-lg"
-                          >
+                          <button type="submit" className=" bg-accent py-2 px-4  rounded-lg">
                             {navigation.state == "submitting" &&
                             navigation.formData?.get("formType") == "getChosenRepo" ? (
                               <p>Submitting....</p>
@@ -490,7 +487,7 @@ export default function Index() {
                     )}
                   </div>
                   <div className="flex flex-row justify-between rounded-lg">
-                    <p className="text-2xl">Contract:</p>
+                    <p className="text-2xl font-primary text-tertiary-gray">Contract :</p>
                     <div className="flex flex-row items-center">
                       <p>{userData.Repository.filename} &nbsp;</p>{" "}
                       <div>
@@ -564,7 +561,7 @@ export default function Index() {
                     </div>
                   </div>
                   <div className="flex flex-row justify-between rounded-lg">
-                    <p className="text-2xl">Deployer: </p>
+                    <p className="text-2xl font-primary text-tertiary-gray">Deployer :</p>
                     <div className="flex flex-row items-center">
                       <p>
                         {userData?.Repository?.deployerAddress?.slice(0, 8)}••••
@@ -631,7 +628,7 @@ export default function Index() {
                     </div>
                   </div>
                   <div className="flex flex-row justify-between rounded-lg">
-                    <p className="text-2xl">Last Deployment: </p>
+                    <p className="text-2xl font-primary text-tertiary-gray">Last Deployment :</p>
                     <p>
                       {userData?.Repository?.lastDeployed
                         ? `${timeSince(userData?.Repository?.lastDeployed)} ago`
@@ -642,7 +639,7 @@ export default function Index() {
 
                 <div className="flex flex-col bg-secondary-gray  border border-secondary-border  shadow-md	 p-5 rounded-lg">
                   <div className="flex flex-row justify-between">
-                    <p className="font-primary">Functions: </p>
+                    <p className="font-primary">Functions :</p>
                     <div className="text-lg">
                       <CustomConnectButton />
                     </div>
@@ -662,7 +659,7 @@ export default function Index() {
 
                           {navigation.state == "submitting" &&
                           navigation.formData?.get("formType") == "fundWallet" ? (
-                            <div className="text-[#f0f0f0] bg-black py-2 mt-2 px-4 text-xl border rounded-lg flex flex-row items-center  float-right">
+                            <div className="text-[#f0f0f0] bg-almost-black py-2 mt-2 px-4 text-xl rounded-lg flex flex-row items-center float-right">
                               +1 FEth
                               <div className="animate-spin items-center ml-3">
                                 <Loader size={20} />
@@ -671,7 +668,7 @@ export default function Index() {
                           ) : (
                             <button
                               type="submit"
-                              className="text-[#f0f0f0] bg-black py-2 px-4 rounded-lg mt-2 text-xl float-right"
+                              className="text-[#f0f0f0] bg-almost-black py-2 px-4 rounded-lg mt-2 text-xl float-right"
                             >
                               Add FEth
                             </button>
@@ -682,7 +679,7 @@ export default function Index() {
                   )}
 
                   <ul className="flex flex-col gap-2 rounded-lg">
-                    <p className="text-2xl border-b border-b-[#363636]">Read</p>
+                    <p className="text-2xl pb-1 border-b border-b-[#363636] font-primary">Read</p>
                     <div className="py-2">
                       {JSON.parse(userData?.Repository?.contractAbi as string).map(
                         (method: AbiFunctionType, i: number) => (
@@ -708,11 +705,12 @@ export default function Index() {
 
                                         setFunctionReturn(returnedData);
                                       }}
-                                      className="text-[#f0f0f0] bg-black py-2 px-4 rounded-lg"
+                                      className="text-[#f0f0f0] bg-almost-black py-2 px-4 rounded-lg"
                                     >
                                       {functionCalled == method.name ? (
                                         <div className="flex flex-row items-center">
-                                          <div className="animate-spin">
+                                          <p>Calling </p>
+                                          <div className="ml-2 animate-spin">
                                             <Loader size={20} />
                                           </div>
                                         </div>
@@ -723,24 +721,46 @@ export default function Index() {
                                   </div>
                                   {functionReturn?.methodName == method.name &&
                                     method.outputs.length > 0 && (
-                                      <>
+                                      <div className="flex flex-col break-words">
                                         <p>Returned:</p>
                                         {method.outputs.map((output, index) => (
                                           <div
                                             key={index}
-                                            className="bg-transparent w-1/3 rounded-lg flex flex-row"
+                                            className="bg-transparent 100% rounded-lg flex flex-row"
                                           >
-                                            <p>
-                                              &nbsp;&nbsp;
+                                            <p className="text-tertiary-gray">
                                               {functionReturn.returnItems[index].name}:{" "}
                                             </p>
-                                            <p>
-                                              &nbsp;&nbsp;
-                                              {functionReturn.returnItems[index].value}
-                                            </p>
+                                            {functionReturn.returnItems[index].value.length < 20 ? (
+                                              <p className="ml-4 break-[anywhere]">
+                                                {functionReturn.returnItems[index].value}
+                                              </p>
+                                            ) : (
+                                              <div className="flex items-center justify-between">
+                                                <p className="ml-4">
+                                                  {functionReturn.returnItems[index].value.slice(
+                                                    0,
+                                                    8
+                                                  )}
+                                                  ••••
+                                                  {functionReturn.returnItems[index].value.slice(
+                                                    37
+                                                  )}
+                                                </p>
+                                                <Copy
+                                                  className="transform ml-4 active:scale-75 transition-transform"
+                                                  size={20}
+                                                  onClick={() =>
+                                                    navigator.clipboard.writeText(
+                                                      functionReturn.returnItems[index].value
+                                                    )
+                                                  }
+                                                />
+                                              </div>
+                                            )}
                                           </div>
                                         ))}
-                                      </>
+                                      </div>
                                     )}
                                 </li>
                               )}
@@ -748,7 +768,7 @@ export default function Index() {
                         )
                       )}
                     </div>
-                    <p className="text-2xl border-b border-b-[#363636]">Write</p>
+                    <p className="text-2xl border-b border-b-[#363636] pb-1 font-primary">Write</p>
 
                     {JSON.parse(userData?.Repository?.contractAbi).map(
                       (method: AbiFunctionType, i: number) => (
@@ -801,12 +821,13 @@ export default function Index() {
                                                 }
                                               }
                                             }}
-                                            className="text-[#f0f0f0] bg-black py-2 px-4 rounded-lg disabled:bg-[#cbcbcb]"
+                                            className="text-[#f0f0f0] bg-almost-black py-2 px-4 rounded-lg disabled:bg-[#cbcbcb]"
                                             disabled={!Boolean(address)}
                                           >
                                             {functionCalled == method.name ? (
                                               <div className="flex flex-row items-center">
-                                                <div className="animate-spin">
+                                                <p>Calling </p>
+                                                <div className="ml-2 animate-spin">
                                                   <Loader size={20} />
                                                 </div>
                                               </div>
@@ -851,14 +872,13 @@ export default function Index() {
                                                   }
                                                 }
                                               }}
-                                              className="text-[#f0f0f0] bg-black py-2 px-4  rounded-lg disabled:bg-[#cbcbcb]"
+                                              className="text-[#f0f0f0] bg-almost-black py-2 px-4  rounded-lg disabled:bg-[#cbcbcb]"
                                               disabled={!Boolean(address)}
                                             >
                                               {functionCalled == method.name ? (
                                                 <div className="flex flex-row items-center">
-                                                  <p>Calling</p>{" "}
-                                                  <div className="animate-spin">
-                                                    {" "}
+                                                  <p>Calling </p>
+                                                  <div className="ml-2 animate-spin">
                                                     <Loader size={20} />
                                                   </div>
                                                 </div>
@@ -904,10 +924,10 @@ export default function Index() {
             </div>
             <div className="flex flex-col w-full xl:w-3/5 gap-10">
               <div className="flex-1  bg-secondary-gray border border-secondary-border  shadow-md	 p-5 rounded-lg ">
-                <div className="flex flex-row justify-between items-center">
-                  <p className="pb-2 font-primary">Transactions:</p>
+                <div className="flex flex-row justify-between align-middle items-center">
+                  <p className="font-primary">Transactions :</p>
 
-                  <Form method="post">
+                  <Form method="post" className="flex items-center">
                     <input
                       type="hidden"
                       name="githubInstallationId"
@@ -916,7 +936,7 @@ export default function Index() {
                     <input type="hidden" name="formType" value="deployContract" />
 
                     <button
-                      className="text-xl text-[#f0f0f0] bg-black py-2 px-4 rounded-lg"
+                      className="text-xl text-[#f0f0f0] bg-almost-black py-2 px-4 rounded-lg"
                       type="submit"
                     >
                       {navigation.state == "submitting" &&
@@ -935,7 +955,7 @@ export default function Index() {
                 </div>
                 <table className="table-fixed w-full mt-5">
                   <thead>
-                    <tr className="text-left">
+                    <tr className="text-left text-tertiary-gray font-primary">
                       <th className="text-lg">Tx Hash</th>
                       <th className="text-lg">Function Name</th>
                       <th className="text-lg">Timestamp</th>

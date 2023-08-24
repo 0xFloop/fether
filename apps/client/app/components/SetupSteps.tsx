@@ -204,14 +204,14 @@ const SelectSmartContract: React.FC<setupProps> = (props: setupProps) => {
             <input type="hidden" name="formType" value="chooseFileToTrack" />
             <fieldset className="grid grid-cols-2">
               {props.actionArgs.solFilesFromChosenRepo?.map((fileName: any, i: number) => (
-                <label key={i} className="text-xl">
+                <label key={i} className="text-xl text-center flex justify-center items-center">
                   <input
                     onClick={() => setFileChosen(true)}
                     type="radio"
                     name="chosenFileName"
                     value={fileName}
                   />
-                  {fileName}
+                  &nbsp;{fileName}
                 </label>
               ))}
             </fieldset>
@@ -226,7 +226,12 @@ const SelectSmartContract: React.FC<setupProps> = (props: setupProps) => {
                 {props.navigation.state == "submitting" &&
                 props.navigation.formData &&
                 props.navigation.formData.get("formType") == "chooseFileToTrack" ? (
-                  <p>Submitting....</p>
+                  <div>
+                    Submitting{" "}
+                    <div className="ml-5 animate-spin">
+                      <Loader size={24} />
+                    </div>
+                  </div>
                 ) : (
                   <p>Submit</p>
                 )}
@@ -276,7 +281,7 @@ const SetDeployerComponent: React.FC<setupProps> = (props: setupProps) => {
             onChange={handleAddressChange}
           />
           <button
-            className="text-white h-full text-xl disabled:bg-gray-400 bg-accent py-2 px-4 border rounded-r-lg"
+            className="text-white h-full text-xl disabled:bg-tertiary-gray bg-accent py-2 px-4 border rounded-r-lg"
             type="submit"
             disabled={!addressValid}
           >
@@ -314,7 +319,7 @@ const DeployContractComponent: React.FC<setupProps> = (props: setupProps) => {
         props.navigation.formData &&
         props.navigation.formData.get("formType") == "deployContract" ? (
           <div className="flex flex-row items-center py-4 px-6 bg-accent border rounded-lg border-[#6161FF]">
-            Deploying...
+            Deploying{" "}
             <div className="ml-5 animate-spin">
               <Loader size={24} />
             </div>

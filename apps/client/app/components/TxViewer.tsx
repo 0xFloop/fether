@@ -8,7 +8,7 @@ type TxDetailsProps = {
 const TxViewer: React.FC<TxDetailsProps> = (props: TxDetailsProps) => {
   const txDetails = props.txDetails;
   return (
-    <div className="border gap-2 flex flex-col w-3/5 p-4 border-white left-[20%] rounded-lg absolute bg-tertiary-gray text-lg text-gray-400">
+    <div className="border gap-2 flex flex-col w-3/5 p-4 border-white left-[20%] rounded-lg absolute text-tertiary-gray bg-secondary-border text-lg ">
       <p className="text-white text-2xl">Transaction Details: </p>
       <p className="">
         Hash: <span className="text-white">{txDetails.hash}</span>
