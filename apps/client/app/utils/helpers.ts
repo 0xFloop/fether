@@ -206,31 +206,48 @@ export const getFunctionArgsFromInput = (abiFunction: AbiFunctionType): any[] =>
 
   return args;
 };
+export enum SetupStepsEnum {
+  "GenerateApiKey",
+  "InstallFetherKitGithubApp",
+  "SelectRepository",
+  "SelectSmartContract",
+  "SetDeployerAddress",
+  "DeployContract",
+  "Done",
+  "Error",
+}
 
 export const determineSetupStep = (userData: UserWithKeyRepoActivity): number => {
-  enum SetupSteps {
-    "GenerateApiKey",
-    "InstallFetherKitGithubApp",
-    "SelectRepository",
-    "SelectSmartContract",
-    "SetDeployerAddress",
-    "DeployContract",
-    "Done",
-    "Error",
+  if (!userData) return SetupStepsEnum.Error;
+
+  if (!userData.ApiKey) return SetupStepsEnum.GenerateApiKey;
+
+  if (!userData.githubInstallationId) return SetupStepsEnum.InstallFetherKitGithubApp;
+
+  if (!userData.Repository) return SetupStepsEnum.SelectRepository;
+
+  if (!userData.Repository.filename) return SetupStepsEnum.SelectSmartContract;
+
+  if (!userData.Repository.deployerAddress) return SetupStepsEnum.SetDeployerAddress;
+
+  if (!userData.Repository.contractAddress) return SetupStepsEnum.DeployContract;
+
+  if (userData.Repository.contractAddress) return SetupStepsEnum.Done;
+  else return SetupStepsEnum.Error;
+};
+
+export const isSetup = (userData: UserWithKeyRepoActivity): boolean => {
+  if (
+    userData &&
+    userData.Repository &&
+    userData.Repository.contractAddress &&
+    userData.Repository.contractAbi &&
+    userData.Repository.deployerAddress &&
+    userData.Repository.filename &&
+    userData.ApiKey &&
+    userData.ApiKey.key
+  ) {
+    return true;
   }
-
-  if (!userData) return SetupSteps.Error;
-
-  if (!userData.ApiKey) return SetupSteps.GenerateApiKey;
-
-  if (!userData.githubInstallationId) return SetupSteps.InstallFetherKitGithubApp;
-
-  if (!userData.Repository) return SetupSteps.SelectRepository;
-
-  if (!userData.Repository.filename) return SetupSteps.SelectSmartContract;
-
-  if (!userData.Repository.deployerAddress) return SetupSteps.SetDeployerAddress;
-
-  if (!userData.Repository.contractAddress) return SetupSteps.DeployContract;
-  else return SetupSteps.Error;
+  return false;
 };
