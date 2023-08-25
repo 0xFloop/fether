@@ -151,6 +151,8 @@ export function fetherChainFromKey(apikey: string): Chain {
 }
 
 export const timeSince = (_date: any) => {
+  if (typeof _date === "number") _date = new Date(_date * 1000);
+
   var date = Date.parse(_date);
   //@ts-ignore
   var seconds = Math.floor((new Date() - date) / 1000);

@@ -1,7 +1,8 @@
 import { TxDetails } from "~/types";
 import { timeSince } from "~/utils/helpers";
-import { X } from "lucide-react";
+import { Copy, X } from "lucide-react";
 import { Form } from "@remix-run/react";
+import { getAddress } from "viem";
 type TxDetailsProps = {
   txDetails: TxDetails;
   githubInstallationId: string;
@@ -27,13 +28,18 @@ const TxViewer: React.FC<TxDetailsProps> = (props: TxDetailsProps) => {
           </Form>
         </div>
 
-        <p className="">
-          Hash: <span className="text-white hidden xl:inline">{txDetails.hash}</span>
-          <span className="text-white xl:hidden">
-            {txDetails.hash.slice(0, 8)}••••
-            {txDetails.hash.slice(37)}
-          </span>
-        </p>
+        <div className="text-white hidden xl:flex">
+          <p className="text-tertiary-gray">Hash:</p>&nbsp;<p>{txDetails.hash}</p>
+        </div>
+        <div className="text-white xl:hidden flex items-center">
+          <p className="text-tertiary-gray">Hash:</p>&nbsp;{txDetails.hash.slice(0, 15)}••••
+          {txDetails.hash.slice(45)}
+          <Copy
+            className="transform ml-4 active:scale-75 transition-transform"
+            size={20}
+            onClick={() => navigator.clipboard.writeText(txDetails.hash)}
+          />
+        </div>
         <div className="flex flex-col xl:flex-row gap-2 xl:gap-0 justify-between">
           <p className="">
             Status:{" "}
@@ -50,16 +56,16 @@ const TxViewer: React.FC<TxDetailsProps> = (props: TxDetailsProps) => {
         </div>
 
         <p className="">
-          From: <span className="text-white">{txDetails.from}</span>
+          From: <span className="text-white">{getAddress(txDetails.from)}</span>
         </p>
         {txDetails.to && (
           <p className="">
-            To: <span className="text-white">{txDetails.to}</span>
+            To: <span className="text-white">{getAddress(txDetails.to)}</span>
           </p>
         )}
         {txDetails.created && (
           <p className="">
-            Created: <span className="text-white">{txDetails.created}</span>
+            Created: <span className="text-white">{getAddress(txDetails.created)}</span>
           </p>
         )}
         <div className="flex flex-col xl:flex-row gap-2 xl:gap-0 justify-between">
