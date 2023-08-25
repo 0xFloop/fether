@@ -23,6 +23,8 @@ import {
   determineSetupStep,
   getTransactionDetails,
   timeSince,
+  SetupStepsEnum,
+  isSetup,
 } from "~/utils/helpers";
 import * as Accordion from "@radix-ui/react-accordion";
 import { useAccount, useBalance } from "wagmi";
@@ -47,10 +49,8 @@ import SetupWizard from "~/components/SetupWizard";
 import TxViewer from "~/components/TxViewer";
 import React from "react";
 
-//TODO: fix compatibility with other repo's. display dirs and files in a tree structure
 //TODO: create error page
-//TODO: allow updates within signup page, prevents lockup bug state
-//TODO: fix call trace ui
+//TODO: Add states to transactions (pending, confirmed, failed)
 
 export const action = async ({ request }: ActionArgs): Promise<DashboardActionReturn> => {
   const body = await request.formData();
@@ -330,11 +330,7 @@ export const loader = async ({ request }: LoaderArgs) => {
       },
     },
   });
-  console.log("params");
-  let setupStep = 6;
-  if (!userData?.Repository?.contractAbi) {
-    setupStep = determineSetupStep(userData);
-  }
+  let setupStep = determineSetupStep(userData);
 
   return { userData, setupStep };
 };
@@ -345,7 +341,7 @@ export default function Index() {
   const navigation = useNavigation();
   const submit = useSubmit();
 
-  const userData = loaderData.userData;
+  const userData = loaderData.userData as UserWithKeyRepoActivity;
   // const setupStep = loaderData.setupStep;
 
   const { address, isConnected } = useAccount();
@@ -356,6 +352,24 @@ export default function Index() {
   const [functionCalled, setFunctionCalled] = useState<string | null>(null);
   const [functionReturn, setFunctionReturn] = useState<ContractReturn | null>(null);
   const [setupStep, setSetupStep] = useState<number>(loaderData.setupStep);
+  const [addressValid, setAddressValid] = useState<boolean>(false);
+  const [addressError, setAddressError] = useState<string | null>(null);
+
+  const handleAddressChange = (event: any) => {
+    let valid = isAddress(event.target.value);
+    if (event.target.value == "") {
+      setAddressValid(false);
+      setAddressError(null);
+      return;
+    } else if (valid) {
+      setAddressValid(true);
+      setAddressError(null);
+      return;
+    } else {
+      setAddressValid(false);
+      setAddressError("Error: Invalid Address");
+    }
+  };
 
   let deployStatus = "Deploy";
 
@@ -388,7 +402,7 @@ export default function Index() {
 
   return (
     <div className="selection:bg-accent selection:text-primary-gray max-w-screen h-auto min-h-screen display flex flex-col items-center justify-center text-[#121212]  ">
-      {!userData?.Repository?.contractAbi ? (
+      {!isSetup(userData) ? (
         <div key={loaderData.setupStep}>
           <SetupWizard
             loaderData={loaderData}
@@ -526,7 +540,7 @@ export default function Index() {
                           </button>
                         </Form>
                         {actionArgs?.originCallForm == "getFilesOfChosenRepo" && (
-                          <div className="absolute left-1/4 w-1/2 p-5 z-10 bg-[#f0f0f0] border border-[#121212] rounded-lg">
+                          <div className="absolute left-1/4 w-1/2 p-5 z-10 bg-secondary-gray border border-white rounded-lg">
                             <div className="w-full justify-between flex flex-row">
                               <p className="text-2xl">Choose File To Track:</p>
                               <Form method="post">
@@ -556,10 +570,7 @@ export default function Index() {
                                 ))}
                               </fieldset>
                               <br />
-                              <button
-                                type="submit"
-                                className="text-[#f0f0f0] bg-black py-2 px-4 border rounded-lg"
-                              >
+                              <button type="submit" className=" bg-accent py-2 px-4  rounded-lg">
                                 {navigation.state == "submitting" &&
                                 navigation.formData?.get("formType") == "chooseFileToTrack" ? (
                                   <p>Submitting....</p>
@@ -601,40 +612,45 @@ export default function Index() {
                         </button>
                       </Form>
                       {deployerModal && actionArgs?.originCallForm != "setDeployerAddress" && (
-                        <div className="absolute left-1/4 w-1/2 p-5 z-10 bg-[#f0f0f0] border border-[#121212] rounded-lg">
-                          <button onClick={() => setDeployerModal(false)} className="float-right ">
-                            <X />
-                          </button>
-                          <Form method="post" className=" w-11/12">
+                        <div className="absolute left-1/4 w-1/2 p-5 z-10 pb-10 bg-secondary-gray border border-white rounded-lg">
+                          <div className="w-full justify-between flex flex-row">
+                            <p className="text-2xl">Update Deployer Address:</p>
+                            <button onClick={() => setDeployerModal(false)} className="float-right">
+                              <X />
+                            </button>
+                          </div>
+
+                          <Form method="post" className="w-11/12 mt-5 h-full">
                             <input
                               type="hidden"
                               name="githubInstallationId"
                               value={userData?.githubInstallationId?.toString()}
                             />
                             <input type="hidden" name="formType" value="setDeployerAddress" />
-                            {navigation.state == "submitting" &&
-                            navigation.formData?.get("formType") == "setDeployerAddress" ? (
-                              <div className="flex flex-row items-center">
-                                Setting Deployer Address....
-                                <div className="ml-5 animate-spin">
-                                  <Loader size={20} />
-                                </div>
-                              </div>
-                            ) : (
-                              <div className="flex flex-row items-center justify-between w-full">
-                                <input
-                                  className="text-lg h-10 rounded-lg p-2 w-1/2 border border-[#121212]"
-                                  name="deployerAddress"
-                                  placeholder="Input desired contract deployer address"
-                                />
-                                <button
-                                  className="text-[#f0f0f0] text-xl bg-black py-2 px-4 border rounded-lg"
-                                  type="submit"
-                                >
-                                  Set Deployer Address
-                                </button>
-                              </div>
-                            )}
+
+                            <div className="flex  overflow-hidden bg-white rounded-lg flex-row items-center justify-between w-full h-full">
+                              <input
+                                className="text-lg outline-none border-none text-black px-2 w-5/6  bg-[#D9D9D9]"
+                                name="deployerAddress"
+                                placeholder="Input desired contract deployer address"
+                                onChange={handleAddressChange}
+                              />
+                              <button
+                                className="text-white h-full border border-red-500 flex-1 text-xl disabled:bg-tertiary-gray bg-accent py-2 px-4"
+                                type="submit"
+                                disabled={!addressValid}
+                              >
+                                {navigation.state == "submitting" &&
+                                navigation.formData &&
+                                navigation.formData.get("formType") == "setDeployerAddress" ? (
+                                  <div className="inline-block animate-spin">
+                                    <Loader size={20} />
+                                  </div>
+                                ) : (
+                                  <p>Confirm</p>
+                                )}
+                              </button>
+                            </div>
                           </Form>
                         </div>
                       )}
@@ -1009,7 +1025,10 @@ export default function Index() {
                   </tbody>
                 </table>
                 {actionArgs?.originCallForm == "getTransaction" && actionArgs.txDetails && (
-                  <TxViewer txDetails={actionArgs.txDetails} />
+                  <TxViewer
+                    txDetails={actionArgs.txDetails}
+                    githubInstallationId={userData.githubInstallationId as string}
+                  />
                 )}
               </div>
             </div>
@@ -1047,68 +1066,3 @@ export function ErrorBoundary() {
     </div>
   );
 }
-// {
-//   "id": "clldw4v9a00001jsz8h2ha3lm",
-//   "email": null,
-//   "username": "0xFloop",
-//   "passwordHash": null,
-//   "githubId": 95703085,
-//   "githubInstallationId": "40783140",
-//   "createdAt": "2023-08-16T15:31:50.206Z",
-//   "updatedAt": "2023-08-16T15:32:22.258Z",
-//   "ApiKey": {
-//     "key": "clldw4zri00021jszadz5aypp",
-//     "userId": "clldw4v9a00001jsz8h2ha3lm",
-//     "keyTier": "FREE",
-//     "expires": "2023-08-16T16:15:08.043Z",
-//     "createdAt": "2023-08-16T15:31:56.046Z",
-//     "updatedAt": "2023-08-16T15:31:56.046Z"
-//   },
-//   "Repository": {
-//     "id": "610809559",
-//     "name": "0xFloop/fether",
-//     "userId": "clldw4v9a00001jsz8h2ha3lm",
-//     "filename": null,
-//     "contractAddress": null,
-//     "contractAbi": null,
-//     "foundryRootDir": "apps/solidity",
-//     "deployerAddress": null,
-//     "lastDeployed": null,
-//     "createdAt": "2023-08-24T13:56:31.388Z",
-//     "updatedAt": "2023-08-24T17:19:26.489Z",
-//     "Activity": []
-//   }
-// }
-
-// {
-//   "id": "clldw4v9a00001jsz8h2ha3lm",
-//   "email": null,
-//   "username": "0xFloop",
-//   "passwordHash": null,
-//   "githubId": 95703085,
-//   "githubInstallationId": "40783140",
-//   "createdAt": "2023-08-16T15:31:50.206Z",
-//   "updatedAt": "2023-08-16T15:32:22.258Z",
-//   "ApiKey": {
-//     "key": "clldw4zri00021jszadz5aypp",
-//     "userId": "clldw4v9a00001jsz8h2ha3lm",
-//     "keyTier": "FREE",
-//     "expires": "2023-08-16T16:15:08.043Z",
-//     "createdAt": "2023-08-16T15:31:56.046Z",
-//     "updatedAt": "2023-08-16T15:31:56.046Z"
-//   },
-//   "Repository": {
-//     "id": "610809559",
-//     "name": "0xFloop/fether",
-//     "userId": "clldw4v9a00001jsz8h2ha3lm",
-//     "filename": "SecretKeeper.sol",
-//     "contractAddress": null,
-//     "contractAbi": null,
-//     "foundryRootDir": "apps/solidity",
-//     "deployerAddress": null,
-//     "lastDeployed": null,
-//     "createdAt": "2023-08-24T13:56:31.388Z",
-//     "updatedAt": "2023-08-24T17:24:37.415Z",
-//     "Activity": []
-//   }
-// }
