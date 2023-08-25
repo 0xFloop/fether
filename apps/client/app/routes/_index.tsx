@@ -67,7 +67,7 @@ export default function Index() {
             fether
           </h1>
         </div>
-        <div className="font-display flex flex-row absolute bottom-4 right-6 align-bottom items-baseline">
+        <div className="font-primary text-lg flex flex-row absolute bottom-4 right-6 align-bottom items-baseline">
           {hasAccess && <Link to="/alpha">Access Alpha</Link>}
           {!hasAccess && !alphaPopup && (
             <button onClick={() => setAlphaPopup(true)}>Get Alpha Access</button>
@@ -99,7 +99,7 @@ export default function Index() {
         )}
 
         {!alphaPopup && (
-          <p className="font-sans text-base md:text-2xl inline-block">
+          <p className="font-primary text-base md:text-2xl inline-block">
             <Typewriter
               options={{
                 strings: [
