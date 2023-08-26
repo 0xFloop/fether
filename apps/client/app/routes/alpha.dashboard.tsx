@@ -398,6 +398,7 @@ export default function Index() {
     loaderData.userData?.Repository?.filename,
     loaderData.userData?.Repository?.name,
     loaderData.userData?.Repository?.deployerAddress,
+    loaderData.userData?.ApiKey?.key,
   ]);
 
   return (
