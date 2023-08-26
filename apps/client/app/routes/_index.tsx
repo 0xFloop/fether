@@ -75,18 +75,21 @@ export default function Index() {
         </div>
         {alphaPopup && (
           <div className="relative left-0 w-full flex flex-col h-full items-center align-middle justify-center">
-            <div className="h-auto w-auto relative border-2 border-black rounded p-10">
+            <div className="relative border-2 border-secondary-border bg-secondary-gray rounded p-10">
               <X
-                size={40}
+                size={24}
                 strokeWidth={1.25}
                 strokeLinecap="square"
                 className="absolute right-3 top-3"
                 onClick={() => setAlphaPopup(false)}
               />
               <p className="font-sans text-2xl inline-block">Enter alpha key</p>
-              <Form method="post" className="mt-10">
-                <input type="text" name="alphaAccessKey" className="border-black rounded" />
-                <button type="submit" className="font-sans text-base ml-4 inline-block">
+              <Form
+                method="post"
+                className="mt-10 rounded-lg overflow-hidden flex flex-row justify-between items-center bg-almost-black"
+              >
+                <input type="text" name="alphaAccessKey" className=" text-black" />
+                <button type="submit" className="font-primary px-2 text-base bg-almost-black">
                   Submit
                 </button>
               </Form>
