@@ -156,6 +156,19 @@ const SelectRepoComponent: React.FC<setupProps> = (props: setupProps) => {
 
 const SelectSmartContract: React.FC<setupProps> = (props: setupProps) => {
   const [fileChosen, setFileChosen] = useState(false);
+  let submit = useSubmit();
+  useEffect(() => {
+    submit(
+      {
+        githubInstallationId: props.userData?.githubInstallationId?.toString() as string,
+        formType: "getFilesOfChosenRepo",
+      },
+      {
+        method: "post",
+        encType: "application/x-www-form-urlencoded",
+      }
+    );
+  }, []);
   return (
     <div className="h-full w-full flex flex-col gap-4 items-center align-middle justify-center">
       {props.actionArgs?.originCallForm != "getFilesOfChosenRepo" && (
@@ -170,21 +183,26 @@ const SelectSmartContract: React.FC<setupProps> = (props: setupProps) => {
             {props.navigation.state == "submitting" &&
             props.navigation.formData &&
             props.navigation.formData.get("formType") == "getFilesOfChosenRepo" ? (
-              <div className="flex flex-row items-center py-4 px-6 bg-accent border rounded-lg border-[#6161FF]">
+              <div className="flex flex-row items-center">
                 Loading files
                 <div className="ml-1 animate-spin">
                   <Loader size={20} />
                 </div>
               </div>
             ) : (
-              <button
-                type="submit"
-                className="py-4 px-6 bg-accent border rounded-lg border-[#6161FF]"
-              >
-                Click to load solidity files
-              </button>
+              <></>
+              // <button
+              //   type="submit"
+              //   className="py-4 px-6 bg-accent border rounded-lg border-[#6161FF]"
+              // >
+              //   Click to load solidity files
+              // </button>
             )}
           </Form>
+        </>
+      )}
+      {props.actionArgs?.originCallForm == "getFilesOfChosenRepo" && (
+        <>
           {props.userData?.Repository?.filename && (
             <div>Current File: {props.userData?.Repository?.filename}</div>
           )}
@@ -196,10 +214,6 @@ const SelectSmartContract: React.FC<setupProps> = (props: setupProps) => {
               <p>Next</p>
             </button>
           )}
-        </>
-      )}
-      {props.actionArgs?.originCallForm == "getFilesOfChosenRepo" && (
-        <>
           <Form method="post" className="w-full">
             <input
               type="hidden"
