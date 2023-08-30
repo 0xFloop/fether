@@ -105,7 +105,7 @@ const SelectRepoComponent: React.FC<setupProps> = (props: setupProps) => {
               <p>Next</p>
             </button>
           )}
-          <Form className="overflow-scroll" method="post">
+          <Form className="overflow-y-auto" method="post">
             <input
               type="hidden"
               name="githubInstallationId"
