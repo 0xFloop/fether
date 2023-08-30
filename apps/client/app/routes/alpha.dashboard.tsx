@@ -51,6 +51,9 @@ import React from "react";
 
 //TODO: create error page
 //TODO: Add states to transactions (pending, confirmed, failed)
+//TODO: fix having to reinstall github app if already installed
+//TODO: add invite links
+//TODO:
 
 export const action = async ({ request }: ActionArgs): Promise<DashboardActionReturn> => {
   const body = await request.formData();
@@ -1056,14 +1059,21 @@ export function ErrorBoundary() {
 
   // Don't forget to typecheck with your own logic.
   // Any value can be thrown, not just errors!
-  // @ts-ignore
-  let errorMessage = error.message;
-
-  return (
-    <div className="pt-48 h-80">
-      <h1>Uh oh ...</h1>
-      <p>Something went wrong.</p>
-      <pre>{errorMessage}</pre>
-    </div>
-  );
+  if (error instanceof Error) {
+    return (
+      <div className="h-screen w-screen flex flex-col justify-center align-middle items-center text-white font-primary">
+        <h1>Uh oh ...</h1>
+        <p>Something went wrong.</p>
+        <pre>Error: {error.message}</pre>
+      </div>
+    );
+  } else {
+    return (
+      <div className="h-screen w-screen flex flex-col justify-center align-middle items-center text-white font-primary">
+        <h1>Uh oh ...</h1>
+        <p>Something went wrong.</p>
+        <pre>Error: {JSON.stringify(error)}</pre>
+      </div>
+    );
+  }
 }
