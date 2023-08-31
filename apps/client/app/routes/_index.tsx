@@ -51,8 +51,8 @@ export async function action({ request }: ActionArgs) {
       });
     }
   } else {
-    console.log("Invalid alpha key");
-    return json({ message: `Invalid key` });
+    console.log("Invalid invite code");
+    return json({ message: `Invalid code` });
   }
 }
 export default function Index() {
@@ -83,13 +83,20 @@ export default function Index() {
                 className="absolute right-3 top-3"
                 onClick={() => setAlphaPopup(false)}
               />
-              <p className="font-sans text-2xl inline-block">Enter alpha key</p>
+              <p className="font-sans text-2xl inline-block">Enter invite code</p>
               <Form
                 method="post"
-                className="mt-10 rounded-lg overflow-hidden flex flex-row justify-between items-center bg-almost-black"
+                className="mt-10 flex flex-row justify-between items-center relative bg-almost-black rounded-lg overflow-hidden"
               >
-                <input type="text" name="alphaAccessKey" className=" text-black" />
-                <button type="submit" className="font-primary px-2 text-base bg-almost-black">
+                <input
+                  type="text"
+                  name="alphaAccessKey"
+                  className="text-black border-0 outline-0 focus:ring-0"
+                />
+                <button
+                  type="submit"
+                  className="font-primary px-2 border-0 outline-0 text-base h-full"
+                >
                   Submit
                 </button>
               </Form>
