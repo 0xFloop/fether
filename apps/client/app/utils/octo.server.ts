@@ -13,6 +13,24 @@ const octo = new Octo({
   privateKey: getGithubPk(),
 });
 
+export const hasGithubAppInstalled = async (githubUsername: string): Promise<string | null> => {
+  let hasId = await octo.octokit
+    .request("GET /users/{username}/installation", {
+      username: githubUsername,
+      headers: {
+        "X-GitHub-Api-Version": "2022-11-28",
+      },
+    })
+    .then((res) => {
+      return res.data.id.toString();
+    })
+    .catch((err) => {
+      return null;
+    });
+
+  return hasId;
+};
+
 export const getUserRepositories = async (githubInstallationId: string) => {
   const octokit = await octo.getInstallationOctokit(parseInt(githubInstallationId));
 

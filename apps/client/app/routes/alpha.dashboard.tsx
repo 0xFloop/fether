@@ -49,11 +49,11 @@ import SetupWizard from "~/components/SetupWizard";
 import TxViewer from "~/components/TxViewer";
 import React from "react";
 
-//TODO: create error page
 //TODO: Add states to transactions (pending, confirmed, failed)
+
 //TODO: fix having to reinstall github app if already installed
 //TODO: add invite links
-//TODO:
+//TODO: add ability for team page
 
 export const action = async ({ request }: ActionArgs): Promise<DashboardActionReturn> => {
   const body = await request.formData();
@@ -398,6 +398,7 @@ export default function Index() {
   useEffect(() => {
     setSetupStep(loaderData.setupStep);
   }, [
+    loaderData.userData?.githubInstallationId,
     loaderData.userData?.Repository?.filename,
     loaderData.userData?.Repository?.name,
     loaderData.userData?.Repository?.deployerAddress,

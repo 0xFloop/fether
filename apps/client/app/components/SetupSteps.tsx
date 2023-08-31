@@ -53,6 +53,7 @@ const InstallGithubAppComponent: React.FC<setupProps> = (props: setupProps) => {
   return (
     <div className="h-full w-full flex items-center align-middle justify-center">
       <Form method="post" action="/api/gh-app-install">
+        <input type="hidden" name="username" value={props.userData?.username} />
         <button type="submit" className="py-4 px-6 bg-accent border rounded-lg border-[#6161FF]">
           Click to add github FetherKit app
         </button>
@@ -294,7 +295,7 @@ const SetDeployerComponent: React.FC<setupProps> = (props: setupProps) => {
         <input type="hidden" name="formType" value="setDeployerAddress" />
         <div className="flex flex-row items-center justify-between w-full h-14">
           <input
-            className="text-lg h-full outline-none text-black rounded-l-lg px-2 flex-1 bg-[#D9D9D9]"
+            className="text-lg h-full outline-none border-none focus:ring-0 text-black rounded-l-lg px-2 flex-1 bg-[#D9D9D9]"
             name="deployerAddress"
             placeholder="Input desired contract deployer address"
             onChange={handleAddressChange}
