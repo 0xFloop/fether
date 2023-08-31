@@ -1,13 +1,5 @@
 import { ActionArgs, LoaderArgs, redirect } from "@vercel/remix";
-import {
-  Form,
-  useActionData,
-  useLoaderData,
-  useNavigation,
-  useSubmit,
-  useRouteError,
-  isRouteErrorResponse,
-} from "@remix-run/react";
+import { Form, useActionData, useLoaderData, useNavigation, useSubmit } from "@remix-run/react";
 import { db } from "../utils/db.server";
 import { getSession as userGetSession } from "../utils/alphaSession.server";
 import { getRootDir, getSolFileNames, getUserRepositories } from "../utils/octo.server";
@@ -1042,39 +1034,4 @@ export default function Index() {
       )}
     </div>
   );
-}
-
-export function ErrorBoundary() {
-  const error = useRouteError();
-
-  // when true, this is what used to go to `CatchBoundary`
-  if (isRouteErrorResponse(error)) {
-    return (
-      <div className="h-80">
-        <h1>Oops</h1>
-        <p>Status: {error.status}</p>
-        <p>{error.data.message}</p>
-      </div>
-    );
-  }
-
-  // Don't forget to typecheck with your own logic.
-  // Any value can be thrown, not just errors!
-  if (error instanceof Error) {
-    return (
-      <div className="h-screen w-screen flex flex-col justify-center align-middle items-center text-white font-primary">
-        <h1>Uh oh ...</h1>
-        <p>Something went wrong.</p>
-        <pre>Error: {error.message}</pre>
-      </div>
-    );
-  } else {
-    return (
-      <div className="h-screen w-screen flex flex-col justify-center align-middle items-center text-white font-primary">
-        <h1>Uh oh ...</h1>
-        <p>Something went wrong.</p>
-        <pre>Error: {JSON.stringify(error)}</pre>
-      </div>
-    );
-  }
 }

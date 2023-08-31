@@ -46,11 +46,11 @@ async function handleAuthentication(
           // handle the user data
         })
         .catch((error) => {
-          // handle the error
+          throw error;
         });
     })
     .catch((error) => {
-      // handle the error
+      throw error;
     });
 
   return { githubUsername, githubId };
