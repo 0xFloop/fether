@@ -1,9 +1,7 @@
-import { isRouteErrorResponse, useRouteError } from "@remix-run/react";
 import { ActionArgs, redirect } from "@vercel/remix";
 import { db } from "~/utils/db.server";
 import { hasGithubAppInstalled } from "~/utils/octo.server";
 import { getSession as userGetSession } from "../utils/alphaSession.server";
-export { ErrorBoundary } from "./alpha.dashboard";
 export const action = async ({ request }: ActionArgs) => {
   const body = await request.formData();
   const username = body.get("username");

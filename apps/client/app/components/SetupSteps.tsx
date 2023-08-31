@@ -1,8 +1,7 @@
 import { Form, useActionData, useNavigation, useSubmit } from "@remix-run/react";
 import { Loader } from "lucide-react";
-import { ReactComponentElement, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { UserWithKeyRepoActivity } from "~/types";
-import { SetupWizardProps } from "./SetupWizard";
 import { action } from "~/routes/alpha.dashboard";
 import { isAddress } from "viem";
 

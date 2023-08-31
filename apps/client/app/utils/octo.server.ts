@@ -1,6 +1,6 @@
 import { App as Octo } from "octokit";
 import { db } from "~/utils/db.server";
-import { set, z } from "zod";
+import { z } from "zod";
 
 function getGithubPk() {
   const githubAppPk = process.env.appPK as string;
