@@ -399,7 +399,16 @@ export default function Index() {
   const displayCodes = useContext(DisplayCodesContext);
   return (
     <div className="selection:bg-accent selection:text-primary-gray max-w-screen h-auto min-h-screen display flex flex-col items-center justify-center text-[#121212]  ">
-      {!isSetup(userData) ? (
+      {!(
+        userData &&
+        userData.Repository &&
+        userData.Repository.contractAddress &&
+        userData.Repository.contractAbi &&
+        userData.Repository.deployerAddress &&
+        userData.Repository.filename &&
+        userData.ApiKey &&
+        userData.ApiKey.key
+      ) ? (
         <div key={loaderData.setupStep}>
           <SetupWizard
             loaderData={loaderData}
