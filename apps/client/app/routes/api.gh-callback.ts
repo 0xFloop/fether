@@ -4,7 +4,7 @@ import {
   getSession as userGetSession,
   commitSession as userCommitSession,
 } from "../utils/alphaSession.server";
-
+import { makeId } from "../utils/helpers";
 async function handleAuthentication(
   code: string,
   redirectUri: string
@@ -89,6 +89,13 @@ export const loader = async ({ request }: LoaderArgs) => {
         githubId: parseInt(githubId as string),
         username: githubUsername as string,
       },
+    });
+    await db.inviteCode.createMany({
+      data: [
+        { inviteCode: makeId(7), issuedToId: newUser.id },
+        { inviteCode: makeId(7), issuedToId: newUser.id },
+        { inviteCode: makeId(7), issuedToId: newUser.id },
+      ],
     });
     session.set("userId", newUser.id as string);
     return redirect("/alpha/dashboard", {

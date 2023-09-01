@@ -3,7 +3,7 @@ import { Form, Link, useActionData, useLoaderData } from "@remix-run/react";
 import { useState } from "react";
 import Typewriter from "typewriter-effect";
 import { X } from "lucide-react";
-import { AlphaKeyStatus } from "database";
+import { KeyStatus } from "database";
 import { db } from "../utils/db.server";
 import { getSession, commitSession } from "../utils/alphaAccessKeySession.server";
 import {
@@ -16,7 +16,7 @@ export const loader = async ({ request }: LoaderArgs) => {
   const session = await getSession(request.headers.get("Cookie"));
   const userSession = await getUserSession(request.headers.get("Cookie"));
 
-  if (session.has("alphaKey") || userSession.has("userId")) {
+  if (session.has("inviteCode") || userSession.has("userId")) {
     return json({ hasAccess: true });
   }
   return json({ hasAccess: false });
@@ -24,25 +24,24 @@ export const loader = async ({ request }: LoaderArgs) => {
 
 export async function action({ request }: ActionArgs) {
   const formData = await request.formData();
-  const alphaAccessKey = formData.get("alphaAccessKey");
-  if (!alphaAccessKey) return redirect("/");
+  const inviteCode = formData.get("inviteCode");
+  if (!inviteCode) return redirect("/");
 
-  let alphaAccessStatus = await db.alphaAccessKeys.findUnique({
-    where: { alphaKey: alphaAccessKey as string },
+  let inviteCodeDetails = await db.inviteCode.findUnique({
+    where: { inviteCode: inviteCode as string },
   });
 
-  if (alphaAccessStatus) {
-    if (alphaAccessStatus.keyStatus == AlphaKeyStatus.USED)
-      return json({ message: `Key already used` });
+  if (inviteCodeDetails) {
+    if (inviteCodeDetails.keyStatus == KeyStatus.USED)
+      return json({ message: `Code already used` });
     else {
-      await db.alphaAccessKeys.update({
-        where: { alphaKey: alphaAccessKey as string },
-        data: { keyStatus: AlphaKeyStatus.USED },
+      await db.inviteCode.update({
+        where: { inviteCode: inviteCode as string },
+        data: { keyStatus: KeyStatus.USED },
       });
 
       const session = await getSession(request.headers.get("Cookie"));
-      session.set("alphaKey", alphaAccessKey as string);
-      console.log(session.get("alphaKey"));
+      session.set("inviteCode", inviteCode as string);
 
       return redirect("/alpha", {
         headers: {
@@ -51,8 +50,7 @@ export async function action({ request }: ActionArgs) {
       });
     }
   } else {
-    console.log("Invalid invite code");
-    return json({ message: `Invalid code` });
+    return json({ message: `Invalid invite code` });
   }
 }
 export default function Index() {
@@ -68,9 +66,9 @@ export default function Index() {
           </h1>
         </div>
         <div className="font-primary text-lg flex flex-row absolute bottom-4 right-6 align-bottom items-baseline">
-          {hasAccess && <Link to="/alpha">Access Alpha</Link>}
+          {hasAccess && <Link to="/alpha">Access</Link>}
           {!hasAccess && !alphaPopup && (
-            <button onClick={() => setAlphaPopup(true)}>Get Alpha Access</button>
+            <button onClick={() => setAlphaPopup(true)}>Get Access</button>
           )}
         </div>
         {alphaPopup && (
@@ -90,7 +88,7 @@ export default function Index() {
               >
                 <input
                   type="text"
-                  name="alphaAccessKey"
+                  name="inviteCode"
                   className="text-black border-0 outline-0 focus:ring-0"
                 />
                 <button

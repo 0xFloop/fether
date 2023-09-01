@@ -22,8 +22,10 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 
-  ApiKey     ApiKey?
-  Repository Repository?
+  ApiKey            ApiKey?
+  Repository        Repository?
+  IssuedInviteCodes InviteCode[] @relation("Issued")
+  UsedInviteCode    InviteCode[] @relation("Used")
 }
 
 model ApiKey {
@@ -75,16 +77,23 @@ enum KeyTier {
   PRO
 }
 
-model AlphaAccessKeys {
-  alphaKey  String         @id @unique @default(cuid())
-  keyStatus AlphaKeyStatus @default(UNUSED)
-  issuedTo  String
+model InviteCode {
+  inviteCode String    @id @unique @default(cuid())
+  keyStatus  KeyStatus @default(UNUSED)
+
+  issuedToId String?
+  usedById   String?
+  issuedTo   User?   @relation("Issued", fields: [issuedToId], references: [id], onDelete: Cascade)
+  usedBy     User?   @relation("Used", fields: [usedById], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
+
+  @@index([issuedToId], name: "IssuedToId")
+  @@index([usedById], name: "UsedById")
 }
 
-enum AlphaKeyStatus {
+enum KeyStatus {
   UNUSED
   USED
 }

@@ -1,7 +1,7 @@
 import { createCookieSessionStorage } from "@vercel/remix";
 
 type SessionData = {
-  alphaKey: string;
+  inviteCode: string;
 };
 
 type SessionFlashData = {
@@ -13,7 +13,7 @@ const { getSession, commitSession, destroySession } = createCookieSessionStorage
   SessionFlashData
 >({
   cookie: {
-    name: "__alphakeysession",
+    name: "__inviteCodeSession",
     httpOnly: true,
     sameSite: "lax",
     secrets: [process.env.alphaKeySecret as string],

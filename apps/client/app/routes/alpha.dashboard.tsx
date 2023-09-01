@@ -6,7 +6,7 @@ import { getRootDir, getSolFileNames, getUserRepositories } from "../utils/octo.
 import { Loader, X, ChevronDown, Copy, Edit, CheckCircle } from "lucide-react";
 import { deployContract } from "~/utils/viem.server";
 import { AbiFunction as AbiFunctionType } from "abitype";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import {
   callContractFunction,
   sleep,
@@ -40,11 +40,9 @@ import { createTestClient, http, parseEther, isAddress, createPublicClient } fro
 import SetupWizard from "~/components/SetupWizard";
 import TxViewer from "~/components/TxViewer";
 import React from "react";
+import { DisplayCodesContext } from "./alpha";
 
 //TODO: Add states to transactions (pending, confirmed, failed)
-
-//TODO: fix having to reinstall github app if already installed
-//TODO: add invite links
 //TODO: add ability for team page
 
 export const action = async ({ request }: ActionArgs): Promise<DashboardActionReturn> => {
@@ -55,6 +53,7 @@ export const action = async ({ request }: ActionArgs): Promise<DashboardActionRe
     where: { githubInstallationId: githubInstallationId as string },
     include: {
       ApiKey: true,
+      IssuedInviteCodes: true,
       Repository: {
         include: {
           Activity: true,
@@ -314,6 +313,7 @@ export const loader = async ({ request }: LoaderArgs) => {
     where: { id: user.get("userId") },
     include: {
       ApiKey: true,
+      IssuedInviteCodes: true,
       Repository: {
         include: {
           Activity: {
@@ -396,7 +396,7 @@ export default function Index() {
     loaderData.userData?.Repository?.deployerAddress,
     loaderData.userData?.ApiKey?.key,
   ]);
-
+  const displayCodes = useContext(DisplayCodesContext);
   return (
     <div className="selection:bg-accent selection:text-primary-gray max-w-screen h-auto min-h-screen display flex flex-col items-center justify-center text-[#121212]  ">
       {!isSetup(userData) ? (
@@ -411,6 +411,45 @@ export default function Index() {
         </div>
       ) : (
         <div id="content" className="w-3/4 max-w-7xl mx-auto rounded-lg mt-40 pb-40 text-white">
+          {displayCodes.displayInviteCodes && (
+            <div className="absolute top-0 left-0 z-50 flex items-center justify-center h-screen w-screen">
+              <span className="bg-[#2f2f2f] opacity-70 absolute top-0 left-0 h-screen w-screen"></span>
+              <div className="p-10 bg-[#727272] font-primary relative rounded-lg">
+                <button
+                  onClick={() => displayCodes.setDisplayInviteCodes(false)}
+                  className="absolute top-4 right-4"
+                >
+                  <X />
+                </button>
+                <h1 className="text-5xl font-primary font-black">Invite friends!</h1>
+                <p className="mt-4">Have a friend you think might benefit from fether?</p>
+                <p className="mt-4">
+                  Send them one of your invite codes below and they can try it out!
+                </p>
+                <div className="flex flex-row justify-evenly mt-4">
+                  {userData?.IssuedInviteCodes?.map((code) => (
+                    <div className="flex flex-col items-center">
+                      <p className={code.keyStatus == "UNUSED" ? "text-green-400" : "text-red-400"}>
+                        {code.keyStatus.slice(0, 1) + code.keyStatus.toLowerCase().slice(1)}
+                      </p>
+
+                      <div className="flex flex-row items-center">
+                        <p>{code.inviteCode}</p>
+                        {code.keyStatus == "UNUSED" && (
+                          <button onClick={() => navigator.clipboard.writeText(code.inviteCode)}>
+                            <Copy
+                              className="transform ml-4 active:scale-75 transition-transform"
+                              size={16}
+                            />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
           <div className="text-4xl flex gap-10 flex-col xl:flex-row justify-between rounded-lg">
             <div className="w-full xl:w-2/5 ">
               <div className="flex flex-col rounded-lg gap-10">

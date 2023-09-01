@@ -11,7 +11,7 @@ export const loader = async ({ request }: LoaderArgs) => {
   let redirectUri = process.env.fetherGithubRedirectUri as string;
   const session = await getSession(request.headers.get("Cookie"));
   const user = await userGetSession(request.headers.get("Cookie"));
-  if (!session.has("alphaKey")) throw redirect("/");
+  if (!session.has("inviteCode")) throw redirect("/");
   if (user.has("userId")) throw redirect("/alpha/dashboard");
   else return redirectUri;
 };
