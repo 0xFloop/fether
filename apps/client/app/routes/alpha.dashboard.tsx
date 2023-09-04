@@ -418,15 +418,13 @@ export default function Index() {
         userData.ApiKey &&
         userData.ApiKey.key
       ) ? (
-        <div key={loaderData.setupStep}>
-          <SetupWizard
-            loaderData={loaderData}
-            navigation={navigation}
-            actionArgs={actionArgs}
-            step={setupStep}
-            updateStep={(step: number) => setSetupStep(step)}
-          />
-        </div>
+        <SetupWizard
+          loaderData={loaderData}
+          navigation={navigation}
+          actionArgs={actionArgs}
+          step={setupStep}
+          updateStep={(step: number) => setSetupStep(step)}
+        />
       ) : (
         <div id="content" className="w-3/4 max-w-7xl mx-auto rounded-lg mt-40 pb-40 text-white">
           {displayCodes.displayInviteCodes && (

@@ -16,8 +16,8 @@ const SetupWizard: React.FC<SetupWizardProps> = (props: SetupWizardProps) => {
   const userData = props.loaderData.userData;
   if (props.step == 7) throw new Error("Setup wizard error, please sign out and sign back in.");
   return (
-    <div className="w-[1100px] max-w-7xl h-[750px] flex flex-row justify-between items-center">
-      <div className="text-white border border-secondary-border rounded-l-3xl h-full w-1/3 p-4 bg-[#1E1E1E] flex flex-col gap-4">
+    <div className="w-11/12 min-w-[800px] max-w-[1100px] h-[750px] flex flex-row justify-between items-center">
+      <div className="text-white border border-secondary-border rounded-l-3xl h-full w-1/3 min-w-[350px] p-4 bg-[#1E1E1E] flex flex-col gap-4">
         <p className="text-lg mt-4 bg-accent w-20 rounded-lg text-center">Alpha</p>
         <h1 className="text-5xl">Welcome to Fether setup wizard</h1>
         <p className="text-lg">Let's get things set up for you!</p>
