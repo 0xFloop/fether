@@ -284,7 +284,7 @@ const SetDeployerComponent: React.FC<setupProps> = (props: setupProps) => {
   };
 
   return (
-    <div className="h-full w-full flex flex-col items-center ">
+    <div className="h-full w-full flex flex-col items-center align-middle justify-center ">
       <Form method="post" className="w-full">
         <input
           type="hidden"
@@ -300,7 +300,7 @@ const SetDeployerComponent: React.FC<setupProps> = (props: setupProps) => {
             onChange={handleAddressChange}
           />
           <button
-            className="text-white h-full text-xl disabled:bg-tertiary-gray bg-accent py-2 px-4 border rounded-r-lg"
+            className="text-white w-1/5 h-full text-xl disabled:bg-tertiary-gray bg-accent py-2 px-4 border rounded-r-lg flex items-center align-middle justify-center"
             type="submit"
             disabled={!addressValid}
           >
