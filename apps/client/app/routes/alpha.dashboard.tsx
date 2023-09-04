@@ -117,6 +117,15 @@ export const action = async ({ request }: ActionArgs): Promise<DashboardActionRe
               error: null,
             };
           }
+          return {
+            originCallForm: "chooseRepo",
+            chosenRepoName: null,
+            repositories: null,
+            solFilesFromChosenRepo: null,
+            chosenFileName: null,
+            txDetails: null,
+            error: null,
+          };
         case "getFilesOfChosenRepo":
           let foundryRootDir = associatedUser.Repository?.foundryRootDir;
           if (!foundryRootDir) {
@@ -139,7 +148,7 @@ export const action = async ({ request }: ActionArgs): Promise<DashboardActionRe
           await db.repository.update({
             where: { userId: associatedUser.id },
             data: {
-              filename: body.get("chosenFileName") as string,
+              filename: body.get("chosenFileName") ? (body.get("chosenFileName") as string) : null,
               contractAbi: null,
               contractAddress: null,
               deployerAddress: null,
@@ -510,51 +519,53 @@ export default function Index() {
                       </Form>
                     </div>
                     {actionArgs?.originCallForm == "getRepos" && (
-                      <div className="absolute left-1/4 w-1/2 p-5 z-10 bg-secondary-gray border border-white rounded-lg">
-                        <div className="w-full justify-between flex flex-row">
-                          <p className="text-2xl">Choose Repository :</p>
-                          <Form method="post">
+                      <div className="absolute top-0 left-0 z-50 flex items-center justify-center h-screen w-screen">
+                        <div className="absolutew-1/2 p-5 bg-secondary-gray border border-white rounded-lg">
+                          <div className="w-full justify-between flex flex-row">
+                            <p className="text-2xl">Choose Repository :</p>
+                            <Form method="post">
+                              <input
+                                type="hidden"
+                                name="githubInstallationId"
+                                value={userData.githubInstallationId as string}
+                              />
+                              <button type="submit">
+                                <X />
+                              </button>
+                            </Form>
+                          </div>
+                          <Form method="post" className="mt-5">
                             <input
                               type="hidden"
                               name="githubInstallationId"
                               value={userData.githubInstallationId as string}
                             />
-                            <button type="submit">
-                              <X />
+                            <input type="hidden" name="formType" value="getChosenRepo" />
+
+                            <fieldset className="grid grid-cols-2">
+                              {actionArgs.repositories?.map((repo) => (
+                                <label key={repo.repoName} className="text-xl">
+                                  <input
+                                    type="radio"
+                                    name="chosenRepoData"
+                                    value={[repo.repoName, repo.repoId]}
+                                  />{" "}
+                                  {repo.repoName}
+                                </label>
+                              ))}
+                            </fieldset>
+                            <br />
+
+                            <button type="submit" className=" bg-accent py-2 px-4  rounded-lg">
+                              {navigation.state == "submitting" &&
+                              navigation.formData?.get("formType") == "getChosenRepo" ? (
+                                <p>Submitting....</p>
+                              ) : (
+                                <p>Submit</p>
+                              )}
                             </button>
                           </Form>
                         </div>
-                        <Form method="post" className="mt-5">
-                          <input
-                            type="hidden"
-                            name="githubInstallationId"
-                            value={userData.githubInstallationId as string}
-                          />
-                          <input type="hidden" name="formType" value="getChosenRepo" />
-
-                          <fieldset className="grid grid-cols-2">
-                            {actionArgs.repositories?.map((repo) => (
-                              <label key={repo.repoName} className="text-xl">
-                                <input
-                                  type="radio"
-                                  name="chosenRepoData"
-                                  value={[repo.repoName, repo.repoId]}
-                                />{" "}
-                                {repo.repoName}
-                              </label>
-                            ))}
-                          </fieldset>
-                          <br />
-
-                          <button type="submit" className=" bg-accent py-2 px-4  rounded-lg">
-                            {navigation.state == "submitting" &&
-                            navigation.formData?.get("formType") == "getChosenRepo" ? (
-                              <p>Submitting....</p>
-                            ) : (
-                              <p>Submit</p>
-                            )}
-                          </button>
-                        </Form>
                       </div>
                     )}
                   </div>
@@ -585,45 +596,47 @@ export default function Index() {
                           </button>
                         </Form>
                         {actionArgs?.originCallForm == "getFilesOfChosenRepo" && (
-                          <div className="absolute left-1/4 w-1/2 p-5 z-10 bg-secondary-gray border border-white rounded-lg">
-                            <div className="w-full justify-between flex flex-row">
-                              <p className="text-2xl">Choose File To Track:</p>
-                              <Form method="post">
+                          <div className="absolute top-0 left-0 z-50 flex items-center justify-center h-screen w-screen">
+                            <div className="p-5 bg-secondary-gray border border-white rounded-lg">
+                              <div className="justify-between flex flex-row">
+                                <p className="text-2xl">Choose File To Track:</p>
+                                <Form method="post">
+                                  <input
+                                    type="hidden"
+                                    name="githubInstallationId"
+                                    value={userData.githubInstallationId as string}
+                                  />
+                                  <button type="submit">
+                                    <X />
+                                  </button>
+                                </Form>
+                              </div>
+                              <Form method="post" className="mt-10">
                                 <input
                                   type="hidden"
                                   name="githubInstallationId"
                                   value={userData.githubInstallationId as string}
                                 />
-                                <button type="submit">
-                                  <X />
+                                <input type="hidden" name="formType" value="chooseFileToTrack" />
+                                <fieldset className="grid grid-cols-2">
+                                  {actionArgs.solFilesFromChosenRepo?.map((fileName, i) => (
+                                    <label key={i} className="text-xl">
+                                      <input type="radio" name="chosenFileName" value={fileName} />{" "}
+                                      {fileName}
+                                    </label>
+                                  ))}
+                                </fieldset>
+                                <br />
+                                <button type="submit" className=" bg-accent py-2 px-4  rounded-lg">
+                                  {navigation.state == "submitting" &&
+                                  navigation.formData?.get("formType") == "chooseFileToTrack" ? (
+                                    <p>Submitting....</p>
+                                  ) : (
+                                    <p>Submit</p>
+                                  )}
                                 </button>
                               </Form>
                             </div>
-                            <Form method="post" className="mt-10">
-                              <input
-                                type="hidden"
-                                name="githubInstallationId"
-                                value={userData.githubInstallationId as string}
-                              />
-                              <input type="hidden" name="formType" value="chooseFileToTrack" />
-                              <fieldset className="grid grid-cols-2">
-                                {actionArgs.solFilesFromChosenRepo?.map((fileName, i) => (
-                                  <label key={i} className="text-xl">
-                                    <input type="radio" name="chosenFileName" value={fileName} />{" "}
-                                    {fileName}
-                                  </label>
-                                ))}
-                              </fieldset>
-                              <br />
-                              <button type="submit" className=" bg-accent py-2 px-4  rounded-lg">
-                                {navigation.state == "submitting" &&
-                                navigation.formData?.get("formType") == "chooseFileToTrack" ? (
-                                  <p>Submitting....</p>
-                                ) : (
-                                  <p>Submit</p>
-                                )}
-                              </button>
-                            </Form>
                           </div>
                         )}
                       </div>
@@ -657,46 +670,51 @@ export default function Index() {
                         </button>
                       </Form>
                       {deployerModal && actionArgs?.originCallForm != "setDeployerAddress" && (
-                        <div className="absolute left-1/4 w-1/2 p-5 z-10 pb-10 bg-secondary-gray border border-white rounded-lg">
-                          <div className="w-full justify-between flex flex-row">
-                            <p className="text-2xl">Update Deployer Address:</p>
-                            <button onClick={() => setDeployerModal(false)} className="float-right">
-                              <X />
-                            </button>
-                          </div>
-
-                          <Form method="post" className="w-11/12 mt-5 h-full">
-                            <input
-                              type="hidden"
-                              name="githubInstallationId"
-                              value={userData?.githubInstallationId?.toString()}
-                            />
-                            <input type="hidden" name="formType" value="setDeployerAddress" />
-
-                            <div className="flex  overflow-hidden bg-white rounded-lg flex-row items-center justify-between w-full h-full">
-                              <input
-                                className="text-lg outline-none border-none text-black px-2 w-5/6  bg-[#D9D9D9]"
-                                name="deployerAddress"
-                                placeholder="Input desired contract deployer address"
-                                onChange={handleAddressChange}
-                              />
+                        <div className="absolute top-0 left-0 z-50 flex items-center justify-center h-screen w-screen">
+                          <div className="absolute left-1/4 w-1/2 p-5 pb-10 bg-secondary-gray border border-white rounded-lg">
+                            <div className="w-full justify-between flex flex-row">
+                              <p className="text-2xl">Update Deployer Address:</p>
                               <button
-                                className="text-white h-full border border-red-500 flex-1 text-xl disabled:bg-tertiary-gray bg-accent py-2 px-4"
-                                type="submit"
-                                disabled={!addressValid}
+                                onClick={() => setDeployerModal(false)}
+                                className="float-right"
                               >
-                                {navigation.state == "submitting" &&
-                                navigation.formData &&
-                                navigation.formData.get("formType") == "setDeployerAddress" ? (
-                                  <div className="inline-block animate-spin">
-                                    <Loader size={20} />
-                                  </div>
-                                ) : (
-                                  <p>Confirm</p>
-                                )}
+                                <X />
                               </button>
                             </div>
-                          </Form>
+
+                            <Form method="post" className="w-11/12 mt-5 h-full">
+                              <input
+                                type="hidden"
+                                name="githubInstallationId"
+                                value={userData?.githubInstallationId?.toString()}
+                              />
+                              <input type="hidden" name="formType" value="setDeployerAddress" />
+
+                              <div className="flex  overflow-hidden bg-white rounded-lg flex-row items-center justify-between w-full h-full">
+                                <input
+                                  className="text-lg outline-none border-none text-black px-2 w-5/6  bg-[#D9D9D9]"
+                                  name="deployerAddress"
+                                  placeholder="Input desired contract deployer address"
+                                  onChange={handleAddressChange}
+                                />
+                                <button
+                                  className="text-white h-full flex-1 text-xl disabled:bg-tertiary-gray bg-accent py-2 px-4"
+                                  type="submit"
+                                  disabled={!addressValid}
+                                >
+                                  {navigation.state == "submitting" &&
+                                  navigation.formData &&
+                                  navigation.formData.get("formType") == "setDeployerAddress" ? (
+                                    <div className="inline-block animate-spin">
+                                      <Loader size={20} />
+                                    </div>
+                                  ) : (
+                                    <p>Confirm</p>
+                                  )}
+                                </button>
+                              </div>
+                            </Form>
+                          </div>
                         </div>
                       )}
                     </div>
