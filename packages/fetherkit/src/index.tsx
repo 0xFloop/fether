@@ -34,35 +34,27 @@ export default class Fether {
 
   constructor(API_KEY: string) {
     this.key = API_KEY;
-    this.chain = {
-      id: 696969,
-      name: "Fether",
-      network: "fether",
-      nativeCurrency: {
-        decimals: 18,
-        name: "Fether",
-        symbol: "FEth",
-      },
-      rpcUrls: {
-        default: { http: [`https://fether-server.vercel.app/rpc/${this.key}`] },
-        public: { http: [`https://fether-server.vercel.app/rpc/${this.key}`] },
-      },
-      testnet: false,
-    };
+    this.chain = fetherChainFromKey(API_KEY);
     this.address = "0x";
     this.abi = [];
     this.methods = {};
   }
   async init() {
     try {
-      let data = await fetch(`https://fether-server.vercel.app/fetherkit/${this.key}`).then(
-        async (res) => {
-          if (res.status > 400) {
-            throw new Error(await res.json());
-          }
-          return res.json();
+      console.log("process.env.NODE_ENV");
+      console.log(process.env.NODE_ENV);
+      let data = await fetch(
+        `https://${
+          process.env.NODE_ENV == "production"
+            ? "fether-server.vercel.app"
+            : "fether-testing.ngrok.app"
+        }/fetherkit/${this.key}`
+      ).then(async (res) => {
+        if (res.status > 400) {
+          throw new Error(await res.json());
         }
-      );
+        return res.json();
+      });
 
       const _abi = JSON.parse(data.contractAbi);
 
@@ -166,14 +158,12 @@ interface FetherProviderProps {
 
 export function FetherProvider(props: FetherProviderProps) {
   const fetherInstance = new Fether(props.apiKey);
+  console.log(fetherInstance.abi);
+  console.log(fetherInstance.address);
 
   useEffect(() => {
     fetherInstance.init();
   }, []);
 
-  return (
-    <div>
-      <FetherContext.Provider value={fetherInstance}>{props.children}</FetherContext.Provider>
-    </div>
-  );
+  return <FetherContext.Provider value={fetherInstance}>{props.children}</FetherContext.Provider>;
 }
