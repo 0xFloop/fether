@@ -1,6 +1,6 @@
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   createPublicClient,
   createTestClient,
@@ -21,11 +21,14 @@ export default function Index() {
   });
 
   const updateStateNumber = async () => {
+    console.log(fether.abi);
+    console.log(fether.address);
     const number = await publicClient.readContract({
       address: fether.address,
       abi: fether.abi,
       functionName: "getSecretNumber",
     });
+
     setNumber(Number(number));
   };
 
@@ -62,6 +65,7 @@ export default function Index() {
   return (
     <div>
       <ConnectButton />
+      <div>{process.env.NODE_ENV}</div>
       <button onClick={updateStateNumber}>click to get contract number value</button>
       <br />
       <br />
