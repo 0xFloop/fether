@@ -35,7 +35,7 @@ export const meta: V2_MetaFunction = () => {
 
 export default function App() {
   // const fetherChain = fetherChainFromKey(apiKey);
-  const fetherKey = "cllcvsb8a0002jo090kwx8trd";
+  const fetherKey = "clm45vcrb0002z9sqtt55ddnr";
 
   return (
     <html lang="en">
@@ -45,7 +45,7 @@ export default function App() {
       </head>
       <body>
         <FetherProvider apiKey={fetherKey}>
-          <WalletProvider>
+          <WalletProvider apiKey={fetherKey}>
             <Outlet />
           </WalletProvider>
         </FetherProvider>

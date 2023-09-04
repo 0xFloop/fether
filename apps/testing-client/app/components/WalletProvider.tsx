@@ -14,21 +14,18 @@ import { configureChains, createConfig, WagmiConfig } from "wagmi";
 import { alchemyProvider } from "wagmi/providers/alchemy";
 import { publicProvider } from "wagmi/providers/public";
 
-export function WalletProvider({
-  children,
-  fallback,
-}: PropsWithChildren<{ fallback?: ReactNode }>) {
+export function WalletProvider({ children, apiKey }: PropsWithChildren<{ apiKey: string }>) {
   const [{ wagmiConfig, chains }] = useState(() => {
     if (typeof window === "undefined") {
       return { wagmiConfig: null, chains: null };
     }
 
     const { chains, publicClient } = configureChains(
-      [fetherChainFromKey("cllb25eqq0002jw08ddgvy1lz")],
+      [fetherChainFromKey(apiKey)],
       [alchemyProvider({ apiKey: "window.ENV.ALCHEMY_ID" }), publicProvider()]
     );
     const { connectors } = getDefaultWallets({
-      appName: "Americana",
+      appName: "fether",
       projectId: "42490798ad26dff0d5bfc67ee7abf1fb",
       chains,
     });
@@ -42,7 +39,7 @@ export function WalletProvider({
   });
 
   return (
-    <ClientOnly fallback={fallback}>
+    <ClientOnly>
       {() =>
         wagmiConfig && chains?.length ? (
           <WagmiConfig config={wagmiConfig}>
@@ -50,7 +47,7 @@ export function WalletProvider({
               chains={chains}
               modalSize="compact"
               theme={darkTheme()}
-              appInfo={{ appName: "Americana" }}
+              appInfo={{ appName: "fether" }}
             >
               {children}
             </RainbowKitProvider>
