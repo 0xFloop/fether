@@ -9,7 +9,7 @@
     "build": "tsc"
   },
   "keywords": [],
-  "author": "",
+  "author": "floop",
   "license": "ISC",
   "devDependencies": {
     "@types/node": "^18.15.11",

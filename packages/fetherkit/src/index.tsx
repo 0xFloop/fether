@@ -41,8 +41,6 @@ export default class Fether {
   }
   async init() {
     try {
-      console.log("process.env.NODE_ENV");
-      console.log(process.env.NODE_ENV);
       let data = await fetch(
         `https://${
           process.env.NODE_ENV == "production"
