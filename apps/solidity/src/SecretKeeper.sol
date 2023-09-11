@@ -3,7 +3,7 @@ pragma solidity ^0.8.13;
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract SecretKeeper is Ownable {
-    string public secretPhrase = "testing shit";
+    string public secretPhrase = "testing turbo-ignore stuff";
     uint256 public secretNumber = 345;
     SecretStorage public secretInStorage = SecretStorage(999, "super secret");
 
