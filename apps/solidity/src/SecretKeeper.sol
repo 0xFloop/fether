@@ -3,9 +3,10 @@ pragma solidity ^0.8.13;
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract SecretKeeper is Ownable {
-    string public secretPhrase = "testing turbo-ignore again AGAIN";
-    uint256 public secretNumber = 6667;
-    SecretStorage public secretInStorage = SecretStorage(999, "super secret");
+    string public secretPhrase = "super duper very secret phrase";
+    uint256 public secretNumber = 8787;
+    SecretStorage public secretInStorage =
+        SecretStorage(1010, "super duper secret");
 
     struct SecretStorage {
         uint secretNumber;
