@@ -49,15 +49,15 @@ export function ErrorBoundary() {
   const error = useRouteError();
 
   // when true, this is what used to go to `CatchBoundary`
-  if (isRouteErrorResponse(error)) {
-    return (
-      <div className="h-80">
-        <h1>Oops</h1>
-        <p>Status: {error.status}</p>
-        <p>{error.data.message}</p>
-      </div>
-    );
-  }
+  // if (isRouteErrorResponse(error)) {
+  //   return (
+  //     <div className="h-80">
+  //       <h1>Oops</h1>
+  //       <p>Status: {error.status}</p>
+  //       <p>{error.data.message}</p>
+  //     </div>
+  //   );
+  // }
 
   // Don't forget to typecheck with your own logic.
   // Any value can be thrown, not just errors!

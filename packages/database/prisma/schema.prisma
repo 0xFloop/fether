@@ -18,6 +18,7 @@ model User {
   passwordHash         String?
   githubId             Int?    @unique
   githubInstallationId String? @unique
+  teamId               String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
@@ -26,19 +27,46 @@ model User {
   Repository        Repository?
   IssuedInviteCodes InviteCode[] @relation("Issued")
   UsedInviteCode    InviteCode[] @relation("Used")
+  MemberTeam        Team?        @relation("TeamMembers", fields: [teamId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([teamId], name: "TeamId")
 }
 
 model ApiKey {
-  key            String   @id @unique @default(cuid())
-  userId         String   @unique
-  associatedUser User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  keyTier        KeyTier
-  expires        DateTime
+  key     String   @id @unique @default(cuid())
+  userId  String?  @unique
+  teamId  String?  @unique
+  expires DateTime
+
+  associatedTeam Team? @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  associatedUser User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  keyTier KeyTier
+  keyType KeyType @default(value: USER)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 
   @@index([userId], name: "UserId")
+  @@index([teamId], name: "TeamId")
+}
+
+model Team {
+  id           String  @id @unique @default(cuid())
+  name         String
+  ownerId      String
+  repositoryId String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  InviteCodes TeamInviteCode[]
+  Repository  Repository?      @relation(fields: [repositoryId], references: [id])
+  Members     User[]           @relation("TeamMembers")
+  ApiKey      ApiKey?
+
+  @@index([repositoryId], name: "RepositoryId")
+  @@index([ownerId], name: "OwnerId")
 }
 
 model Repository {
@@ -56,6 +84,7 @@ model Repository {
   createdAt DateTime      @default(now())
   updatedAt DateTime      @default(now()) @updatedAt
   Activity  Transaction[]
+  Team      Team[]
 
   @@index([userId], name: "UserId")
 }
@@ -77,6 +106,11 @@ enum KeyTier {
   PRO
 }
 
+enum KeyType {
+  USER
+  TEAM
+}
+
 model InviteCode {
   inviteCode String    @id @unique @default(cuid())
   keyStatus  KeyStatus @default(UNUSED)
@@ -91,6 +125,19 @@ model InviteCode {
 
   @@index([issuedToId], name: "IssuedToId")
   @@index([usedById], name: "UsedById")
+}
+
+model TeamInviteCode {
+  inviteCode String    @id @unique @default(cuid())
+  keyStatus  KeyStatus @default(UNUSED)
+
+  teamId String?
+  team   Team?   @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  @@index([teamId], name: "TeamId")
 }
 
 enum KeyStatus {
