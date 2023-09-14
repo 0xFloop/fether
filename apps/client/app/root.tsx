@@ -20,8 +20,9 @@ export const links: LinksFunction = () => [
 
 export const meta: V2_MetaFunction = () => {
   return [
+    { title: "Fether" },
+    { name: "description", content: "Enabling frictionless smart contract to frontend testing." },
     { name: "charset", content: "utf-8" },
-    { name: "title", content: "fether" },
     { name: "viewport", content: "width=device-width,initial-scale=1" },
   ];
 };
