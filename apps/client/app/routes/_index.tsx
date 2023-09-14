@@ -65,7 +65,7 @@ export default function Index() {
             fether
           </h1>
         </div>
-        <div className="font-primary text-lg flex flex-row absolute bottom-4 right-6 align-bottom items-baseline">
+        <div className="font-primary text-lg flex-row hidden md:flex absolute bottom-4 right-6 align-bottom items-baseline">
           {hasAccess && <Link to="/alpha">Access</Link>}
           {!hasAccess && !alphaPopup && (
             <button onClick={() => setAlphaPopup(true)}>Get Access</button>
