@@ -1,9 +1,18 @@
-import { ActionArgs, LoaderArgs, redirect } from "@vercel/remix";
+import { ActionArgs, LoaderArgs, V2_MetaFunction, redirect } from "@vercel/remix";
 import { Form, useActionData, useLoaderData, useNavigation, useSubmit } from "@remix-run/react";
 import { db } from "../utils/db.server";
 import { getSession as userGetSession } from "../utils/alphaSession.server";
 import { getRootDir, getSolFileNames, getUserRepositories } from "../utils/octo.server";
-import { Loader, X, ChevronDown, Copy, Edit, CheckCircle } from "lucide-react";
+import {
+  Loader,
+  X,
+  ChevronDown,
+  Copy,
+  Edit,
+  CheckCircle,
+  ChevronsUpDown,
+  PlusCircle,
+} from "lucide-react";
 import { deployContract } from "~/utils/viem.server";
 import { AbiFunction as AbiFunctionType } from "abitype";
 import { useContext, useEffect, useState } from "react";
@@ -17,6 +26,7 @@ import {
   timeSince,
   SetupStepsEnum,
   isSetup,
+  zodTeamName,
 } from "~/utils/helpers";
 import * as Accordion from "@radix-ui/react-accordion";
 import { useAccount, useBalance } from "wagmi";
@@ -26,7 +36,7 @@ import {
   DashboardActionReturn,
   RepoData,
   TxDetails,
-  UserWithKeyRepoActivity,
+  UserWithKeyRepoActivityTeam,
 } from "~/types";
 
 import rainbowStylesUrl from "@rainbow-me/rainbowkit/styles.css";
@@ -42,9 +52,13 @@ import TxViewer from "~/components/TxViewer";
 import React from "react";
 import { DisplayCodesContext } from "./alpha";
 
+//TODO: improve tx viewer
 //TODO: Add states to transactions (pending, confirmed, failed)
-//TODO: add ability for team page
+//TODO: add teams
 
+export const meta: V2_MetaFunction<typeof loader> = ({ data }) => {
+  return [{ title: ("Fether | " + data?.userData?.username) as string }];
+};
 export const action = async ({ request }: ActionArgs): Promise<DashboardActionReturn> => {
   const body = await request.formData();
   const githubInstallationId = body.get("githubInstallationId");
@@ -54,6 +68,7 @@ export const action = async ({ request }: ActionArgs): Promise<DashboardActionRe
     include: {
       ApiKey: true,
       IssuedInviteCodes: true,
+      MemberTeam: true,
       Repository: {
         include: {
           Activity: true,
@@ -264,6 +279,64 @@ export const action = async ({ request }: ActionArgs): Promise<DashboardActionRe
             txDetails: txDetails,
             error: null,
           };
+        case "createTeam":
+          const teamName = body.get("teamName");
+          if (!teamName) {
+            return {
+              originCallForm: "createTeam",
+              chosenRepoName: null,
+              repositories: null,
+              solFilesFromChosenRepo: null,
+              chosenFileName: null,
+              txDetails: null,
+              error: "null teamName",
+            };
+          }
+          const validTeamName = zodTeamName.safeParse(teamName);
+
+          if (validTeamName.success == false) {
+            return {
+              originCallForm: "createTeam",
+              chosenRepoName: null,
+              repositories: null,
+              solFilesFromChosenRepo: null,
+              chosenFileName: null,
+              txDetails: null,
+              error: "Name can only contain alphanumeric, hyphen, underscore, and 3-20 characters.",
+            };
+          }
+          if (associatedUser.teamId) {
+            return {
+              originCallForm: "createTeam",
+              chosenRepoName: null,
+              repositories: null,
+              solFilesFromChosenRepo: null,
+              chosenFileName: null,
+              txDetails: null,
+              error: "User already has a team",
+            };
+          }
+          let newTeam = await db.team.create({
+            data: {
+              name: teamName as string,
+              ownerId: associatedUser.id,
+            },
+          });
+          await db.user.update({
+            where: { id: associatedUser.id },
+            data: {
+              teamId: newTeam.id,
+            },
+          });
+          return {
+            originCallForm: "createTeam",
+            chosenRepoName: null,
+            repositories: null,
+            solFilesFromChosenRepo: null,
+            chosenFileName: null,
+            txDetails: null,
+            error: null,
+          };
         default:
           return {
             originCallForm: "",
@@ -318,11 +391,12 @@ export const loader = async ({ request }: LoaderArgs) => {
   const user = await userGetSession(request.headers.get("Cookie"));
   if (!user.has("userId")) throw redirect("/alpha/login");
 
-  const userData: UserWithKeyRepoActivity = await db.user.findUnique({
+  const userData: UserWithKeyRepoActivityTeam = await db.user.findUnique({
     where: { id: user.get("userId") },
     include: {
       ApiKey: true,
       IssuedInviteCodes: true,
+      MemberTeam: true,
       Repository: {
         include: {
           Activity: {
@@ -345,7 +419,7 @@ export default function Index() {
   const navigation = useNavigation();
   const submit = useSubmit();
 
-  const userData = loaderData.userData as UserWithKeyRepoActivity;
+  const userData = loaderData.userData as UserWithKeyRepoActivityTeam;
   // const setupStep = loaderData.setupStep;
 
   const { address, isConnected } = useAccount();
@@ -358,6 +432,8 @@ export default function Index() {
   const [setupStep, setSetupStep] = useState<number>(loaderData.setupStep);
   const [addressValid, setAddressValid] = useState<boolean>(false);
   const [addressError, setAddressError] = useState<string | null>(null);
+  const [teamSelect, setTeamSelect] = useState(false);
+  const [createTeam, setCreateTeam] = useState(false);
 
   const handleAddressChange = (event: any) => {
     let valid = isAddress(event.target.value);
@@ -399,6 +475,7 @@ export default function Index() {
   useEffect(() => {
     setSetupStep(loaderData.setupStep);
   }, [
+    loaderData.userData?.teamId,
     loaderData.userData?.githubInstallationId,
     loaderData.userData?.Repository?.filename,
     loaderData.userData?.Repository?.name,
@@ -471,6 +548,71 @@ export default function Index() {
               <div className="flex flex-col rounded-lg gap-10">
                 <div className="text-xl gap-2 bg-secondary-gray border border-secondary-border shadow-md	 p-5 flex flex-col rounded-lg">
                   <p className="pb-2 text-4xl font-primary">Details :</p>
+                  <div className="flex flex-row justify-between rounded-lg relative">
+                    <p className="text-2xl font-primary text-tertiary-gray">Current Dashboard :</p>
+                    <div className="flex flex-row items-center gap-2">
+                      <p>{userData?.username}</p>
+
+                      <button onClick={() => setTeamSelect(!teamSelect)}>
+                        <ChevronsUpDown size={20} />
+                      </button>
+                    </div>
+                    {teamSelect && (
+                      <div className="absolute top-full p-4 w-full bg-tertiary-gray z-50 rounded-md">
+                        <h1>Dashboard Selector</h1>
+                        <div>
+                          <p>Personal Account:</p>
+                          <p>{userData?.username}</p>
+                        </div>
+                        {userData?.teamId ? (
+                          <div>
+                            <p>Team:</p>
+                            <button>{userData.MemberTeam?.name}</button>
+                          </div>
+                        ) : (
+                          <div>
+                            <div className="flex flex-row justify-between">
+                              <p>Create Team</p>
+                              <button onClick={() => setCreateTeam(!createTeam)}>
+                                {createTeam ? <X size={20} /> : <PlusCircle size={20} />}
+                              </button>
+                            </div>
+
+                            {createTeam && (
+                              <Form method="post" className="flex flex-col">
+                                <input
+                                  type="hidden"
+                                  name="githubInstallationId"
+                                  value={userData.githubInstallationId as string}
+                                />
+                                <input type="hidden" name="formType" value="createTeam" />
+                                <input
+                                  type="text"
+                                  maxLength={20}
+                                  name="teamName"
+                                  placeholder="Team Name"
+                                  className="text-black bg-transparent outline-none border-0 px-0 text-left focus:ring-0"
+                                />
+                                <button type="submit" className="flex items-center justify-center">
+                                  {navigation.state == "submitting" &&
+                                  navigation.formData?.get("formType") == "createTeam" ? (
+                                    <div className="animate-spin">
+                                      <Loader size={20} />
+                                    </div>
+                                  ) : (
+                                    "Create Team"
+                                  )}
+                                </button>
+                              </Form>
+                            )}
+                            {actionArgs?.originCallForm == "createTeam" && actionArgs.error && (
+                              <p className="text-red-500 text-base">{actionArgs.error}</p>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
                   <div className="flex flex-row justify-between rounded-lg">
                     <p className="text-2xl font-primary text-tertiary-gray">Api Key :</p>
                     <p className="flex flex-row items-center gap-2">
