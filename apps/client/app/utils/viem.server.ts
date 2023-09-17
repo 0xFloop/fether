@@ -11,7 +11,7 @@ import { privateKeyToAccount } from "viem/accounts";
 import { App as Octo } from "octokit";
 import { zodContractBuildFileSchema } from "./octo.server";
 import { Abi } from "abitype/zod";
-import { UserWithKeyRepoActivity } from "~/types";
+import { UserWithKeyRepoActivityTeam } from "~/types";
 import { fetherChainFromKey } from "./helpers";
 
 function getGithubPk() {
@@ -33,7 +33,7 @@ export const deployerAddress = pkaccount.address;
 
 export const deployContract = async (
   githubInstallationId: string,
-  repoData: UserWithKeyRepoActivity
+  repoData: UserWithKeyRepoActivityTeam
 ) => {
   const octokit = await octo.getInstallationOctokit(parseInt(githubInstallationId));
 

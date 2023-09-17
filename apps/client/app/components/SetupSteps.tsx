@@ -1,7 +1,7 @@
 import { Form, useActionData, useNavigation, useSubmit } from "@remix-run/react";
 import { Loader } from "lucide-react";
 import { useEffect, useState } from "react";
-import { UserWithKeyRepoActivity } from "~/types";
+import { UserWithKeyRepoActivityTeam } from "~/types";
 import { action } from "~/routes/alpha.dashboard";
 import { isAddress } from "viem";
 
@@ -14,7 +14,7 @@ type setupStep = {
 };
 
 type setupProps = {
-  userData: UserWithKeyRepoActivity;
+  userData: UserWithKeyRepoActivityTeam;
   navigation: ReturnType<typeof useNavigation>;
   actionArgs: ReturnType<typeof useActionData<typeof action>>;
   updateStep: (step: number) => void;

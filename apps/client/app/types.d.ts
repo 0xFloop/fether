@@ -1,9 +1,10 @@
-import { ApiKey, Repository, User, Transaction, InviteCode } from "database";
+import { ApiKey, Repository, User, Transaction, InviteCode, Team } from "database";
 
-export type UserWithKeyRepoActivity =
+export type UserWithKeyRepoActivityTeam =
   | (User & {
       ApiKey: ApiKey | null;
       IssuedInviteCodes: InviteCode[] | null;
+      MemberTeam: Team | null;
       Repository:
         | (Repository & {
             Activity: Transaction[] | null;

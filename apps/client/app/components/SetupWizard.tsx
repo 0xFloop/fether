@@ -2,7 +2,7 @@ import { useActionData, useLoaderData, useNavigation } from "@remix-run/react";
 import { Info } from "lucide-react";
 import { action, loader } from "~/routes/alpha.dashboard";
 import { setupSteps } from "./SetupSteps";
-import { UserWithKeyRepoActivity } from "~/types";
+import { UserWithKeyRepoActivityTeam } from "~/types";
 
 export interface SetupWizardProps {
   loaderData: ReturnType<typeof useLoaderData<typeof loader>>;
@@ -62,7 +62,7 @@ const SetupWizard: React.FC<SetupWizardProps> = (props: SetupWizardProps) => {
         </div>
         <div className="flex-1 px-10 overflow-hidden">
           {setupSteps[props.step].actionComponent({
-            userData: userData as UserWithKeyRepoActivity,
+            userData: userData as UserWithKeyRepoActivityTeam,
             navigation: props.navigation,
             actionArgs: props.actionArgs,
             updateStep: props.updateStep,
