@@ -27,7 +27,7 @@ model User {
   Repository        Repository?
   IssuedInviteCodes InviteCode[] @relation("Issued")
   UsedInviteCode    InviteCode[] @relation("Used")
-  MemberTeam        Team?        @relation("TeamMembers", fields: [teamId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  MemberTeam        Team?        @relation("TeamMembers", fields: [teamId], references: [id], onDelete: SetNull, onUpdate: SetNull)
 
   @@index([teamId], name: "TeamId")
 }
@@ -61,7 +61,7 @@ model Team {
   updatedAt DateTime @default(now()) @updatedAt
 
   InviteCodes TeamInviteCode[]
-  Repository  Repository?      @relation(fields: [repositoryId], references: [id])
+  Repository  Repository?      @relation(fields: [repositoryId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   Members     User[]           @relation("TeamMembers")
   ApiKey      ApiKey?
 
