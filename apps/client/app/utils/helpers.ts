@@ -2,11 +2,21 @@ import { Abi, AbiFunction } from "abitype/zod";
 import { Chain, createPublicClient, createWalletClient, custom, http } from "viem";
 import { AbiFunction as AbiFunctionType } from "abitype";
 import { z } from "zod";
-import { ContractReturn, ContractReturnItem, TxDetails, UserWithKeyRepoActivity } from "~/types";
+import {
+  ContractReturn,
+  ContractReturnItem,
+  TxDetails,
+  UserWithKeyRepoActivityTeam,
+} from "~/types";
 
 export const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 const zodFunctionReturnSchema = z.array(z.any());
+export const zodTeamName = z
+  .string()
+  .min(3)
+  .max(20)
+  .regex(/^[a-zA-Z0-9_-]*$/);
 
 export function truncateToDecimals(num: number, dec = 2) {
   const calcDec = Math.pow(10, dec);
@@ -229,7 +239,7 @@ export enum SetupStepsEnum {
   "Error",
 }
 
-export const determineSetupStep = (userData: UserWithKeyRepoActivity): number => {
+export const determineSetupStep = (userData: UserWithKeyRepoActivityTeam): number => {
   if (!userData) return SetupStepsEnum.Error;
 
   if (!userData.ApiKey) return SetupStepsEnum.GenerateApiKey;
@@ -248,7 +258,7 @@ export const determineSetupStep = (userData: UserWithKeyRepoActivity): number =>
   else return SetupStepsEnum.Error;
 };
 
-export const isSetup = (userData: UserWithKeyRepoActivity): boolean => {
+export const isSetup = (userData: UserWithKeyRepoActivityTeam): boolean => {
   if (
     userData &&
     userData.Repository &&
