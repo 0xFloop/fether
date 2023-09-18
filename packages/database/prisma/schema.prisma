@@ -18,7 +18,7 @@ model User {
   passwordHash         String?
   githubId             Int?    @unique
   githubInstallationId String? @unique
-  teamId               String?
+  memberTeamId         String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
@@ -27,9 +27,10 @@ model User {
   Repository        Repository?
   IssuedInviteCodes InviteCode[] @relation("Issued")
   UsedInviteCode    InviteCode[] @relation("Used")
-  MemberTeam        Team?        @relation("TeamMembers", fields: [teamId], references: [id], onDelete: SetNull, onUpdate: SetNull)
+  MemberTeam        Team?        @relation("TeamMembers", fields: [memberTeamId], references: [id], onDelete: SetNull, onUpdate: SetNull)
+  OwnedTeam         Team?        @relation("TeamOwner")
 
-  @@index([teamId], name: "TeamId")
+  @@index([memberTeamId], name: "TeamId")
 }
 
 model ApiKey {
@@ -54,12 +55,13 @@ model ApiKey {
 model Team {
   id           String  @id @unique @default(cuid())
   name         String
-  ownerId      String
+  ownerId      String  @unique
   repositoryId String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 
+  Owner       User             @relation("TeamOwner", fields: [ownerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   InviteCodes TeamInviteCode[]
   Repository  Repository?      @relation(fields: [repositoryId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   Members     User[]           @relation("TeamMembers")
