@@ -5,6 +5,7 @@ import { z } from "zod";
 import {
   ContractReturn,
   ContractReturnItem,
+  TeamWithKeyRepoActivityMembers,
   TxDetails,
   UserWithKeyRepoActivityTeam,
 } from "~/types";
@@ -12,6 +13,10 @@ import {
 export const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 const zodFunctionReturnSchema = z.array(z.any());
+
+export function spacify(str: string) {
+  return str.replace("-", " ").replace("_", " ");
+}
 export const zodTeamName = z
   .string()
   .min(3)
@@ -239,23 +244,41 @@ export enum SetupStepsEnum {
   "Error",
 }
 
-export const determineSetupStep = (userData: UserWithKeyRepoActivityTeam): number => {
-  if (!userData) return SetupStepsEnum.Error;
+export const determineSetupStep = (
+  userData: UserWithKeyRepoActivityTeam | null,
+  teamData: TeamWithKeyRepoActivityMembers | null
+): number => {
+  if (userData) {
+    if (!userData.ApiKey) return SetupStepsEnum.GenerateApiKey;
 
-  if (!userData.ApiKey) return SetupStepsEnum.GenerateApiKey;
+    if (!userData.githubInstallationId) return SetupStepsEnum.InstallFetherKitGithubApp;
 
-  if (!userData.githubInstallationId) return SetupStepsEnum.InstallFetherKitGithubApp;
+    if (!userData.Repository) return SetupStepsEnum.SelectRepository;
 
-  if (!userData.Repository) return SetupStepsEnum.SelectRepository;
+    if (!userData.Repository.filename) return SetupStepsEnum.SelectSmartContract;
 
-  if (!userData.Repository.filename) return SetupStepsEnum.SelectSmartContract;
+    if (!userData.Repository.deployerAddress) return SetupStepsEnum.SetDeployerAddress;
 
-  if (!userData.Repository.deployerAddress) return SetupStepsEnum.SetDeployerAddress;
+    if (!userData.Repository.contractAddress) return SetupStepsEnum.DeployContract;
 
-  if (!userData.Repository.contractAddress) return SetupStepsEnum.DeployContract;
+    if (userData.Repository.contractAddress) return SetupStepsEnum.Done;
+    else return SetupStepsEnum.Error;
+  } else if (teamData) {
+    if (!teamData.ApiKey) return SetupStepsEnum.GenerateApiKey;
 
-  if (userData.Repository.contractAddress) return SetupStepsEnum.Done;
-  else return SetupStepsEnum.Error;
+    if (!teamData.Repository) return SetupStepsEnum.SelectRepository;
+
+    if (!teamData.Repository.filename) return SetupStepsEnum.SelectSmartContract;
+
+    if (!teamData.Repository.deployerAddress) return SetupStepsEnum.SetDeployerAddress;
+
+    if (!teamData.Repository.contractAddress) return SetupStepsEnum.DeployContract;
+
+    if (teamData.Repository.contractAddress) return SetupStepsEnum.Done;
+    else return SetupStepsEnum.Error;
+  } else {
+    return SetupStepsEnum.Error;
+  }
 };
 
 export const isSetup = (userData: UserWithKeyRepoActivityTeam): boolean => {
