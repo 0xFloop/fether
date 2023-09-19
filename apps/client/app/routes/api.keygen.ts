@@ -5,8 +5,6 @@ import { KeyTier } from "database";
 export const action = async ({ request }: ActionArgs) => {
   const body = await request.formData();
   const userId = body.get("userId");
-  console.log("USERID IS CONSOLE LOGGED BELOW");
-  console.log(userId);
   if (!userId) {
     return redirect("/alpha/dashboard");
   } else {
