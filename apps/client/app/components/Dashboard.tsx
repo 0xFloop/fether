@@ -165,7 +165,7 @@ export const Dashboard = (props: DashboardProps) => {
                             <p>Personal Account:</p>
                             <p>{userData?.username}</p>
                           </div>
-                          {userData?.teamId ? (
+                          {userData?.memberTeamId ? (
                             <div>
                               <p>Team:</p>
                               <Link to={`/alpha/team/${userData.MemberTeam?.id}`}>
