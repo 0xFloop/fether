@@ -79,13 +79,13 @@ export const action = async ({ request }: ActionArgs): Promise<DashboardActionRe
             await db.repository.upsert({
               where: { userId: associatedUser.id },
               create: {
-                id: chosenRepoId as string,
-                name: chosenRepoName as string,
+                repoId: chosenRepoId as string,
+                repoName: chosenRepoName as string,
                 userId: associatedUser.id,
               },
               update: {
-                name: chosenRepoName as string,
-                id: chosenRepoId as string,
+                repoName: chosenRepoName as string,
+                repoId: chosenRepoId as string,
                 contractAbi: null,
                 contractAddress: null,
                 filename: null,
@@ -157,7 +157,11 @@ export const action = async ({ request }: ActionArgs): Promise<DashboardActionRe
           };
         case "deployContract":
           try {
-            await deployContract(githubInstallationId as string, associatedUser);
+            await deployContract(
+              githubInstallationId as string,
+              associatedUser.Repository,
+              associatedUser.ApiKey?.key as string
+            );
           } catch (e: any) {
             if (e.message == "Not Found") {
               throw new Error(
@@ -399,7 +403,7 @@ export default function Index() {
     loaderData.userData?.memberTeamId,
     loaderData.userData?.githubInstallationId,
     loaderData.userData?.Repository?.filename,
-    loaderData.userData?.Repository?.name,
+    loaderData.userData?.Repository?.repoName,
     loaderData.userData?.Repository?.deployerAddress,
     loaderData.userData?.ApiKey?.key,
   ]);

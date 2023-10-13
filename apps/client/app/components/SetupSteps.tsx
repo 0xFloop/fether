@@ -27,8 +27,9 @@ const GenerateKeyComponent: React.FC<setupProps> = (props: setupProps) => {
   return (
     <div className="h-full w-full flex items-center align-middle justify-center">
       <Form method="post" action="/api/keygen">
-        <input type="hidden" name="userId" value={data?.id} />
+        <input type="hidden" name="id" value={data?.id} />
         <input type="hidden" name="formType" value="generateApiKey" />
+        <input type="hidden" name="dashboardType" value={props.dashboardType} />
 
         <button
           disabled={props.navigation.state === "submitting"}
@@ -74,7 +75,7 @@ const SelectRepoComponent: React.FC<setupProps> = (props: setupProps) => {
   useEffect(() => {
     submit(
       {
-        githubInstallationId: props.userData
+        githubInstallationId: Boolean(props.userData)
           ? (props.userData?.githubInstallationId?.toString() as string)
           : (props.teamData?.Owner?.githubInstallationId?.toString() as string),
         formType: "getAllRepos",
@@ -102,8 +103,8 @@ const SelectRepoComponent: React.FC<setupProps> = (props: setupProps) => {
         </div>
       ) : (
         <>
-          {data?.Repository?.name && <p>Current Repo: {data?.Repository?.name}</p>}
-          {data?.Repository?.name && (
+          {data?.Repository?.repoName && <p>Current Repo: {data?.Repository?.repoName}</p>}
+          {data?.Repository?.repoName && (
             <button
               onClick={() => props.updateStep(3)}
               className="py-3 px-5 bg-accent border rounded-lg border-[#6161FF] absolute bottom-7 right-10"

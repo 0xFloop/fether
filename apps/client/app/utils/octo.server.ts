@@ -51,8 +51,8 @@ export const getRootDir = async (githubInstallationId: string): Promise<string> 
       include: { Repository: true },
     });
 
-    let ownerName = repoData?.Repository?.name.split("/")[0];
-    let repoName = repoData?.Repository?.name.split("/")[1];
+    let ownerName = repoData?.Repository?.repoName.split("/")[0];
+    let repoName = repoData?.Repository?.repoName.split("/")[1];
 
     if (!ownerName || !repoName) throw new Error("No owner or repo name found");
 
@@ -116,8 +116,8 @@ export const getSolFileNames = async (
     include: { Repository: true },
   });
 
-  let ownerName = repoData?.Repository?.name.split("/")[0];
-  let repoName = repoData?.Repository?.name.split("/")[1];
+  let ownerName = repoData?.Repository?.repoName.split("/")[0];
+  let repoName = repoData?.Repository?.repoName.split("/")[1];
 
   let fileNames: string[] = [];
 

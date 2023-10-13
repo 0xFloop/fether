@@ -18,7 +18,11 @@ export type returnedMemberData = {
   username: string;
   isOwner: boolean;
 };
-
+export type RepoWithActivity =
+  | (Repository & {
+      Activity: Transaction[] | null;
+    })
+  | null;
 export type TeamWithKeyRepoActivityMembers =
   | (Team & {
       ApiKey: ApiKey | null;

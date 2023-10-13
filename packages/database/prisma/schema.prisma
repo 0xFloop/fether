@@ -53,29 +53,30 @@ model ApiKey {
 }
 
 model Team {
-  id           String  @id @unique @default(cuid())
-  name         String
-  ownerId      String  @unique
-  repositoryId String?
+  id      String @id @unique @default(cuid())
+  name    String
+  ownerId String @unique
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 
-  Owner       User             @relation("TeamOwner", fields: [ownerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  Owner       User?            @relation("TeamOwner", fields: [ownerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   InviteCodes TeamInviteCode[]
-  Repository  Repository?      @relation(fields: [repositoryId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   Members     User[]           @relation("TeamMembers")
   ApiKey      ApiKey?
+  Repository  Repository?
 
-  @@index([repositoryId], name: "RepositoryId")
   @@index([ownerId], name: "OwnerId")
 }
 
 model Repository {
   id              String    @id @unique @default(cuid())
-  name            String
-  userId          String    @unique
-  associatedUser  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  repoName        String
+  repoId          String
+  userId          String?   @unique
+  teamId          String?   @unique
+  associatedUser  User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  associatedTeam  Team?     @relation(fields: [teamId], references: [id], onDelete: Cascade)
   filename        String?
   contractAddress String?
   contractAbi     String?   @db.Text
@@ -86,9 +87,9 @@ model Repository {
   createdAt DateTime      @default(now())
   updatedAt DateTime      @default(now()) @updatedAt
   Activity  Transaction[]
-  Team      Team[]
 
   @@index([userId], name: "UserId")
+  @@index([teamId], name: "TeamId")
 }
 
 model Transaction {
