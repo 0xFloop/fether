@@ -24,6 +24,7 @@ import { Dashboard } from "~/components/Dashboard";
 //TODO: improve tx viewer
 //TODO: Add states to transactions (pending, confirmed, failed)
 //TODO: add teams
+//TODO: fix teams delete
 
 export const meta: V2_MetaFunction<typeof loader> = ({ data }) => {
   return [{ title: ("Fether | " + data?.userData?.username) as string }];
@@ -31,13 +32,13 @@ export const meta: V2_MetaFunction<typeof loader> = ({ data }) => {
 export const action = async ({ request }: ActionArgs): Promise<DashboardActionReturn> => {
   const body = await request.formData();
   const githubInstallationId = body.get("githubInstallationId");
-  const chosenRepoData = body.get("chosenRepoData");
   const associatedUser = await db.user.findUnique({
     where: { githubInstallationId: githubInstallationId as string },
     include: {
       ApiKey: true,
       IssuedInviteCodes: true,
       MemberTeam: true,
+      OwnedTeam: true,
       Repository: {
         include: {
           Activity: true,
@@ -68,7 +69,10 @@ export const action = async ({ request }: ActionArgs): Promise<DashboardActionRe
             error: null,
           };
         case "getChosenRepo":
+          const chosenRepoData = body.get("chosenRepoData");
+
           if (chosenRepoData) {
+            console.log(chosenRepoData);
             const chosenRepoName = chosenRepoData.toString().split(",")[0];
             const chosenRepoId = chosenRepoData.toString().split(",")[1];
 
@@ -274,7 +278,7 @@ export const action = async ({ request }: ActionArgs): Promise<DashboardActionRe
               error: "Name can only contain alphanumeric, hyphen, underscore, and 3-20 characters.",
             };
           }
-          if (associatedUser.teamId) {
+          if (associatedUser.memberTeamId) {
             return {
               originCallForm: "createTeam",
               chosenRepoName: null,
@@ -294,7 +298,7 @@ export const action = async ({ request }: ActionArgs): Promise<DashboardActionRe
           await db.user.update({
             where: { id: associatedUser.id },
             data: {
-              teamId: newTeam.id,
+              memberTeamId: newTeam.id,
             },
           });
           return {
@@ -342,7 +346,6 @@ export const action = async ({ request }: ActionArgs): Promise<DashboardActionRe
       }
     }
   } else {
-    console.error("user not found");
     return {
       originCallForm: "",
       chosenRepoName: null,
@@ -350,7 +353,7 @@ export const action = async ({ request }: ActionArgs): Promise<DashboardActionRe
       solFilesFromChosenRepo: null,
       chosenFileName: null,
       txDetails: null,
-      error: null,
+      error: "user not found",
     };
   }
 };
@@ -366,6 +369,7 @@ export const loader = async ({ request }: LoaderArgs) => {
       ApiKey: true,
       IssuedInviteCodes: true,
       MemberTeam: true,
+      OwnedTeam: true,
       Repository: {
         include: {
           Activity: {
@@ -392,7 +396,7 @@ export default function Index() {
   useEffect(() => {
     setSetupStep(loaderData.setupStep);
   }, [
-    loaderData.userData?.teamId,
+    loaderData.userData?.memberTeamId,
     loaderData.userData?.githubInstallationId,
     loaderData.userData?.Repository?.filename,
     loaderData.userData?.Repository?.name,
