@@ -3,10 +3,10 @@ pragma solidity ^0.8.13;
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract SecretKeeper is Ownable {
-    string public secretPhrase = "super duper very secret phrase";
-    uint256 public secretNumber = 8787;
+    string public secretPhrase = "ty is cool";
+    uint256 public secretNumber = 69420;
     SecretStorage public secretInStorage =
-        SecretStorage(1010, "super duper secret");
+        SecretStorage(1010, "super duper secret ForTY");
 
     struct SecretStorage {
         uint secretNumber;
@@ -25,11 +25,13 @@ contract SecretKeeper is Ownable {
         _secretPhrase = secretPhrase;
     }
 
-    function updateSecretInStorage(SecretStorage memory secretParam) public {
+    function updateSecretInStorageForTY(
+        SecretStorage memory secretParam
+    ) public {
         secretInStorage = secretParam;
     }
 
-    function updateSecretNumber(uint256 _secretNumber) public {
+    function updateSecretNumberForTY(uint256 _secretNumber) public {
         secretNumber = _secretNumber;
     }
 
