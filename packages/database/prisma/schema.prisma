@@ -27,7 +27,7 @@ model User {
   Repository        Repository?
   IssuedInviteCodes InviteCode[] @relation("Issued")
   UsedInviteCode    InviteCode[] @relation("Used")
-  MemberTeam        Team?        @relation("TeamMembers", fields: [memberTeamId], references: [id], onDelete: SetNull, onUpdate: SetNull)
+  MemberTeam        Team?        @relation("TeamMembers", fields: [memberTeamId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   OwnedTeam         Team?        @relation("TeamOwner")
 
   @@index([memberTeamId], name: "TeamId")
@@ -61,7 +61,7 @@ model Team {
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 
-  Owner       User             @relation("TeamOwner", fields: [ownerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  Owner       User             @relation("TeamOwner", fields: [ownerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   InviteCodes TeamInviteCode[]
   Repository  Repository?      @relation(fields: [repositoryId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   Members     User[]           @relation("TeamMembers")
