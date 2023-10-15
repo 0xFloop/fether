@@ -5,18 +5,34 @@ import {
   getSession as userGetSession,
   commitSession as userCommitSession,
 } from "../utils/alphaSession.server";
-import { Dashboard } from "~/components/Dashboard";
-import { RepoData, TeamWithKeyRepoActivityMembers, returnedMemberData } from "~/types";
+
+import {
+  RepoData,
+  TeamWithKeyRepoActivityMembers,
+  UserWithKeyRepoActivityTeam,
+  returnedMemberData,
+} from "~/types";
 import SetupWizard from "~/components/SetupWizard";
-import { determineSetupStep, spacify } from "~/utils/helpers";
+import {
+  determineSetupStep,
+  fetherChainFromKey,
+  getTransactionDetails,
+  spacify,
+  zodTeamName,
+} from "~/utils/helpers";
 import { useEffect, useState } from "react";
-import { getRootDir, getSolFileNames, getUserRepositories } from "~/utils/octo.server";
+import { getRootDirTeam, getSolFileNames, getUserRepositories } from "~/utils/octo.server";
 import { deployContract } from "~/utils/viem.server";
+import { createPublicClient, createTestClient, http, isAddress, parseEther } from "viem";
+import { TeamDashboard } from "~/components/TeamDashboard";
 
 export const loader = async ({ params, request }: LoaderArgs) => {
   const user = await userGetSession(request.headers.get("Cookie"));
   if (!user.has("userId")) throw redirect("/");
   let userId = user.get("userId");
+  const userData = await db.user.findUnique({
+    where: { id: userId },
+  });
   const teamData: TeamWithKeyRepoActivityMembers = await db.team.findUnique({
     where: { id: params.teamId },
     include: {
@@ -57,14 +73,14 @@ export const loader = async ({ params, request }: LoaderArgs) => {
   };
   let setupStep = determineSetupStep(null, teamData);
 
-  return { returnedTeamData, isOwner, teamData, setupStep };
+  return { returnedTeamData, userData, isOwner, teamData, setupStep };
 };
 export const action = async ({ request }: ActionArgs) => {
   const body = await request.formData();
-  const ownerGithubInstallationId = body.get("githubInstallationId");
+  const githubInstallationId = body.get("githubInstallationId");
 
   const teamFromUser = await db.user.findUnique({
-    where: { githubInstallationId: ownerGithubInstallationId as string },
+    where: { githubInstallationId: githubInstallationId as string },
     include: {
       MemberTeam: {
         include: {
@@ -124,9 +140,7 @@ export const action = async ({ request }: ActionArgs) => {
                 foundryRootDir: null,
               },
             });
-            await db.transaction.deleteMany({
-              where: { repositoryId: team.Repository?.id as string },
-            });
+
             return {
               originCallForm: "chooseRepo",
               chosenRepoName: chosenRepoName,
@@ -149,10 +163,10 @@ export const action = async ({ request }: ActionArgs) => {
         case "getFilesOfChosenRepo":
           let foundryRootDir = team.Repository?.foundryRootDir;
           if (!foundryRootDir) {
-            foundryRootDir = await getRootDir(ownerGithubInstallationId as string);
+            foundryRootDir = await getRootDirTeam(team.id, githubInstallationId as string);
           }
           let fileNameArray: string[] = await getSolFileNames(
-            ownerGithubInstallationId as string,
+            githubInstallationId as string,
             foundryRootDir as string
           );
           return {
@@ -190,10 +204,12 @@ export const action = async ({ request }: ActionArgs) => {
         case "deployContract":
           try {
             if (!team.Repository) throw new Error("No filename found");
+            console.log(team.Repository);
             await deployContract(
-              ownerGithubInstallationId as string,
+              githubInstallationId as string,
               team.Repository,
-              team.ApiKey?.key as string
+              team.ApiKey?.key as string,
+              teamFromUser.username
             );
           } catch (e: any) {
             if (e.message == "Not Found") {
@@ -217,12 +233,12 @@ export const action = async ({ request }: ActionArgs) => {
         case "fundWallet":
           let currentBalance = body.get("currentBalance") as `${number}`;
           const adminClient = createTestClient({
-            chain: fetherChainFromKey(associatedUser.ApiKey?.key as string),
+            chain: fetherChainFromKey(team.ApiKey?.key as string),
             mode: "anvil",
             transport: http(),
           });
           const publicClient = createPublicClient({
-            chain: fetherChainFromKey(associatedUser.ApiKey?.key as string),
+            chain: fetherChainFromKey(team.ApiKey?.key as string),
             transport: http(),
           });
 
@@ -249,7 +265,7 @@ export const action = async ({ request }: ActionArgs) => {
           let valid = isAddress(newDeployerAddress);
           if (valid) {
             await db.repository.update({
-              where: { userId: associatedUser.id },
+              where: { teamId: team.id },
               data: {
                 deployerAddress: newDeployerAddress,
               },
@@ -287,64 +303,6 @@ export const action = async ({ request }: ActionArgs) => {
             solFilesFromChosenRepo: null,
             chosenFileName: null,
             txDetails: txDetails,
-            error: null,
-          };
-        case "createTeam":
-          const teamName = body.get("teamName");
-          if (!teamName) {
-            return {
-              originCallForm: "createTeam",
-              chosenRepoName: null,
-              repositories: null,
-              solFilesFromChosenRepo: null,
-              chosenFileName: null,
-              txDetails: null,
-              error: "null teamName",
-            };
-          }
-          const validTeamName = zodTeamName.safeParse(teamName);
-
-          if (validTeamName.success == false) {
-            return {
-              originCallForm: "createTeam",
-              chosenRepoName: null,
-              repositories: null,
-              solFilesFromChosenRepo: null,
-              chosenFileName: null,
-              txDetails: null,
-              error: "Name can only contain alphanumeric, hyphen, underscore, and 3-20 characters.",
-            };
-          }
-          if (associatedUser.memberTeamId) {
-            return {
-              originCallForm: "createTeam",
-              chosenRepoName: null,
-              repositories: null,
-              solFilesFromChosenRepo: null,
-              chosenFileName: null,
-              txDetails: null,
-              error: "User already has a team",
-            };
-          }
-          let newTeam = await db.team.create({
-            data: {
-              name: teamName as string,
-              ownerId: associatedUser.id,
-            },
-          });
-          await db.user.update({
-            where: { id: associatedUser.id },
-            data: {
-              memberTeamId: newTeam.id,
-            },
-          });
-          return {
-            originCallForm: "createTeam",
-            chosenRepoName: null,
-            repositories: null,
-            solFilesFromChosenRepo: null,
-            chosenFileName: null,
-            txDetails: null,
             error: null,
           };
         default:
@@ -402,6 +360,7 @@ export default function Index() {
   const actionArgs = useActionData<typeof action>();
   const navigation = useNavigation();
   const teamData = loaderData.teamData as unknown as TeamWithKeyRepoActivityMembers;
+  const userData = loaderData.userData as UserWithKeyRepoActivityTeam;
 
   const [setupStep, setSetupStep] = useState<number>(loaderData.setupStep);
   useEffect(() => {
@@ -434,9 +393,9 @@ export default function Index() {
           updateStep={(step: number) => setSetupStep(step)}
         />
       ) : (
-        <Dashboard
+        <TeamDashboard
           teamData={teamData}
-          userData={null}
+          userData={userData}
           navigation={navigation}
           actionArgs={actionArgs}
           dashboardType="team"
