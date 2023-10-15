@@ -11,6 +11,7 @@ import {
   determineSetupStep,
   getTransactionDetails,
   zodTeamName,
+  makeId,
 } from "~/utils/helpers";
 import { DashboardActionReturn, RepoData, UserWithKeyRepoActivityTeam } from "~/types";
 import rainbowStylesUrl from "@rainbow-me/rainbowkit/styles.css";
@@ -19,12 +20,11 @@ export function links() {
 }
 import { createTestClient, http, parseEther, isAddress, createPublicClient } from "viem";
 import SetupWizard from "~/components/SetupWizard";
-import { Dashboard } from "~/components/Dashboard";
+import { PersonalDashboard } from "~/components/PersonalDashboard";
 
-//TODO: improve tx viewer
-//TODO: Add states to transactions (pending, confirmed, failed)
 //TODO: add teams
 //TODO: fix teams delete
+//TODO: add caller to transactions
 
 export const meta: V2_MetaFunction<typeof loader> = ({ data }) => {
   return [{ title: ("Fether | " + data?.userData?.username) as string }];
@@ -92,9 +92,6 @@ export const action = async ({ request }: ActionArgs): Promise<DashboardActionRe
                 foundryRootDir: null,
               },
             });
-            await db.transaction.deleteMany({
-              where: { repositoryId: associatedUser.Repository?.id as string },
-            });
             return {
               originCallForm: "chooseRepo",
               chosenRepoName: chosenRepoName,
@@ -160,7 +157,8 @@ export const action = async ({ request }: ActionArgs): Promise<DashboardActionRe
             await deployContract(
               githubInstallationId as string,
               associatedUser.Repository,
-              associatedUser.ApiKey?.key as string
+              associatedUser.ApiKey?.key as string,
+              associatedUser.username
             );
           } catch (e: any) {
             if (e.message == "Not Found") {
@@ -182,7 +180,6 @@ export const action = async ({ request }: ActionArgs): Promise<DashboardActionRe
             error: null,
           };
         case "fundWallet":
-          let currentBalance = body.get("currentBalance") as `${number}`;
           const adminClient = createTestClient({
             chain: fetherChainFromKey(associatedUser.ApiKey?.key as string),
             mode: "anvil",
@@ -304,6 +301,13 @@ export const action = async ({ request }: ActionArgs): Promise<DashboardActionRe
             data: {
               memberTeamId: newTeam.id,
             },
+          });
+          await db.teamInviteCode.createMany({
+            data: [
+              { inviteCode: makeId(7), teamId: newTeam.id },
+              { inviteCode: makeId(7), teamId: newTeam.id },
+              { inviteCode: makeId(7), teamId: newTeam.id },
+            ],
           });
           return {
             originCallForm: "createTeam",
@@ -429,7 +433,7 @@ export default function Index() {
           updateStep={(step: number) => setSetupStep(step)}
         />
       ) : (
-        <Dashboard
+        <PersonalDashboard
           userData={userData}
           teamData={null}
           navigation={navigation}
