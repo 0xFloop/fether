@@ -3,7 +3,7 @@ import { Info } from "lucide-react";
 import { action, loader } from "~/routes/alpha.dashboard";
 import { setupSteps } from "./SetupSteps";
 import { TeamWithKeyRepoActivityMembers, UserWithKeyRepoActivityTeam } from "~/types";
-import { DashboardProps } from "./Dashboard";
+import { DashboardProps } from "./PersonalDashboard";
 
 export type SetupWizardProps = DashboardProps & {
   step: number;

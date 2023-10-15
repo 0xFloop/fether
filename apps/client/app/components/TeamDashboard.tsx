@@ -34,7 +34,8 @@ export interface DashboardProps {
   dashboardType: "personal" | "team";
 }
 
-export const Dashboard = (props: DashboardProps) => {
+export const TeamDashboard = (props: DashboardProps) => {
+  const teamData = props.teamData;
   const userData = props.userData;
   const actionArgs = props.actionArgs;
   const navigation = props.navigation;
@@ -55,8 +56,8 @@ export const Dashboard = (props: DashboardProps) => {
 
   let deployStatus = "Deploy";
 
-  if (userData?.Repository?.Activity) {
-    let activity = userData.Repository.Activity;
+  if (teamData?.Repository?.Activity) {
+    let activity = teamData.Repository.Activity;
 
     for (let i = 0; i < activity.length; i++) {
       if (activity[i].functionName.includes("Deployment")) {
@@ -67,8 +68,8 @@ export const Dashboard = (props: DashboardProps) => {
   }
 
   const animateCopy = async () => {
-    if (userData?.ApiKey) {
-      navigator.clipboard.writeText(userData.ApiKey.key);
+    if (teamData?.ApiKey) {
+      navigator.clipboard.writeText(teamData.ApiKey.key);
       setCopied(true);
       await sleep(2000);
       setCopied(false);
@@ -92,14 +93,14 @@ export const Dashboard = (props: DashboardProps) => {
   };
   return (
     <div className="selection:bg-accent selection:text-primary-gray max-w-screen h-auto min-h-screen display flex flex-col items-center justify-center text-[#a38282]">
-      {userData &&
-        userData.Repository &&
-        userData.Repository.contractAddress &&
-        userData.Repository.contractAbi &&
-        userData.Repository.deployerAddress &&
-        userData.Repository.filename &&
-        userData.ApiKey &&
-        userData.ApiKey.key && (
+      {teamData &&
+        teamData.Repository &&
+        teamData.Repository.contractAddress &&
+        teamData.Repository.contractAbi &&
+        teamData.Repository.deployerAddress &&
+        teamData.Repository.filename &&
+        teamData.ApiKey &&
+        teamData.ApiKey.key && (
           <div id="content" className="w-3/4 max-w-7xl mx-auto rounded-lg mt-40 pb-40 text-white">
             {displayCodes.displayInviteCodes && (
               <div className="absolute top-0 left-0 z-50 flex items-center justify-center h-screen w-screen">
@@ -116,8 +117,8 @@ export const Dashboard = (props: DashboardProps) => {
                   <p className="mt-4">
                     Send them one of your invite codes below and they can try it out!
                   </p>
-                  <div className="flex flex-row justify-evenly mt-4">
-                    {userData?.IssuedInviteCodes?.map((code) => (
+                  {/* <div className="flex flex-row justify-evenly mt-4">
+                    {teamData?.IssuedInviteCodes?.map((code) => (
                       <div className="flex flex-col items-center">
                         <p
                           className={code.keyStatus == "UNUSED" ? "text-green-400" : "text-red-400"}
@@ -138,7 +139,7 @@ export const Dashboard = (props: DashboardProps) => {
                         </div>
                       </div>
                     ))}
-                  </div>
+                  </div> */}
                 </div>
               </div>
             )}
@@ -152,7 +153,7 @@ export const Dashboard = (props: DashboardProps) => {
                         Current Dashboard :
                       </p>
                       <div className="flex flex-row items-center gap-2">
-                        <p>{userData?.username}</p>
+                        <p>{teamData?.name}</p>
 
                         <button onClick={() => setTeamSelect(!teamSelect)}>
                           <ChevronsUpDown size={20} />
@@ -163,67 +164,19 @@ export const Dashboard = (props: DashboardProps) => {
                           <h1>Dashboard Selector</h1>
                           <div>
                             <p>Personal Account:</p>
-                            <p>{userData?.username}</p>
+                            <div>
+                              <Link to={`/alpha/dashboard`}>{userData?.username}</Link>
+                            </div>
                           </div>
-                          {userData?.memberTeamId ? (
-                            <div>
-                              <p>Team:</p>
-                              <Link to={`/alpha/team/${userData.MemberTeam?.id}`}>
-                                {userData.MemberTeam?.name}
-                              </Link>
-                            </div>
-                          ) : (
-                            <div>
-                              <div className="flex flex-row justify-between">
-                                <p>Create Team</p>
-                                <button onClick={() => setCreateTeam(!createTeam)}>
-                                  {createTeam ? <X size={20} /> : <PlusCircle size={20} />}
-                                </button>
-                              </div>
-
-                              {createTeam && (
-                                <Form method="post" className="flex flex-col">
-                                  <input
-                                    type="hidden"
-                                    name="githubInstallationId"
-                                    value={userData.githubInstallationId as string}
-                                  />
-                                  <input type="hidden" name="formType" value="createTeam" />
-                                  <input
-                                    type="text"
-                                    maxLength={20}
-                                    name="teamName"
-                                    placeholder="Team Name"
-                                    className="text-black bg-transparent outline-none border-0 px-0 text-left focus:ring-0"
-                                  />
-                                  <button
-                                    type="submit"
-                                    className="flex items-center justify-center"
-                                  >
-                                    {navigation.state == "submitting" &&
-                                    navigation.formData?.get("formType") == "createTeam" ? (
-                                      <div className="animate-spin">
-                                        <Loader size={20} />
-                                      </div>
-                                    ) : (
-                                      "Create Team"
-                                    )}
-                                  </button>
-                                </Form>
-                              )}
-                              {actionArgs?.originCallForm == "createTeam" && actionArgs.error && (
-                                <p className="text-red-500 text-base">{actionArgs.error}</p>
-                              )}
-                            </div>
-                          )}
+                          <p>Team: {teamData.name}</p>
                         </div>
                       )}
                     </div>
                     <div className="flex flex-row justify-between rounded-lg">
                       <p className="text-2xl font-primary text-tertiary-gray">Api Key :</p>
                       <p className="flex flex-row items-center gap-2">
-                        {userData?.ApiKey?.key.slice(0, 10)}••••
-                        {userData?.ApiKey?.key.slice(20)}
+                        {teamData?.ApiKey?.key.slice(0, 10)}••••
+                        {teamData?.ApiKey?.key.slice(20)}
                         <button className="transform active:scale-75 transition-transform">
                           {copied ? (
                             <CheckCircle size={20} />
@@ -241,12 +194,12 @@ export const Dashboard = (props: DashboardProps) => {
                     <div className="flex flex-row justify-between rounded-lg">
                       <p className="text-2xl font-primary text-tertiary-gray">Repository :</p>
                       <div className="flex flex-row items-center">
-                        <p>{userData.Repository.name} &nbsp;</p>{" "}
+                        <p>{teamData.Repository.repoName} &nbsp;</p>{" "}
                         <Form method="post">
                           <input
                             type="hidden"
                             name="githubInstallationId"
-                            value={userData.githubInstallationId as string}
+                            value={userData?.githubInstallationId as string}
                           />
                           <input type="hidden" name="formType" value="getAllRepos" />
                           <button type="submit">
@@ -273,7 +226,7 @@ export const Dashboard = (props: DashboardProps) => {
                                 <input
                                   type="hidden"
                                   name="githubInstallationId"
-                                  value={userData.githubInstallationId as string}
+                                  value={userData?.githubInstallationId as string}
                                 />
                                 <button type="submit">
                                   <X />
@@ -284,7 +237,7 @@ export const Dashboard = (props: DashboardProps) => {
                               <input
                                 type="hidden"
                                 name="githubInstallationId"
-                                value={userData.githubInstallationId as string}
+                                value={userData?.githubInstallationId as string}
                               />
                               <input type="hidden" name="formType" value="getChosenRepo" />
 
@@ -318,13 +271,13 @@ export const Dashboard = (props: DashboardProps) => {
                     <div className="flex flex-row justify-between rounded-lg">
                       <p className="text-2xl font-primary text-tertiary-gray">Contract :</p>
                       <div className="flex flex-row items-center">
-                        <p>{userData.Repository.filename} &nbsp;</p>{" "}
+                        <p>{teamData.Repository.filename} &nbsp;</p>{" "}
                         <div>
                           <Form method="post">
                             <input
                               type="hidden"
                               name="githubInstallationId"
-                              value={userData.githubInstallationId as string}
+                              value={userData?.githubInstallationId as string}
                             />
                             <input type="hidden" name="formType" value="getFilesOfChosenRepo" />
                             <button type="submit">
@@ -350,7 +303,7 @@ export const Dashboard = (props: DashboardProps) => {
                                     <input
                                       type="hidden"
                                       name="githubInstallationId"
-                                      value={userData.githubInstallationId as string}
+                                      value={userData?.githubInstallationId as string}
                                     />
                                     <button type="submit">
                                       <X />
@@ -361,7 +314,7 @@ export const Dashboard = (props: DashboardProps) => {
                                   <input
                                     type="hidden"
                                     name="githubInstallationId"
-                                    value={userData.githubInstallationId as string}
+                                    value={userData?.githubInstallationId as string}
                                   />
                                   <input type="hidden" name="formType" value="chooseFileToTrack" />
                                   <fieldset className="grid grid-cols-2">
@@ -399,14 +352,14 @@ export const Dashboard = (props: DashboardProps) => {
                       <p className="text-2xl font-primary text-tertiary-gray">Deployer :</p>
                       <div className="flex flex-row items-center">
                         <p>
-                          {userData?.Repository?.deployerAddress?.slice(0, 8)}••••
-                          {userData?.Repository?.deployerAddress?.slice(37)} &nbsp;{" "}
+                          {teamData?.Repository?.deployerAddress?.slice(0, 8)}••••
+                          {teamData?.Repository?.deployerAddress?.slice(37)} &nbsp;{" "}
                         </p>
                         <Form method="post">
                           <input
                             type="hidden"
                             name="githubInstallationId"
-                            value={userData.githubInstallationId as string}
+                            value={userData?.githubInstallationId as string}
                           />
                           <button
                             onClick={() => {
@@ -475,8 +428,8 @@ export const Dashboard = (props: DashboardProps) => {
                     <div className="flex flex-row justify-between rounded-lg">
                       <p className="text-2xl font-primary text-tertiary-gray">Last Deployment :</p>
                       <p>
-                        {userData?.Repository?.lastDeployed
-                          ? `${timeSince(userData?.Repository?.lastDeployed)} ago`
+                        {teamData?.Repository?.lastDeployed
+                          ? `${timeSince(teamData?.Repository?.lastDeployed)} ago`
                           : "N/A"}
                       </p>
                     </div>
@@ -496,7 +449,7 @@ export const Dashboard = (props: DashboardProps) => {
                             <input
                               type="hidden"
                               name="githubInstallationId"
-                              value={userData.githubInstallationId as string}
+                              value={userData?.githubInstallationId as string}
                             />
                             <input type="hidden" name="formType" value="fundWallet" />
                             <input type="hidden" name="walletAddress" value={address} />
@@ -526,7 +479,7 @@ export const Dashboard = (props: DashboardProps) => {
                     <ul className="flex flex-col gap-2 rounded-lg">
                       <p className="text-2xl pb-1 border-b border-b-[#363636] font-primary">Read</p>
                       <div className="py-2">
-                        {JSON.parse(userData?.Repository?.contractAbi as string).map(
+                        {JSON.parse(teamData?.Repository?.contractAbi as string).map(
                           (method: AbiFunctionType, i: number) => (
                             <div key={i}>
                               {(method.stateMutability == "view" ||
@@ -541,10 +494,10 @@ export const Dashboard = (props: DashboardProps) => {
 
                                           let returnedData = await callContractFunction(
                                             method,
-                                            userData?.Repository?.contractAbi as string,
-                                            userData?.Repository?.contractAddress as `0x${string}`,
+                                            teamData?.Repository?.contractAbi as string,
+                                            teamData?.Repository?.contractAddress as `0x${string}`,
                                             getFunctionArgsFromInput(method),
-                                            userData?.ApiKey?.key as string
+                                            teamData?.ApiKey?.key as string
                                           );
                                           setFunctionCalled(null);
 
@@ -618,7 +571,7 @@ export const Dashboard = (props: DashboardProps) => {
                         Write
                       </p>
 
-                      {JSON.parse(userData?.Repository?.contractAbi).map(
+                      {JSON.parse(teamData?.Repository?.contractAbi).map(
                         (method: AbiFunctionType, i: number) => (
                           <React.Fragment key={i}>
                             {!(
@@ -658,11 +611,11 @@ export const Dashboard = (props: DashboardProps) => {
                                                   try {
                                                     let returnedData = await callContractFunction(
                                                       method,
-                                                      userData?.Repository?.contractAbi as string,
-                                                      userData?.Repository
+                                                      teamData?.Repository?.contractAbi as string,
+                                                      teamData?.Repository
                                                         ?.contractAddress as `0x${string}`,
                                                       getFunctionArgsFromInput(method),
-                                                      userData?.ApiKey?.key as string
+                                                      teamData?.ApiKey?.key as string
                                                     );
                                                     setFunctionCalled(null);
 
@@ -709,11 +662,11 @@ export const Dashboard = (props: DashboardProps) => {
                                                     try {
                                                       let returnedData = await callContractFunction(
                                                         method,
-                                                        userData?.Repository?.contractAbi as string,
-                                                        userData?.Repository
+                                                        teamData?.Repository?.contractAbi as string,
+                                                        teamData?.Repository
                                                           ?.contractAddress as `0x${string}`,
                                                         getFunctionArgsFromInput(method),
-                                                        userData?.ApiKey?.key as string
+                                                        teamData?.ApiKey?.key as string
                                                       );
                                                       setFunctionCalled(null);
 
@@ -782,7 +735,7 @@ export const Dashboard = (props: DashboardProps) => {
                       <input
                         type="hidden"
                         name="githubInstallationId"
-                        value={userData.githubInstallationId?.toString() as string}
+                        value={userData?.githubInstallationId?.toString() as string}
                       />
                       <input type="hidden" name="formType" value="deployContract" />
 
@@ -809,21 +762,22 @@ export const Dashboard = (props: DashboardProps) => {
                       <tr className="text-left text-tertiary-gray font-primary">
                         <th className="text-lg">Tx Hash</th>
                         <th className="text-lg">Function Name</th>
+                        <th className="text-lg">Caller</th>
                         <th className="text-lg">Timestamp</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {userData?.Repository?.Activity?.map((transaction: any, i) => (
+                      {teamData?.Repository?.Activity?.map((transaction, i) => (
                         <tr key={i} className="">
                           <td>
                             <Form method="post">
                               <input
                                 type="hidden"
                                 name="githubInstallationId"
-                                value={userData.githubInstallationId?.toString() as string}
+                                value={userData?.githubInstallationId?.toString() as string}
                               />
                               <input type="hidden" name="formType" value="getTransaction" />
-                              <input type="hidden" name="apiKey" value={userData.ApiKey?.key} />
+                              <input type="hidden" name="apiKey" value={teamData.ApiKey?.key} />
                               <input type="hidden" name="txHash" value={transaction.txHash} />
                               <button
                                 // href={`http://localhost:3003/${transaction.txHash}`}
@@ -840,6 +794,9 @@ export const Dashboard = (props: DashboardProps) => {
                             <p className="text-lg">{transaction.functionName}</p>
                           </td>
                           <td>
+                            <p className="text-lg">{transaction.callerUsername}</p>
+                          </td>
+                          <td>
                             <p className="text-lg">{timeSince(transaction.timestamp)} ago</p>
                           </td>
                         </tr>
@@ -849,10 +806,22 @@ export const Dashboard = (props: DashboardProps) => {
                   {actionArgs?.originCallForm == "getTransaction" && actionArgs.txDetails && (
                     <TxViewer
                       txDetails={actionArgs.txDetails}
-                      githubInstallationId={userData.githubInstallationId as string}
+                      githubInstallationId={userData?.githubInstallationId as string}
                     />
                   )}
                 </div>
+              </div>
+              <div>
+                <p>members</p>
+                {teamData.InviteCodes?.map((code) => (
+                  <>
+                    <Link to={`/alpha/team/${teamData.id}/join/${code.inviteCode}`}>
+                      {code.inviteCode}
+                    </Link>
+                    <br></br>
+                  </>
+                ))}
+                {teamData?.Members?.map((member) => <div>{member.username}</div>)}
               </div>
             </div>
           </div>
