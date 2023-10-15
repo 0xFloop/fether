@@ -97,6 +97,7 @@ model Transaction {
   repositoryId         String
   associatedRepository Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
   functionName         String
+  callerUsername       String?
 
   timestamp DateTime @default(now())
 

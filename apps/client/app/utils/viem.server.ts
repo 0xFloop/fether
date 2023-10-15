@@ -29,10 +29,11 @@ const octo = new Octo({
 export const deployContract = async (
   githubInstallationId: string,
   repoData: RepoWithActivity,
-  apiKey: string
+  apiKey: string,
+  deployerUsername: string
 ) => {
   const octokit = await octo.getInstallationOctokit(parseInt(githubInstallationId));
-  console.log({ repoData });
+
   if (!repoData?.foundryRootDir && repoData?.foundryRootDir != "") throw new Error("Not Found");
 
   let deployerAddress = repoData.deployerAddress as `0x${string}`;
@@ -115,6 +116,7 @@ export const deployContract = async (
     data: {
       txHash: deployHash,
       repositoryId: repoData.id,
+      callerUsername: deployerUsername,
       functionName,
     },
   });
