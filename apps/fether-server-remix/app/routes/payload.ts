@@ -52,8 +52,8 @@ export const action = async ({ request }: ActionArgs) => {
               let rootDir = associatedUserData.Repository.foundryRootDir;
               let fileName = associatedUserData.Repository.filename;
 
-              let userName = associatedUserData.Repository.name.split("/")[0];
-              let repoName = associatedUserData.Repository.name.split("/")[1];
+              let userName = associatedUserData.Repository.repoName.split("/")[0];
+              let repoName = associatedUserData.Repository.repoName.split("/")[1];
 
               let byteCodePath =
                 rootDir + "/out/" + fileName + "/" + fileName?.split(".")[0] + ".json";
