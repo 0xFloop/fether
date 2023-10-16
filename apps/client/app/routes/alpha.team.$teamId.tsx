@@ -32,12 +32,14 @@ export const loader = async ({ params, request }: LoaderArgs) => {
   let userId = user.get("userId");
   const userData = await db.user.findUnique({
     where: { id: userId },
+    include: {
+      IssuedInviteCodes: true,
+    },
   });
   const teamData: TeamWithKeyRepoActivityMembers = await db.team.findUnique({
     where: { id: params.teamId },
     include: {
       ApiKey: true,
-      Owner: true,
       InviteCodes: true,
       Members: true,
       Repository: {
@@ -88,7 +90,6 @@ export const action = async ({ request }: ActionArgs) => {
           ApiKey: true,
           Members: true,
           InviteCodes: true,
-          Owner: true,
         },
       },
     },
@@ -100,7 +101,7 @@ export const action = async ({ request }: ActionArgs) => {
       switch (formType) {
         case "getAllRepos":
           const repositories = await getUserRepositories(
-            team.Owner?.githubInstallationId as string
+            teamFromUser.githubInstallationId as string
           );
           const repoArray = repositories.data.repositories;
           const repoObjArray: RepoData[] = [];
@@ -385,7 +386,7 @@ export default function Index() {
       ) ? (
         <SetupWizard
           teamData={teamData}
-          userData={null}
+          userData={userData}
           navigation={navigation}
           actionArgs={actionArgs}
           dashboardType="team"
