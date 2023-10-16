@@ -51,8 +51,8 @@ export const getRootDir = async (githubInstallationId: string): Promise<string> 
       include: { Repository: true },
     });
 
-    let ownerName = repoData?.Repository?.name.split("/")[0];
-    let repoName = repoData?.Repository?.name.split("/")[1];
+    let ownerName = repoData?.Repository?.repoName.split("/")[0];
+    let repoName = repoData?.Repository?.repoName.split("/")[1];
 
     if (!ownerName || !repoName) throw new Error("No owner or repo name found");
 
@@ -104,6 +104,70 @@ export const getRootDir = async (githubInstallationId: string): Promise<string> 
     throw e;
   }
 };
+export const getRootDirTeam = async (
+  teamId: string,
+  githubInstallationId: string
+): Promise<string> => {
+  try {
+    const octokit = await octo.getInstallationOctokit(parseInt(githubInstallationId));
+
+    let repoData = await db.repository.findUnique({
+      where: { teamId },
+    });
+
+    let ownerName = repoData?.repoName.split("/")[0];
+    let repoName = repoData?.repoName.split("/")[1];
+
+    if (!ownerName || !repoName) throw new Error("No owner or repo name found");
+
+    let repoRootFolder = await octokit.request("GET /repos/{owner}/{repo}/contents/", {
+      owner: ownerName,
+      repo: repoName,
+      headers: {
+        "X-GitHub-Api-Version": "2022-11-28",
+        Accept: "application/vnd.github.raw",
+      },
+    });
+
+    for (let i = 0; i < repoRootFolder.data.length; i++) {
+      if (repoRootFolder.data[i].type == "dir" && repoRootFolder.data[i].name == "apps") {
+        let appsFolder = await octokit.request("GET /repos/{owner}/{repo}/contents/{path}", {
+          owner: ownerName,
+          repo: repoName,
+          path: repoRootFolder.data[i].path,
+          headers: {
+            "X-GitHub-Api-Version": "2022-11-28",
+            Accept: "application/vnd.github.raw",
+          },
+        });
+        let zodAppsFolderArray = zodArrayOfGithubFiles.safeParse(appsFolder.data);
+
+        if (!zodAppsFolderArray.success) throw new Error("No solidity src folder found");
+
+        for (let j = 0; j < zodAppsFolderArray.data.length; j++) {
+          if (
+            zodAppsFolderArray.data[j].type == "dir" &&
+            zodAppsFolderArray.data[j].name == "solidity"
+          ) {
+            await db.repository.update({
+              where: { id: repoData?.id },
+              data: { foundryRootDir: zodAppsFolderArray.data[j].path },
+            });
+            return zodAppsFolderArray.data[j].path;
+          }
+        }
+      } else if (repoRootFolder.data[i].name == "foundry.toml") {
+        await db.repository.update({
+          where: { id: repoData?.id },
+          data: { foundryRootDir: "" },
+        });
+      }
+    }
+    return "";
+  } catch (e) {
+    throw e;
+  }
+};
 
 export const getSolFileNames = async (
   githubInstallationId: string,
@@ -116,8 +180,8 @@ export const getSolFileNames = async (
     include: { Repository: true },
   });
 
-  let ownerName = repoData?.Repository?.name.split("/")[0];
-  let repoName = repoData?.Repository?.name.split("/")[1];
+  let ownerName = repoData?.Repository?.repoName.split("/")[0];
+  let repoName = repoData?.Repository?.repoName.split("/")[1];
 
   let fileNames: string[] = [];
 

@@ -2,11 +2,31 @@ import { Abi, AbiFunction } from "abitype/zod";
 import { Chain, createPublicClient, createWalletClient, custom, http } from "viem";
 import { AbiFunction as AbiFunctionType } from "abitype";
 import { z } from "zod";
-import { ContractReturn, ContractReturnItem, TxDetails, UserWithKeyRepoActivity } from "~/types";
+import {
+  ContractReturn,
+  ContractReturnItem,
+  TeamWithKeyRepoActivityMembers,
+  TxDetails,
+  UserWithKeyRepoActivityTeam,
+} from "~/types";
 
 export const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 const zodFunctionReturnSchema = z.array(z.any());
+
+export function spacify(str: string) {
+  let spacedStr = str.replace("-", " ").replace("_", " ");
+  let splitStr = spacedStr.split(" ");
+  for (let i = 0; i < splitStr.length; i++) {
+    splitStr[i] = splitStr[i].charAt(0).toUpperCase() + splitStr[i].slice(1);
+  }
+  return splitStr.join(" ");
+}
+export const zodTeamName = z
+  .string()
+  .min(3)
+  .max(20)
+  .regex(/^[a-zA-Z0-9_-]*$/);
 
 export function truncateToDecimals(num: number, dec = 2) {
   const calcDec = Math.pow(10, dec);
@@ -229,26 +249,44 @@ export enum SetupStepsEnum {
   "Error",
 }
 
-export const determineSetupStep = (userData: UserWithKeyRepoActivity): number => {
-  if (!userData) return SetupStepsEnum.Error;
+export const determineSetupStep = (
+  userData: UserWithKeyRepoActivityTeam | null,
+  teamData: TeamWithKeyRepoActivityMembers | null
+): number => {
+  if (userData) {
+    if (!userData.ApiKey) return SetupStepsEnum.GenerateApiKey;
 
-  if (!userData.ApiKey) return SetupStepsEnum.GenerateApiKey;
+    if (!userData.githubInstallationId) return SetupStepsEnum.InstallFetherKitGithubApp;
 
-  if (!userData.githubInstallationId) return SetupStepsEnum.InstallFetherKitGithubApp;
+    if (!userData.Repository) return SetupStepsEnum.SelectRepository;
 
-  if (!userData.Repository) return SetupStepsEnum.SelectRepository;
+    if (!userData.Repository.filename) return SetupStepsEnum.SelectSmartContract;
 
-  if (!userData.Repository.filename) return SetupStepsEnum.SelectSmartContract;
+    if (!userData.Repository.deployerAddress) return SetupStepsEnum.SetDeployerAddress;
 
-  if (!userData.Repository.deployerAddress) return SetupStepsEnum.SetDeployerAddress;
+    if (!userData.Repository.contractAddress) return SetupStepsEnum.DeployContract;
 
-  if (!userData.Repository.contractAddress) return SetupStepsEnum.DeployContract;
+    if (userData.Repository.contractAddress) return SetupStepsEnum.Done;
+    else return SetupStepsEnum.Error;
+  } else if (teamData) {
+    if (!teamData.ApiKey) return SetupStepsEnum.GenerateApiKey;
 
-  if (userData.Repository.contractAddress) return SetupStepsEnum.Done;
-  else return SetupStepsEnum.Error;
+    if (!teamData.Repository) return SetupStepsEnum.SelectRepository;
+
+    if (!teamData.Repository.filename) return SetupStepsEnum.SelectSmartContract;
+
+    if (!teamData.Repository.deployerAddress) return SetupStepsEnum.SetDeployerAddress;
+
+    if (!teamData.Repository.contractAddress) return SetupStepsEnum.DeployContract;
+
+    if (teamData.Repository.contractAddress) return SetupStepsEnum.Done;
+    else return SetupStepsEnum.Error;
+  } else {
+    return SetupStepsEnum.Error;
+  }
 };
 
-export const isSetup = (userData: UserWithKeyRepoActivity): boolean => {
+export const isSetup = (userData: UserWithKeyRepoActivityTeam): boolean => {
   if (
     userData &&
     userData.Repository &&

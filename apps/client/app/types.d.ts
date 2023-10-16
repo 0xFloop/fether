@@ -1,9 +1,32 @@
-import { ApiKey, Repository, User, Transaction, InviteCode } from "database";
+import { ApiKey, Repository, User, Transaction, InviteCode, Team, TeamInviteCode } from "database";
 
-export type UserWithKeyRepoActivity =
+export type UserWithKeyRepoActivityTeam =
   | (User & {
       ApiKey: ApiKey | null;
       IssuedInviteCodes: InviteCode[] | null;
+      MemberTeam: Team | null;
+      Repository:
+        | (Repository & {
+            Activity: Transaction[] | null;
+          })
+        | null;
+    })
+  | null;
+
+export type returnedMemberData = {
+  username: string;
+  isOwner: boolean;
+};
+export type RepoWithActivity =
+  | (Repository & {
+      Activity: Transaction[] | null;
+    })
+  | null;
+export type TeamWithKeyRepoActivityMembers =
+  | (Team & {
+      ApiKey: ApiKey | null;
+      InviteCodes: TeamInviteCode[] | null;
+      Members: User[] | null;
       Repository:
         | (Repository & {
             Activity: Transaction[] | null;
