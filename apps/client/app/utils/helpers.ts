@@ -15,7 +15,12 @@ export const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 const zodFunctionReturnSchema = z.array(z.any());
 
 export function spacify(str: string) {
-  return str.replace("-", " ").replace("_", " ");
+  let spacedStr = str.replace("-", " ").replace("_", " ");
+  let splitStr = spacedStr.split(" ");
+  for (let i = 0; i < splitStr.length; i++) {
+    splitStr[i] = splitStr[i].charAt(0).toUpperCase() + splitStr[i].slice(1);
+  }
+  return splitStr.join(" ");
 }
 export const zodTeamName = z
   .string()
