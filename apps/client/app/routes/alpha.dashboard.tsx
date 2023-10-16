@@ -38,7 +38,6 @@ export const action = async ({ request }: ActionArgs): Promise<DashboardActionRe
       ApiKey: true,
       IssuedInviteCodes: true,
       MemberTeam: true,
-      OwnedTeam: true,
       Repository: {
         include: {
           Activity: true,
@@ -377,7 +376,6 @@ export const loader = async ({ request }: LoaderArgs) => {
       ApiKey: true,
       IssuedInviteCodes: true,
       MemberTeam: true,
-      OwnedTeam: true,
       Repository: {
         include: {
           Activity: {

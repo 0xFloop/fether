@@ -5,7 +5,6 @@ export type UserWithKeyRepoActivityTeam =
       ApiKey: ApiKey | null;
       IssuedInviteCodes: InviteCode[] | null;
       MemberTeam: Team | null;
-      OwnedTeam: Team | null;
       Repository:
         | (Repository & {
             Activity: Transaction[] | null;
@@ -27,7 +26,6 @@ export type TeamWithKeyRepoActivityMembers =
   | (Team & {
       ApiKey: ApiKey | null;
       InviteCodes: TeamInviteCode[] | null;
-      Owner: User | null;
       Members: User[] | null;
       Repository:
         | (Repository & {

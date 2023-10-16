@@ -11,28 +11,6 @@ datasource db {
   relationMode = "prisma"
 }
 
-model User {
-  id                   String  @id @default(cuid())
-  email                String? @unique
-  username             String  @unique
-  passwordHash         String?
-  githubId             Int?    @unique
-  githubInstallationId String? @unique
-  memberTeamId         String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now()) @updatedAt
-
-  ApiKey            ApiKey?
-  Repository        Repository?
-  IssuedInviteCodes InviteCode[] @relation("Issued")
-  UsedInviteCode    InviteCode[] @relation("Used")
-  MemberTeam        Team?        @relation("TeamMembers", fields: [memberTeamId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  OwnedTeam         Team?        @relation("TeamOwner")
-
-  @@index([memberTeamId], name: "TeamId")
-}
-
 model ApiKey {
   key     String   @id @unique @default(cuid())
   userId  String?  @unique
@@ -52,6 +30,27 @@ model ApiKey {
   @@index([teamId], name: "TeamId")
 }
 
+model User {
+  id                   String  @id @default(cuid())
+  email                String? @unique
+  username             String  @unique
+  passwordHash         String?
+  githubId             Int?    @unique
+  githubInstallationId String? @unique
+  memberTeamId         String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+
+  ApiKey            ApiKey?
+  Repository        Repository?
+  IssuedInviteCodes InviteCode[] @relation("Issued")
+  UsedInviteCode    InviteCode[] @relation("Used")
+  MemberTeam        Team?        @relation("TeamMembers", fields: [memberTeamId], references: [id])
+
+  @@index([memberTeamId], name: "TeamId")
+}
+
 model Team {
   id      String @id @unique @default(cuid())
   name    String
@@ -60,11 +59,11 @@ model Team {
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 
-  Owner       User?            @relation("TeamOwner", fields: [ownerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  InviteCodes TeamInviteCode[]
-  Members     User[]           @relation("TeamMembers")
+  Members User[] @relation("TeamMembers")
+
   ApiKey      ApiKey?
   Repository  Repository?
+  InviteCodes TeamInviteCode[]
 
   @@index([ownerId], name: "OwnerId")
 }

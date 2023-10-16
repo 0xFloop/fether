@@ -75,9 +75,7 @@ const SelectRepoComponent: React.FC<setupProps> = (props: setupProps) => {
   useEffect(() => {
     submit(
       {
-        githubInstallationId: Boolean(props.userData)
-          ? (props.userData?.githubInstallationId?.toString() as string)
-          : (props.teamData?.Owner?.githubInstallationId?.toString() as string),
+        githubInstallationId: props.userData?.githubInstallationId as string,
         formType: "getAllRepos",
       },
       {
@@ -116,11 +114,7 @@ const SelectRepoComponent: React.FC<setupProps> = (props: setupProps) => {
             <input
               type="hidden"
               name="githubInstallationId"
-              value={
-                props.dashboardType == "personal"
-                  ? props.userData?.githubInstallationId?.toString()
-                  : props.teamData?.Owner?.githubInstallationId?.toString()
-              }
+              value={props.userData?.githubInstallationId?.toString()}
             />
             <input type="hidden" name="formType" value="getChosenRepo" />
 
@@ -173,9 +167,7 @@ const SelectSmartContract: React.FC<setupProps> = (props: setupProps) => {
   useEffect(() => {
     submit(
       {
-        githubInstallationId: props.userData
-          ? (props.userData?.githubInstallationId?.toString() as string)
-          : (props.teamData?.Owner?.githubInstallationId?.toString() as string),
+        githubInstallationId: props.userData?.githubInstallationId as string,
         formType: "getFilesOfChosenRepo",
       },
       {
@@ -192,11 +184,7 @@ const SelectSmartContract: React.FC<setupProps> = (props: setupProps) => {
             <input
               type="hidden"
               name="githubInstallationId"
-              value={
-                props.dashboardType == "personal"
-                  ? props.userData?.githubInstallationId?.toString()
-                  : props.teamData?.Owner?.githubInstallationId?.toString()
-              }
+              value={props.userData?.githubInstallationId as string}
             />
             <input type="hidden" name="formType" value="getFilesOfChosenRepo" />
             {props.navigation.state == "submitting" &&
@@ -235,11 +223,7 @@ const SelectSmartContract: React.FC<setupProps> = (props: setupProps) => {
             <input
               type="hidden"
               name="githubInstallationId"
-              value={
-                props.dashboardType == "personal"
-                  ? props.userData?.githubInstallationId?.toString()
-                  : props.teamData?.Owner?.githubInstallationId?.toString()
-              }
+              value={props.userData?.githubInstallationId as string}
             />
             <input type="hidden" name="formType" value="chooseFileToTrack" />
             <fieldset className="grid grid-cols-2">
@@ -311,11 +295,7 @@ const SetDeployerComponent: React.FC<setupProps> = (props: setupProps) => {
         <input
           type="hidden"
           name="githubInstallationId"
-          value={
-            props.dashboardType == "personal"
-              ? props.userData?.githubInstallationId?.toString()
-              : props.teamData?.Owner?.githubInstallationId?.toString()
-          }
+          value={props.userData?.githubInstallationId as string}
         />
         <input type="hidden" name="formType" value="setDeployerAddress" />
         <div className="flex flex-row items-center justify-between w-full h-14">
@@ -365,18 +345,14 @@ const DeployContractComponent: React.FC<setupProps> = (props: setupProps) => {
         <input
           type="hidden"
           name="githubInstallationId"
-          value={
-            props.dashboardType == "personal"
-              ? props.userData?.githubInstallationId?.toString()
-              : props.teamData?.Owner?.githubInstallationId?.toString()
-          }
+          value={props.userData?.githubInstallationId as string}
         />
         <input type="hidden" name="formType" value="deployContract" />
         {props.navigation.state == "submitting" &&
         props.navigation.formData &&
         props.navigation.formData.get("formType") == "deployContract" ? (
           <div className="flex flex-row items-center py-4 px-6 bg-accent border rounded-lg border-[#6161FF]">
-            Deploying{" "}
+            Deploying
             <div className="ml-1 animate-spin">
               <Loader size={20} />
             </div>
