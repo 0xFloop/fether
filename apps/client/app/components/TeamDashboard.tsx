@@ -1,14 +1,5 @@
 import { Form, Link, useActionData, useNavigation, useSubmit } from "@remix-run/react";
-import {
-  CheckCircle,
-  ChevronDown,
-  ChevronsUpDown,
-  Copy,
-  Edit,
-  Loader,
-  PlusCircle,
-  X,
-} from "lucide-react";
+import { CheckCircle, ChevronDown, ChevronsUpDown, Copy, Edit, Loader, X } from "lucide-react";
 import { DisplayCodesContext } from "~/routes/alpha";
 import { action } from "~/routes/alpha.dashboard";
 import {
@@ -46,13 +37,14 @@ export const TeamDashboard = (props: DashboardProps) => {
   const { data } = useBalance({ address });
 
   const [deployerModal, setDeployerModal] = useState(false);
+  const [teamInviteModal, setTeamInviteModal] = useState(false);
+
   const [copied, setCopied] = useState(false);
   const [functionCalled, setFunctionCalled] = useState<string | null>(null);
   const [functionReturn, setFunctionReturn] = useState<ContractReturn | null>(null);
   const [addressValid, setAddressValid] = useState<boolean>(false);
   const [addressError, setAddressError] = useState<string | null>(null);
   const [teamSelect, setTeamSelect] = useState(false);
-  const [createTeam, setCreateTeam] = useState(false);
 
   let deployStatus = "Deploy";
 
@@ -117,15 +109,15 @@ export const TeamDashboard = (props: DashboardProps) => {
                   <p className="mt-4">
                     Send them one of your invite codes below and they can try it out!
                   </p>
-                  {/* <div className="flex flex-row justify-evenly mt-4">
-                    {teamData?.IssuedInviteCodes?.map((code) => (
+                  <p className="mt-4">{}</p>
+                  <div className="flex flex-row justify-evenly mt-4">
+                    {userData?.IssuedInviteCodes?.map((code) => (
                       <div className="flex flex-col items-center">
                         <p
                           className={code.keyStatus == "UNUSED" ? "text-green-400" : "text-red-400"}
                         >
                           {code.keyStatus.slice(0, 1) + code.keyStatus.toLowerCase().slice(1)}
                         </p>
-
                         <div className="flex flex-row items-center">
                           <p>{code.inviteCode}</p>
                           {code.keyStatus == "UNUSED" && (
@@ -139,7 +131,7 @@ export const TeamDashboard = (props: DashboardProps) => {
                         </div>
                       </div>
                     ))}
-                  </div> */}
+                  </div>
                 </div>
               </div>
             )}
@@ -810,18 +802,81 @@ export const TeamDashboard = (props: DashboardProps) => {
                     />
                   )}
                 </div>
-              </div>
-              <div>
-                <p>members</p>
-                {teamData.InviteCodes?.map((code) => (
-                  <>
-                    <Link to={`/alpha/team/${teamData.id}/join/${code.inviteCode}`}>
-                      {code.inviteCode}
-                    </Link>
-                    <br></br>
-                  </>
-                ))}
-                {teamData?.Members?.map((member) => <div>{member.username}</div>)}
+                <div className="bg-secondary-gray border border-secondary-border  shadow-md	 p-5 rounded-lg ">
+                  <div className="flex flex-row justify-between align-middle items-center">
+                    <p className="font-primary">Members :</p>
+                    <button
+                      onClick={() => setTeamInviteModal(true)}
+                      className="text-xl text-[#f0f0f0] bg-almost-black py-2 px-4 rounded-lg"
+                    >
+                      Invite
+                    </button>
+                    {teamInviteModal && (
+                      <div className="absolute top-0 left-0 z-50 flex items-center justify-center h-screen w-screen">
+                        <span className="bg-[#2f2f2f] opacity-70 absolute top-0 left-0 h-screen w-screen"></span>
+                        <div className="p-10 bg-[#727272] font-primary relative rounded-lg">
+                          <button
+                            onClick={() => setTeamInviteModal(false)}
+                            className="absolute top-4 right-4"
+                          >
+                            <X />
+                          </button>
+                          <h1 className="text-5xl font-primary font-black">
+                            Invite members to {teamData.name}!
+                          </h1>
+                          <p className="mt-4">Send them one of your invite links below!</p>
+                          <p className="mt-4">{}</p>
+                          <div className="flex flex-row justify-evenly mt-4">
+                            {teamData.InviteCodes?.map((code) => (
+                              <>
+                                <button>{code.inviteCode}</button>
+                                <Copy
+                                  className="transform ml-4 active:scale-75 transition-transform"
+                                  size={20}
+                                  onClick={() =>
+                                    navigator.clipboard.writeText(
+                                      `https://fether.xyz/alpha/team/${teamData.id}/join/${code.inviteCode}`
+                                    )
+                                  }
+                                />
+                              </>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  <table className="table-fixed w-full mt-5">
+                    <thead>
+                      <tr className="text-left text-tertiary-gray font-primary">
+                        <th className="text-lg">Username</th>
+                        <th className="text-lg">Role</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {teamData?.Members?.map((member, i) => (
+                        <tr key={i} className="">
+                          <td className="flex flex-row gap-2">
+                            <p className="text-lg">{member.username}</p>
+                            {member.id == userData?.id && member.id != teamData.ownerId && (
+                              <Link
+                                to={`/alpha/team/${teamData.id}/leave`}
+                                className="bg-red-500 text-base px-2 rounded-lg"
+                              >
+                                Leave Team
+                              </Link>
+                            )}
+                          </td>
+                          <td>
+                            <p className="text-lg">
+                              {member.id == teamData.ownerId ? "Owner" : "Member"}
+                            </p>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           </div>
