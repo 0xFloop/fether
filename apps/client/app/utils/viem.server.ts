@@ -11,8 +11,9 @@ import { privateKeyToAccount } from "viem/accounts";
 import { App as Octo } from "octokit";
 import { zodContractBuildFileSchema } from "./octo.server";
 import { Abi } from "abitype/zod";
-import { UserWithKeyRepoActivity } from "~/types";
+import { RepoWithActivity, UserWithKeyRepoActivityTeam } from "~/types";
 import { fetherChainFromKey } from "./helpers";
+import { Repository } from "database";
 
 function getGithubPk() {
   const githubAppPk = process.env.appPK as string;
@@ -25,28 +26,23 @@ const octo = new Octo({
   privateKey: getGithubPk(),
 });
 
-const pkaccount = privateKeyToAccount(
-  "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
-);
-
-export const deployerAddress = pkaccount.address;
-
 export const deployContract = async (
   githubInstallationId: string,
-  repoData: UserWithKeyRepoActivity
+  repoData: RepoWithActivity,
+  apiKey: string,
+  deployerUsername: string
 ) => {
   const octokit = await octo.getInstallationOctokit(parseInt(githubInstallationId));
 
-  if (!repoData?.Repository?.foundryRootDir && repoData?.Repository?.foundryRootDir != "")
-    throw new Error("Not Found");
+  if (!repoData?.foundryRootDir && repoData?.foundryRootDir != "") throw new Error("Not Found");
 
-  let deployerAddress = repoData.Repository.deployerAddress as `0x${string}`;
+  let deployerAddress = repoData.deployerAddress as `0x${string}`;
 
-  let rootDir = repoData.Repository.foundryRootDir;
-  let fileName = repoData.Repository.filename;
+  let rootDir = repoData.foundryRootDir;
+  let fileName = repoData.filename;
 
-  let userName = repoData.Repository.name.split("/")[0];
-  let repoName = repoData.Repository.name.split("/")[1];
+  let userName = repoData.repoName.split("/")[0];
+  let repoName = repoData.repoName.split("/")[1];
 
   let byteCodePath = rootDir + "/out/" + fileName + "/" + fileName?.split(".")[0] + ".json";
 
@@ -59,7 +55,8 @@ export const deployContract = async (
       Accept: "application/vnd.github.raw",
     },
   });
-  const fetherChain = fetherChainFromKey(repoData.ApiKey?.key as string);
+
+  const fetherChain = fetherChainFromKey(apiKey);
 
   const walletClient = createWalletClient({
     chain: fetherChain,
@@ -105,7 +102,7 @@ export const deployContract = async (
   });
 
   let functionName = "User Deployment";
-  let activity = repoData.Repository.Activity;
+  let activity = repoData.Activity;
   if (activity) {
     for (let i = 0; i < activity.length; i++) {
       if (activity[i].functionName.includes("Deployment")) {
@@ -118,12 +115,13 @@ export const deployContract = async (
   await db.transaction.create({
     data: {
       txHash: deployHash,
-      repositoryId: repoData.Repository.id,
+      repositoryId: repoData.id,
+      callerUsername: deployerUsername,
       functionName,
     },
   });
   await db.repository.update({
-    where: { id: repoData.Repository.id },
+    where: { id: repoData.id },
     data: {
       contractAddress: transaction["contractAddress"],
       contractAbi: dbAbi,

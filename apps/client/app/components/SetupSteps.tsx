@@ -1,7 +1,7 @@
 import { Form, useActionData, useNavigation, useSubmit } from "@remix-run/react";
 import { Loader } from "lucide-react";
 import { useEffect, useState } from "react";
-import { UserWithKeyRepoActivity } from "~/types";
+import { TeamWithKeyRepoActivityMembers, UserWithKeyRepoActivityTeam } from "~/types";
 import { action } from "~/routes/alpha.dashboard";
 import { isAddress } from "viem";
 
@@ -14,18 +14,22 @@ type setupStep = {
 };
 
 type setupProps = {
-  userData: UserWithKeyRepoActivity;
+  userData: UserWithKeyRepoActivityTeam;
+  teamData: TeamWithKeyRepoActivityMembers;
+  dashboardType: "personal" | "team";
   navigation: ReturnType<typeof useNavigation>;
   actionArgs: ReturnType<typeof useActionData<typeof action>>;
   updateStep: (step: number) => void;
 };
 
 const GenerateKeyComponent: React.FC<setupProps> = (props: setupProps) => {
+  const data = props.dashboardType == "personal" ? props.userData : props.teamData;
   return (
     <div className="h-full w-full flex items-center align-middle justify-center">
       <Form method="post" action="/api/keygen">
-        <input type="hidden" name="userId" value={props.userData?.id} />
+        <input type="hidden" name="id" value={data?.id} />
         <input type="hidden" name="formType" value="generateApiKey" />
+        <input type="hidden" name="dashboardType" value={props.dashboardType} />
 
         <button
           disabled={props.navigation.state === "submitting"}
@@ -49,25 +53,29 @@ const GenerateKeyComponent: React.FC<setupProps> = (props: setupProps) => {
 };
 
 const InstallGithubAppComponent: React.FC<setupProps> = (props: setupProps) => {
-  return (
-    <div className="h-full w-full flex items-center align-middle justify-center">
-      <Form method="post" action="/api/gh-app-install">
-        <input type="hidden" name="username" value={props.userData?.username} />
-        <button type="submit" className="py-4 px-6 bg-accent border rounded-lg border-[#6161FF]">
-          Click to add github FetherKit app
-        </button>
-      </Form>
-    </div>
-  );
+  if (props.teamData) return;
+  else {
+    return (
+      <div className="h-full w-full flex items-center align-middle justify-center">
+        <Form method="post" action="/api/gh-app-install">
+          <input type="hidden" name="username" value={props.userData?.username} />
+          <button type="submit" className="py-4 px-6 bg-accent border rounded-lg border-[#6161FF]">
+            Click to add github FetherKit app
+          </button>
+        </Form>
+      </div>
+    );
+  }
 };
 
 const SelectRepoComponent: React.FC<setupProps> = (props: setupProps) => {
+  const data = props.dashboardType == "personal" ? props.userData : props.teamData;
   const [repoChosen, setRepoChosen] = useState(false);
   let submit = useSubmit();
   useEffect(() => {
     submit(
       {
-        githubInstallationId: props.userData?.githubInstallationId?.toString() as string,
+        githubInstallationId: props.userData?.githubInstallationId as string,
         formType: "getAllRepos",
       },
       {
@@ -76,7 +84,6 @@ const SelectRepoComponent: React.FC<setupProps> = (props: setupProps) => {
       }
     );
   }, []);
-
   return (
     <div className="h-full w-full flex flex-col gap-4 items-center">
       {props.actionArgs?.originCallForm != "getRepos" ? (
@@ -94,10 +101,8 @@ const SelectRepoComponent: React.FC<setupProps> = (props: setupProps) => {
         </div>
       ) : (
         <>
-          {props.userData?.Repository?.name && (
-            <p>Current Repo: {props.userData?.Repository?.name}</p>
-          )}
-          {props.userData?.Repository?.name && (
+          {data?.Repository?.repoName && <p>Current Repo: {data?.Repository?.repoName}</p>}
+          {data?.Repository?.repoName && (
             <button
               onClick={() => props.updateStep(3)}
               className="py-3 px-5 bg-accent border rounded-lg border-[#6161FF] absolute bottom-7 right-10"
@@ -122,7 +127,7 @@ const SelectRepoComponent: React.FC<setupProps> = (props: setupProps) => {
                     name="chosenRepoData"
                     value={[repo.repoName, repo.repoId]}
                     onClick={() => setRepoChosen(true)}
-                  />{" "}
+                  />
                   {repo.repoName}
                 </label>
               ))}
@@ -157,10 +162,12 @@ const SelectRepoComponent: React.FC<setupProps> = (props: setupProps) => {
 const SelectSmartContract: React.FC<setupProps> = (props: setupProps) => {
   const [fileChosen, setFileChosen] = useState(false);
   let submit = useSubmit();
+  const data = props.dashboardType == "personal" ? props.userData : props.teamData;
+
   useEffect(() => {
     submit(
       {
-        githubInstallationId: props.userData?.githubInstallationId?.toString() as string,
+        githubInstallationId: props.userData?.githubInstallationId as string,
         formType: "getFilesOfChosenRepo",
       },
       {
@@ -177,7 +184,7 @@ const SelectSmartContract: React.FC<setupProps> = (props: setupProps) => {
             <input
               type="hidden"
               name="githubInstallationId"
-              value={props.userData?.githubInstallationId?.toString()}
+              value={props.userData?.githubInstallationId as string}
             />
             <input type="hidden" name="formType" value="getFilesOfChosenRepo" />
             {props.navigation.state == "submitting" &&
@@ -203,10 +210,8 @@ const SelectSmartContract: React.FC<setupProps> = (props: setupProps) => {
       )}
       {props.actionArgs?.originCallForm == "getFilesOfChosenRepo" && (
         <>
-          {props.userData?.Repository?.filename && (
-            <div>Current File: {props.userData?.Repository?.filename}</div>
-          )}
-          {props.userData?.Repository?.filename && (
+          {data?.Repository?.filename && <div>Current File: {data?.Repository?.filename}</div>}
+          {data?.Repository?.filename && (
             <button
               onClick={() => props.updateStep(4)}
               className="py-3 px-5 bg-accent border rounded-lg border-[#6161FF] absolute bottom-7 right-10"
@@ -218,7 +223,7 @@ const SelectSmartContract: React.FC<setupProps> = (props: setupProps) => {
             <input
               type="hidden"
               name="githubInstallationId"
-              value={props.userData?.githubInstallationId?.toString()}
+              value={props.userData?.githubInstallationId as string}
             />
             <input type="hidden" name="formType" value="chooseFileToTrack" />
             <fieldset className="grid grid-cols-2">
@@ -266,6 +271,7 @@ const SelectSmartContract: React.FC<setupProps> = (props: setupProps) => {
 const SetDeployerComponent: React.FC<setupProps> = (props: setupProps) => {
   const [addressValid, setAddressValid] = useState<boolean>(false);
   const [addressError, setAddressError] = useState<string | null>(null);
+  const data = props.dashboardType == "personal" ? props.userData : props.teamData;
 
   const handleAddressChange = (event: any) => {
     let valid = isAddress(event.target.value);
@@ -289,7 +295,7 @@ const SetDeployerComponent: React.FC<setupProps> = (props: setupProps) => {
         <input
           type="hidden"
           name="githubInstallationId"
-          value={props.userData?.githubInstallationId?.toString()}
+          value={props.userData?.githubInstallationId as string}
         />
         <input type="hidden" name="formType" value="setDeployerAddress" />
         <div className="flex flex-row items-center justify-between w-full h-14">
@@ -317,10 +323,10 @@ const SetDeployerComponent: React.FC<setupProps> = (props: setupProps) => {
         </div>
       </Form>
       <p className="text-red-500 mt-10">{addressError}</p>
-      {props.userData?.Repository?.deployerAddress && (
-        <div>Current Deployer: {props.userData?.Repository?.deployerAddress}</div>
+      {data?.Repository?.deployerAddress && (
+        <div>Current Deployer: {data?.Repository?.deployerAddress}</div>
       )}
-      {props.userData?.Repository?.deployerAddress && (
+      {data?.Repository?.deployerAddress && (
         <button
           onClick={() => props.updateStep(5)}
           className="py-3 px-5 bg-accent border rounded-lg border-[#6161FF] absolute bottom-7 right-10"
@@ -339,14 +345,14 @@ const DeployContractComponent: React.FC<setupProps> = (props: setupProps) => {
         <input
           type="hidden"
           name="githubInstallationId"
-          value={props.userData?.githubInstallationId?.toString()}
+          value={props.userData?.githubInstallationId as string}
         />
         <input type="hidden" name="formType" value="deployContract" />
         {props.navigation.state == "submitting" &&
         props.navigation.formData &&
         props.navigation.formData.get("formType") == "deployContract" ? (
           <div className="flex flex-row items-center py-4 px-6 bg-accent border rounded-lg border-[#6161FF]">
-            Deploying{" "}
+            Deploying
             <div className="ml-1 animate-spin">
               <Loader size={20} />
             </div>
@@ -370,7 +376,9 @@ export const setupSteps: setupStep[] = [
     iconUrl: "/images/key.svg",
     actionComponent: (props: setupProps) => (
       <GenerateKeyComponent
+        dashboardType={props.dashboardType}
         userData={props.userData}
+        teamData={props.teamData}
         navigation={props.navigation}
         actionArgs={props.actionArgs}
         updateStep={props.updateStep}
@@ -385,7 +393,9 @@ export const setupSteps: setupStep[] = [
     iconUrl: "/images/github.svg",
     actionComponent: (props: setupProps) => (
       <InstallGithubAppComponent
+        dashboardType={props.dashboardType}
         userData={props.userData}
+        teamData={props.teamData}
         navigation={props.navigation}
         actionArgs={props.actionArgs}
         updateStep={props.updateStep}
@@ -400,7 +410,9 @@ export const setupSteps: setupStep[] = [
     iconUrl: "/images/folder.svg",
     actionComponent: (props: setupProps) => (
       <SelectRepoComponent
+        dashboardType={props.dashboardType}
         userData={props.userData}
+        teamData={props.teamData}
         navigation={props.navigation}
         actionArgs={props.actionArgs}
         updateStep={props.updateStep}
@@ -415,7 +427,9 @@ export const setupSteps: setupStep[] = [
     iconUrl: "/images/file.svg",
     actionComponent: (props: setupProps) => (
       <SelectSmartContract
+        dashboardType={props.dashboardType}
         userData={props.userData}
+        teamData={props.teamData}
         navigation={props.navigation}
         actionArgs={props.actionArgs}
         updateStep={props.updateStep}
@@ -430,7 +444,9 @@ export const setupSteps: setupStep[] = [
     iconUrl: "/images/paperAirplane.svg",
     actionComponent: (props: setupProps) => (
       <SetDeployerComponent
+        dashboardType={props.dashboardType}
         userData={props.userData}
+        teamData={props.teamData}
         navigation={props.navigation}
         actionArgs={props.actionArgs}
         updateStep={props.updateStep}
@@ -445,7 +461,9 @@ export const setupSteps: setupStep[] = [
     iconUrl: "/images/celebrate.svg",
     actionComponent: (props: setupProps) => (
       <DeployContractComponent
+        dashboardType={props.dashboardType}
         userData={props.userData}
+        teamData={props.teamData}
         navigation={props.navigation}
         actionArgs={props.actionArgs}
         updateStep={props.updateStep}
