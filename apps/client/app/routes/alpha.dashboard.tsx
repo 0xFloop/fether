@@ -42,8 +42,7 @@ import TxViewer from "~/components/TxViewer";
 import React from "react";
 import { DisplayCodesContext } from "./alpha";
 
-//TODO: Add states to transactions (pending, confirmed, failed)
-//TODO: add ability for team page
+//TODO: split prod and dev databases
 
 export const action = async ({ request }: ActionArgs): Promise<DashboardActionReturn> => {
   const body = await request.formData();
