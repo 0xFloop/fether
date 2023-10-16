@@ -4,7 +4,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract SecretKeeper is Ownable {
     string public saucesSecretPhrase =
-        "sauce definitely vert is SUPER MEGA cool";
+        "sauce definitely very is SUPER MEGA cool";
     uint256 public secretNumber = 420;
     SecretStorage public secretInStorage = SecretStorage(6969, "deex nuts");
 
