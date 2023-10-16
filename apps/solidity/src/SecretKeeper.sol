@@ -3,7 +3,8 @@ pragma solidity ^0.8.13;
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract SecretKeeper is Ownable {
-    string public saucesSecretPhrase = "sauce definitely is SUPER MEGA cool";
+    string public saucesSecretPhrase =
+        "sauce definitely vert is SUPER MEGA cool";
     uint256 public secretNumber = 420;
     SecretStorage public secretInStorage = SecretStorage(6969, "deex nuts");
 
