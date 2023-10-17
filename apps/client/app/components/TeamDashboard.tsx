@@ -12,7 +12,7 @@ import { useAccount, useBalance } from "wagmi";
 import { isAddress } from "viem";
 import { callContractFunction, getFunctionArgsFromInput, sleep, timeSince } from "~/utils/helpers";
 import { CustomConnectButton } from "./ConnectButton";
-import { AbiFunction as AbiFunctionType } from "abitype";
+import { AbiFunction as AbiFunctionType, AbiParameter } from "abitype";
 import React from "react";
 import * as Accordion from "@radix-ui/react-accordion";
 import TxViewer from "./TxViewer";
@@ -637,15 +637,35 @@ export const TeamDashboard = (props: DashboardProps) => {
                                           <Accordion.Content>
                                             <div className="flex flex-row justify-between mt-4">
                                               <div className="flex flex-col mt-2 gap-2">
-                                                {method.inputs.map((input) => (
-                                                  <input
-                                                    key={input.name}
-                                                    id={`${method.name}-${input.name}`}
-                                                    className="bg-transparent rounded-lg"
-                                                    type="text"
-                                                    placeholder={`${input.type}: ${input.name}`}
-                                                  />
-                                                ))}
+                                                {method.inputs.map((input) =>
+                                                  input.type == "tuple" ? (
+                                                    <>
+                                                      {input.internalType}
+                                                      {
+                                                        //@ts-ignore
+                                                        input.components.map(
+                                                          (component: AbiParameter) => (
+                                                            <input
+                                                              key={component.name}
+                                                              id={`${method.name}-${input.name}-${component.name}`}
+                                                              className="bg-transparent rounded-lg ml-12"
+                                                              type="text"
+                                                              placeholder={`${component.type}: ${component.name}`}
+                                                            />
+                                                          )
+                                                        )
+                                                      }
+                                                    </>
+                                                  ) : (
+                                                    <input
+                                                      key={input.name}
+                                                      id={`${method.name}-${input.name}`}
+                                                      className="bg-transparent rounded-lg"
+                                                      type="text"
+                                                      placeholder={`${input.type}: ${input.name}`}
+                                                    />
+                                                  )
+                                                )}
                                               </div>
                                               <button
                                                 onClick={async () => {

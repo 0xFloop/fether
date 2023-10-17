@@ -114,6 +114,7 @@ export const callContractFunction = async (
 
     for (let i = 0; i < method.outputs.length; i++) {
       let newReturnItem: ContractReturnItem = {
+        type: method.outputs[i].type,
         name: method.outputs[i].name ? (method.outputs[i].name as string) : method.outputs[i].type,
         value: parsedReturn[i].toString(),
       };
@@ -128,23 +129,49 @@ export const callContractFunction = async (
     });
 
     const [address] = await walletClient.getAddresses();
+
     const publicClient = createPublicClient({
       chain: fetherChainFromApiKey,
       transport: http(),
     });
-    console.log(method.name);
-    const { request } = await publicClient.simulateContract({
+
+    const { result, request } = await publicClient.simulateContract({
       account: address,
       address: contractAddress,
       abi: parsedAbi,
       functionName: method.name,
       args: args,
     });
-    console.log("request exists: " + Boolean(request));
+
+    let returnItems: ContractReturnItem[] = [];
+    console.log(typeof result);
+    if (typeof result == "object") {
+      for (let i = 0; i < method.outputs.length; i++) {
+        let newReturnItem: ContractReturnItem = {
+          type: method.outputs[i].type,
+          name: method.outputs[i].name
+            ? (method.outputs[i].name as string)
+            : method.outputs[i].type,
+          value: result[i].toString(),
+        };
+        returnItems.push(newReturnItem);
+      }
+    } else {
+      let newReturnItem: ContractReturnItem = {
+        type: method.outputs[0].type,
+        name: method.outputs[0].name ? (method.outputs[0].name as string) : method.outputs[0].type,
+        value: result.toString(),
+      };
+      returnItems.push(newReturnItem);
+    }
+
     let tx = await walletClient.writeContract(request);
 
     //TODO idk wtf is going on here lol
-    return { returnItems: [{ name: "numbuh", value: 4 }], methodName: method.name };
+    return {
+      returnItems: returnItems,
+      methodName: method.name,
+    };
   }
 };
 
@@ -227,13 +254,29 @@ export const timeSince = (_date: any) => {
 export const getFunctionArgsFromInput = (abiFunction: AbiFunctionType): any[] => {
   let args = [];
   for (let i = 0; i < abiFunction.inputs.length; i++) {
-    const inputElement = document.getElementById(
-      `${abiFunction.name}-${abiFunction.inputs[i].name}`
-    ) as HTMLInputElement;
+    if (abiFunction.inputs[i].type == "tuple") {
+      let argStruct: { [key: string]: string } = {};
+      for (let j = 0; j < abiFunction.inputs[i].components.length; j++) {
+        const inputElement = document.getElementById(
+          `${abiFunction.name}-${abiFunction.inputs[i].name}-${abiFunction.inputs[i].components[j].name}`
+        ) as HTMLInputElement;
 
-    const val = inputElement.value;
+        let val: any = inputElement.value;
 
-    args.push(val);
+        let key = abiFunction.inputs[i].components[j].name as string;
+        argStruct[key] = val;
+      }
+
+      args.push(argStruct);
+    } else {
+      const inputElement = document.getElementById(
+        `${abiFunction.name}-${abiFunction.inputs[i].name}`
+      ) as HTMLInputElement;
+
+      const val = inputElement.value;
+
+      args.push(val);
+    }
   }
 
   return args;
