@@ -190,7 +190,7 @@ export const getSolFileNames = async (
   let contractSrcFolder = await octokit.request("GET /repos/{owner}/{repo}/contents/{path}", {
     owner: ownerName,
     repo: repoName,
-    path: foundryRootDir + "/src",
+    path: foundryRootDir == "" ? "src" : foundryRootDir + "/src",
     headers: {
       "X-GitHub-Api-Version": "2022-11-28",
       Accept: "application/vnd.github.raw",
