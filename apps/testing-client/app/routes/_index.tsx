@@ -21,8 +21,6 @@ export default function Index() {
   });
 
   const updateStateNumber = async () => {
-    console.log(fether.abi);
-    console.log(fether.address);
     const number = await publicClient.readContract({
       address: fether.address,
       abi: fether.abi,

@@ -22,9 +22,6 @@ import { createTestClient, http, parseEther, isAddress, createPublicClient } fro
 import SetupWizard from "~/components/SetupWizard";
 import { PersonalDashboard } from "~/components/PersonalDashboard";
 
-//TODO: Add states to transactions (pending, confirmed, failed)
-//TODO: add ability for team page
-
 export const meta: V2_MetaFunction<typeof loader> = ({ data }) => {
   return [{ title: ("Fether | " + data?.userData?.username) as string }];
 };
