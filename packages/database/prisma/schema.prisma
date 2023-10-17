@@ -87,6 +87,7 @@ model Repository {
   updatedAt DateTime      @default(now()) @updatedAt
   Activity  Transaction[]
 
+  @@index([repoId], name: "RepoId")
   @@index([userId], name: "UserId")
   @@index([teamId], name: "TeamId")
 }
