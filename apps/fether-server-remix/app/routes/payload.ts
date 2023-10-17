@@ -15,138 +15,144 @@ export const action = async ({ request }: ActionArgs) => {
   try {
     const reqBody = await request.json();
 
+    console.log("reqBody: ", reqBody);
+
     let installId = reqBody.installation.id.toString();
 
     const octokit = await octo.getInstallationOctokit(installId);
 
-    let associatedUserData = await db.user.findUnique({
-      where: { githubInstallationId: installId as string },
+    let associatedRepositories = await db.repository.findMany({
+      where: { repoId: reqBody.repository.id.toString() },
       include: {
-        ApiKey: true,
-        Repository: {
-          include: {
-            Activity: true,
-          },
-        },
+        associatedUser: { include: { ApiKey: true } },
+        associatedTeam: { include: { ApiKey: true } },
       },
     });
 
-    if (
-      associatedUserData &&
-      associatedUserData.ApiKey &&
-      associatedUserData.Repository &&
-      associatedUserData.Repository.repoId == reqBody.repository.id
-    ) {
-      for (let i = 0; i < reqBody.commits.length; i++) {
-        for (let j = 0; j < reqBody.commits[i].modified.length; j++)
-          if (reqBody.commits[i].modified[j].slice(-3) == "sol") {
-            let modifiedContractPath: string = reqBody.commits[i].modified[j];
-            console.log("modified contract path: ", modifiedContractPath);
+    for (let i = 0; i < associatedRepositories.length; i++) {
+      let associatedRepo = associatedRepositories[i];
 
-            let pathArray = modifiedContractPath.split("/");
-            console.log("pathArray: ", pathArray);
+      let associatedData = associatedRepo.associatedUser
+        ? associatedRepo.associatedUser
+        : associatedRepo.associatedTeam;
 
-            let fileName = pathArray.pop();
+      if (associatedData?.ApiKey) {
+        for (let i = 0; i < reqBody.commits.length; i++) {
+          for (let j = 0; j < reqBody.commits[i].modified.length; j++)
+            if (reqBody.commits[i].modified[j].slice(-3) == "sol") {
+              let modifiedContractPath: string = reqBody.commits[i].modified[j];
+              console.log("modified contract path: ", modifiedContractPath);
 
-            if (associatedUserData.Repository.filename == fileName) {
-              let rootDir = associatedUserData.Repository.foundryRootDir;
-              let fileName = associatedUserData.Repository.filename;
+              let pathArray = modifiedContractPath.split("/");
+              console.log("pathArray: ", pathArray);
 
-              let userName = associatedUserData.Repository.repoName.split("/")[0];
-              let repoName = associatedUserData.Repository.repoName.split("/")[1];
+              let fileName = pathArray.pop();
 
-              let byteCodePath =
-                rootDir + "/out/" + fileName + "/" + fileName?.split(".")[0] + ".json";
+              if (associatedRepo.filename == fileName) {
+                let rootDir = associatedRepo.foundryRootDir;
+                let fileName = associatedRepo.filename;
 
-              let contentsReq = await octokit.request("GET /repos/{owner}/{repo}/contents/{path}", {
-                owner: userName,
-                repo: repoName,
-                path: byteCodePath,
-                headers: {
-                  "X-GitHub-Api-Version": "2022-11-28",
-                  Accept: "application/vnd.github.raw",
-                },
-              });
+                let userName = associatedRepo.repoName.split("/")[0];
+                let repoName = associatedRepo.repoName.split("/")[1];
 
-              let fileJSON = JSON.parse(contentsReq.data.toString());
-              let validatedJSON = zodContractBuildFileSchema.parse(fileJSON);
+                let byteCodePath =
+                  rootDir + "/out/" + fileName + "/" + fileName?.split(".")[0] + ".json";
 
-              let bytecode = validatedJSON.bytecode.object as `0x${string}`;
-              let abi = Abi.parse(fileJSON.abi);
-              let dbAbi = JSON.stringify(fileJSON.abi);
-              let deployerAddress = associatedUserData.Repository.deployerAddress as `0x${string}`;
+                let contentsReq = await octokit.request(
+                  "GET /repos/{owner}/{repo}/contents/{path}",
+                  {
+                    owner: userName,
+                    repo: repoName,
+                    path: byteCodePath,
+                    headers: {
+                      "X-GitHub-Api-Version": "2022-11-28",
+                      Accept: "application/vnd.github.raw",
+                    },
+                  }
+                );
 
-              ///
-              const fetherChain = fetherChainFromKey(associatedUserData.ApiKey?.key as string);
+                let fileJSON = JSON.parse(contentsReq.data.toString());
+                let validatedJSON = zodContractBuildFileSchema.parse(fileJSON);
 
-              const walletClient = createWalletClient({
-                chain: fetherChain,
-                transport: http(),
-              });
+                let bytecode = validatedJSON.bytecode.object as `0x${string}`;
+                let abi = Abi.parse(fileJSON.abi);
+                let dbAbi = JSON.stringify(fileJSON.abi);
+                let deployerAddress = associatedRepo.deployerAddress as `0x${string}`;
 
-              const publicClient = createPublicClient({
-                chain: fetherChain,
-                transport: http(),
-              });
+                const fetherChain = fetherChainFromKey(associatedData.ApiKey?.key as string);
 
-              const adminClient = createTestClient({
-                chain: fetherChain,
-                mode: "anvil",
-                transport: http(),
-              });
+                const walletClient = createWalletClient({
+                  chain: fetherChain,
+                  transport: http(),
+                });
 
-              if ((await publicClient.getBalance({ address: deployerAddress })) < 1) {
-                await adminClient.setBalance({ address: deployerAddress, value: parseEther("1") });
+                const publicClient = createPublicClient({
+                  chain: fetherChain,
+                  transport: http(),
+                });
+
+                const adminClient = createTestClient({
+                  chain: fetherChain,
+                  mode: "anvil",
+                  transport: http(),
+                });
+
+                if ((await publicClient.getBalance({ address: deployerAddress })) < 1) {
+                  await adminClient.setBalance({
+                    address: deployerAddress,
+                    value: parseEther("1"),
+                  });
+                }
+
+                await adminClient.impersonateAccount({
+                  address: deployerAddress,
+                });
+
+                let deployHash = await walletClient.deployContract({
+                  abi,
+                  account: deployerAddress,
+                  bytecode,
+                });
+
+                await adminClient.stopImpersonatingAccount({ address: deployerAddress });
+
+                await new Promise((r) => setTimeout(r, 5500));
+                const transaction = await publicClient.getTransactionReceipt({
+                  hash: deployHash,
+                });
+
+                await db.transaction.create({
+                  data: {
+                    txHash: deployHash,
+                    repositoryId: associatedRepo.id,
+                    functionName: "GitHub Deployment",
+                  },
+                });
+
+                await db.repository.update({
+                  where: { id: associatedRepo.id },
+                  data: {
+                    contractAddress: transaction["contractAddress"],
+                    contractAbi: dbAbi,
+                    lastDeployed: new Date(),
+                  },
+                });
               }
-
-              await adminClient.impersonateAccount({
-                address: deployerAddress,
-              });
-
-              let deployHash = await walletClient.deployContract({
-                abi,
-                account: deployerAddress,
-                bytecode,
-              });
-
-              await adminClient.stopImpersonatingAccount({ address: deployerAddress });
-
-              await new Promise((r) => setTimeout(r, 5500));
-              const transaction = await publicClient.getTransactionReceipt({
-                hash: deployHash,
-              });
-
-              await db.transaction.create({
-                data: {
-                  txHash: deployHash,
-                  repositoryId: associatedUserData.Repository.id,
-                  functionName: "GitHub Deployment",
-                },
-              });
-
-              await db.repository.update({
-                where: { id: associatedUserData.Repository.id },
-                data: {
-                  contractAddress: transaction["contractAddress"],
-                  contractAbi: dbAbi,
-                  lastDeployed: new Date(),
-                },
-              });
             }
-          }
+        }
+      } else {
+        console.log("no api key found for this repo: ", reqBody.installation.id);
+        return new Response(null, {
+          status: 500,
+          headers: { "Access-Control-Allow-Origin": "*" },
+          statusText: "No api key found for this repo, please sign up at https://www.fether.xyz.",
+        });
       }
-      return new Response(null, {
-        status: 200,
-        headers: { "Access-Control-Allow-Origin": "*" },
-      });
-    } else {
-      console.log("no api key found for this repo: ", reqBody.installation.id);
-      return new Response(null, {
-        status: 500,
-        headers: { "Access-Control-Allow-Origin": "*" },
-        statusText: "No api key found for this repo, please sign up at https://www.fether.xyz.",
-      });
     }
+    return new Response(null, {
+      status: 200,
+      headers: { "Access-Control-Allow-Origin": "*" },
+    });
   } catch (err) {
     console.log("ERROR OCCURED: \n", err);
     return new Response(null, {
