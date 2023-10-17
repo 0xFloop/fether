@@ -33,6 +33,13 @@ contract SecretKeeper is Ownable {
         secretInStorage = secretParam;
     }
 
+    function writeWith1Return(
+        SecretStorage memory secretParam
+    ) public returns (string memory _secretPhrase) {
+        _secretPhrase = secretParam.secretPrase;
+        secretInStorage = secretParam;
+    }
+
     function updateSecretNumber(uint256 _secretNumber) public {
         secretNumber = _secretNumber;
     }
