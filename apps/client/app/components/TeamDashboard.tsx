@@ -521,12 +521,8 @@ export const TeamDashboard = (props: DashboardProps) => {
                                               <p className="text-tertiary-gray">
                                                 {functionReturn.returnItems[index].name}:{" "}
                                               </p>
-                                              {functionReturn.returnItems[index].value.length <
-                                              20 ? (
-                                                <p className="ml-4 break-[anywhere]">
-                                                  {functionReturn.returnItems[index].value}
-                                                </p>
-                                              ) : (
+                                              {functionReturn.returnItems[index].type ==
+                                              "address" ? (
                                                 <div className="flex items-center justify-between">
                                                   <p className="ml-4">
                                                     {functionReturn.returnItems[index].value.slice(
@@ -548,6 +544,10 @@ export const TeamDashboard = (props: DashboardProps) => {
                                                     }
                                                   />
                                                 </div>
+                                              ) : (
+                                                <p className="ml-4 break-[anywhere]">
+                                                  {functionReturn.returnItems[index].value}
+                                                </p>
                                               )}
                                             </div>
                                           ))}

@@ -38,6 +38,7 @@ export type TeamWithKeyRepoActivityMembers =
 export type RepoData = { repoName: string; repoId: string };
 
 export type ContractReturnItem = {
+  type: string;
   name: string;
   value: any;
 };
