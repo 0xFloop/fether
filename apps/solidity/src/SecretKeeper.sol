@@ -25,7 +25,10 @@ contract SecretKeeper is Ownable {
         _secretPhrase = saucesSecretPhrase;
     }
 
-    function updateSecretInStorage(SecretStorage memory secretParam) public {
+    function updateSecretInStorage(
+        SecretStorage memory secretParam
+    ) public returns (string memory _secretPhrase) {
+        _secretPhrase = secretParam.secretPrase;
         secretInStorage = secretParam;
     }
 
