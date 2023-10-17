@@ -35,7 +35,7 @@ export const action = async ({ request }: ActionArgs) => {
       associatedUserData &&
       associatedUserData.ApiKey &&
       associatedUserData.Repository &&
-      associatedUserData.Repository.id == reqBody.repository.id
+      associatedUserData.Repository.repoId == reqBody.repository.id
     ) {
       for (let i = 0; i < reqBody.commits.length; i++) {
         for (let j = 0; j < reqBody.commits[i].modified.length; j++)
