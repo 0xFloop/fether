@@ -4,9 +4,9 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract SecretKeeper is Ownable {
     string public saucesSecretPhrase =
-        "sauce very super duper very ultra mega is the super best";
+        "maisie very super duper very ultra mega is the super best";
     uint256 public secretNumber = 10;
-    SecretStorage public secretInStorage = SecretStorage(6969, "deex nuts");
+    SecretStorage public secretInStorage = SecretStorage(6969, "maisies nuts");
 
     struct SecretStorage {
         uint secretNumber;
@@ -44,7 +44,7 @@ contract SecretKeeper is Ownable {
         secretNumber = _secretNumber;
     }
 
-    function getSaucesNumber() public view returns (uint256) {
+    function getMaisiesNumber() public view returns (uint256) {
         return secretNumber;
     }
 
