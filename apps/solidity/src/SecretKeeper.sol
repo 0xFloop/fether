@@ -32,7 +32,7 @@ contract SecretKeeper is Ownable {
         view
         returns (string memory _secretPhrase)
     {
-        _secretPhrase = saucesSecretPhrase;
+        _secretPhrase = maisiesHatersSecretPhrase;
     }
 
     function updateSecretInStorage(
@@ -54,7 +54,7 @@ contract SecretKeeper is Ownable {
         secretNumber = _secretNumber;
     }
 
-    function getSaucesNumber() public view returns (uint256) {
+    function getMaisiesNumber() public view returns (uint256) {
         return secretNumber;
     }
 
@@ -63,6 +63,6 @@ contract SecretKeeper is Ownable {
         view
         returns (string memory _secretPhrase, uint256 _secretNumber)
     {
-        return (saucesSecretPhrase, secretNumber);
+        return (maisiesHatersSecretPhrase, secretNumber);
     }
 }
