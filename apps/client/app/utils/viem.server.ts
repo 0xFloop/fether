@@ -33,7 +33,6 @@ export const deployContract = async (
   deployerUsername: string,
   args: any[]
 ) => {
-  console.log({ args });
   if (!repoData) throw new Error("Not Found");
   if (!repoData?.foundryRootDir && repoData?.foundryRootDir != "") throw new Error("Not Found");
   const octokit = await octo.getInstallationOctokit(parseInt(githubInstallationId));

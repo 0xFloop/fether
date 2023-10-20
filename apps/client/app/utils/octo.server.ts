@@ -242,6 +242,7 @@ export const chooseFileToTrack = async (
     data: {
       filename: newFileName,
       contractAbi: dbAbi,
+      cachedConstructorArgs: null,
       contractAddress: null,
       deployerAddress: null,
     },
