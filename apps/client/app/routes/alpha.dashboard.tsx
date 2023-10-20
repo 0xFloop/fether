@@ -27,7 +27,7 @@ import { createTestClient, http, parseEther, isAddress, createPublicClient } fro
 import SetupWizard from "~/components/SetupWizard";
 import { PersonalDashboard } from "~/components/PersonalDashboard";
 
-//TODO: add ability to pass in constructor args
+//TODO: add button to opt in to using cached args
 //TODO: fix view functions that take params
 //TODO: add ability to set your branch to deploy from
 //      (currently deploys from main regardless of branch that was commit to)
@@ -160,13 +160,28 @@ export const action = async ({ request }: ActionArgs): Promise<DashboardActionRe
         case "deployContract":
           try {
             let numOfArgs = body.get("numOfArgs") as string;
-            if (!numOfArgs) numOfArgs = "0";
+            let useCachedArgs = body.get("useCachedArgs") as string;
             let args = [];
-            for (let i = 0; i < parseInt(numOfArgs); i++) {
-              let arg = body.get(`constructorArg-${i}`) as string;
-              if (!arg) throw new Error("Error loading constructor arg.");
-              args.push(arg);
+
+            if (useCachedArgs == "true" && associatedUser?.Repository?.cachedConstructorArgs) {
+              args = JSON.parse(associatedUser?.Repository?.cachedConstructorArgs);
+            } else if (numOfArgs) {
+              for (let i = 0; i < parseInt(numOfArgs); i++) {
+                let arg = body.get(`constructorArg-${i}`) as string;
+                if (!arg) throw new Error("Error loading constructor arg.");
+                args.push(arg);
+              }
             }
+
+            if (!associatedUser?.Repository?.cachedConstructorArgs) {
+              await db.repository.update({
+                where: { userId: associatedUser.id },
+                data: {
+                  cachedConstructorArgs: JSON.stringify(args),
+                },
+              });
+            }
+
             await deployContract(
               githubInstallationId as string,
               associatedUser.Repository,

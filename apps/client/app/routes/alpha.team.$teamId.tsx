@@ -203,13 +203,28 @@ export const action = async ({ request }: ActionArgs) => {
           try {
             if (!team.Repository) throw new Error("No filename found");
             let numOfArgs = body.get("numOfArgs") as string;
-            if (!numOfArgs) numOfArgs = "0";
+            let useCachedArgs = body.get("useCachedArgs") as string;
             let args = [];
-            for (let i = 0; i < parseInt(numOfArgs); i++) {
-              let arg = body.get(`constructorArg-${i}`) as string;
-              if (!arg) throw new Error("Error loading constructor arg.");
-              args.push(arg);
+
+            if (useCachedArgs == "true" && team.Repository.cachedConstructorArgs) {
+              args = JSON.parse(team.Repository.cachedConstructorArgs);
+            } else if (numOfArgs) {
+              for (let i = 0; i < parseInt(numOfArgs); i++) {
+                let arg = body.get(`constructorArg-${i}`) as string;
+                if (!arg) throw new Error("Error loading constructor arg.");
+                args.push(arg);
+              }
             }
+
+            if (!team.Repository.cachedConstructorArgs) {
+              await db.repository.update({
+                where: { teamId: team.id },
+                data: {
+                  cachedConstructorArgs: JSON.stringify(args),
+                },
+              });
+            }
+
             await deployContract(
               githubInstallationId as string,
               team.Repository,

@@ -15,8 +15,6 @@ export const action = async ({ request }: ActionArgs) => {
   try {
     const reqBody = await request.json();
 
-    console.log("reqBody: ", reqBody);
-
     let installId = reqBody.installation.id.toString();
 
     const octokit = await octo.getInstallationOctokit(installId);
@@ -41,10 +39,8 @@ export const action = async ({ request }: ActionArgs) => {
           for (let j = 0; j < reqBody.commits[i].modified.length; j++)
             if (reqBody.commits[i].modified[j].slice(-3) == "sol") {
               let modifiedContractPath: string = reqBody.commits[i].modified[j];
-              console.log("modified contract path: ", modifiedContractPath);
 
               let pathArray = modifiedContractPath.split("/");
-              console.log("pathArray: ", pathArray);
 
               let fileName = pathArray.pop();
 
@@ -112,6 +108,9 @@ export const action = async ({ request }: ActionArgs) => {
                   abi,
                   account: deployerAddress,
                   bytecode,
+                  args: associatedRepo.cachedConstructorArgs
+                    ? JSON.parse(associatedRepo.cachedConstructorArgs)
+                    : [],
                 });
 
                 await adminClient.stopImpersonatingAccount({ address: deployerAddress });
