@@ -833,6 +833,19 @@ export const PersonalDashboard = (props: DashboardProps) => {
                                   Input constructor args to {deployStatus.toLowerCase()} your
                                   contract!
                                 </h1>
+
+                                <input
+                                  className="focus:outline-none rounded-xl focus:border-none ring-0 focus:ring-0"
+                                  type="checkbox"
+                                  name="useCachedArgs"
+                                  id="useCachedArgs"
+                                />
+                                <label
+                                  className="ml-2 text-base align-middle"
+                                  htmlFor="useCachedArgs"
+                                >
+                                  Use cached constructor args?
+                                </label>
                                 {parsedAbi.map(
                                   (method, i) =>
                                     method.type == "constructor" &&

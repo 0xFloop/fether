@@ -204,9 +204,10 @@ export const action = async ({ request }: ActionArgs) => {
             if (!team.Repository) throw new Error("No filename found");
             let numOfArgs = body.get("numOfArgs") as string;
             let useCachedArgs = body.get("useCachedArgs") as string;
+
             let args = [];
 
-            if (useCachedArgs == "true" && team.Repository.cachedConstructorArgs) {
+            if (useCachedArgs == "on" && team.Repository.cachedConstructorArgs) {
               args = JSON.parse(team.Repository.cachedConstructorArgs);
             } else if (numOfArgs) {
               for (let i = 0; i < parseInt(numOfArgs); i++) {

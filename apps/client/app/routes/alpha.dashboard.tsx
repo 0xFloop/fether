@@ -27,7 +27,7 @@ import { createTestClient, http, parseEther, isAddress, createPublicClient } fro
 import SetupWizard from "~/components/SetupWizard";
 import { PersonalDashboard } from "~/components/PersonalDashboard";
 
-//TODO: add button to opt in to using cached args
+//TODO: add ability to manually update constructor args
 //TODO: fix view functions that take params
 //TODO: add ability to set your branch to deploy from
 //      (currently deploys from main regardless of branch that was commit to)
@@ -161,9 +161,10 @@ export const action = async ({ request }: ActionArgs): Promise<DashboardActionRe
           try {
             let numOfArgs = body.get("numOfArgs") as string;
             let useCachedArgs = body.get("useCachedArgs") as string;
+
             let args = [];
 
-            if (useCachedArgs == "true" && associatedUser?.Repository?.cachedConstructorArgs) {
+            if (useCachedArgs == "on" && associatedUser?.Repository?.cachedConstructorArgs) {
               args = JSON.parse(associatedUser?.Repository?.cachedConstructorArgs);
             } else if (numOfArgs) {
               for (let i = 0; i < parseInt(numOfArgs); i++) {
