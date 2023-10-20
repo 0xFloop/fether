@@ -571,18 +571,16 @@ export const PersonalDashboard = (props: DashboardProps) => {
                               </div>
                             </div>
                           )}
-                          <div className="flex flex-row justify-between rounded-lg">
-                            <p className="text-2xl font-primary text-tertiary-gray">
-                              Last Deployment :
-                            </p>
-                            <p>
-                              {userData?.Repository?.lastDeployed
-                                ? `${timeSince(userData?.Repository?.lastDeployed)} ago`
-                                : "N/A"}
-                            </p>
-                          </div>
                         </>
                       )}
+                    <div className="flex flex-row justify-between rounded-lg">
+                      <p className="text-2xl font-primary text-tertiary-gray">Last Deployment :</p>
+                      <p>
+                        {userData?.Repository?.lastDeployed
+                          ? `${timeSince(userData?.Repository?.lastDeployed)} ago`
+                          : "N/A"}
+                      </p>
+                    </div>
                   </div>
 
                   <div className="flex flex-col bg-secondary-gray  border border-secondary-border  shadow-md	 p-5 rounded-lg">
