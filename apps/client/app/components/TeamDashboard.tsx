@@ -16,6 +16,7 @@ import { AbiFunction as AbiFunctionType, AbiParameter } from "abitype";
 import React from "react";
 import * as Accordion from "@radix-ui/react-accordion";
 import TxViewer from "./TxViewer";
+import { Abi } from "abitype/zod";
 
 export interface DashboardProps {
   userData: UserWithKeyRepoActivityTeam;
@@ -28,6 +29,7 @@ export interface DashboardProps {
 export const TeamDashboard = (props: DashboardProps) => {
   const teamData = props.teamData;
   const userData = props.userData;
+  const parsedAbi = Abi.parse(JSON.parse(teamData?.Repository?.contractAbi as string));
   const actionArgs = props.actionArgs;
   const navigation = props.navigation;
   const displayCodes = useContext(DisplayCodesContext);
@@ -45,6 +47,7 @@ export const TeamDashboard = (props: DashboardProps) => {
   const [addressValid, setAddressValid] = useState<boolean>(false);
   const [addressError, setAddressError] = useState<string | null>(null);
   const [teamSelect, setTeamSelect] = useState(false);
+  const [openDeployContractModal, setOpenDeployContractModal] = useState(false);
 
   let deployStatus = "Deploy";
 
@@ -742,7 +745,6 @@ export const TeamDashboard = (props: DashboardProps) => {
                 <div className="flex-1  bg-secondary-gray border border-secondary-border  shadow-md	 p-5 rounded-lg ">
                   <div className="flex flex-row justify-between align-middle items-center">
                     <p className="font-primary">Transactions :</p>
-
                     <Form method="post" className="flex items-center">
                       <input
                         type="hidden"
@@ -750,23 +752,96 @@ export const TeamDashboard = (props: DashboardProps) => {
                         value={userData?.githubInstallationId?.toString() as string}
                       />
                       <input type="hidden" name="formType" value="deployContract" />
-
-                      <button
-                        className="text-xl text-[#f0f0f0] bg-almost-black py-2 px-4 rounded-lg"
-                        type="submit"
-                      >
-                        {navigation.state == "submitting" &&
-                        navigation.formData?.get("formType") == "deployContract" ? (
-                          <div className="flex flex-row items-center">
-                            <p>Deploying</p>{" "}
-                            <div className="animate-spin ml-2">
-                              <Loader size={20} />
+                      {parsedAbi[0].type == "constructor" && parsedAbi[0].inputs.length > 0 ? (
+                        <>
+                          {!openDeployContractModal && (
+                            <button
+                              key={"openContractDeployerModalButton"}
+                              type="button"
+                              className="text-xl text-[#f0f0f0] bg-almost-black py-2 px-4 rounded-lg"
+                              onClick={() => setOpenDeployContractModal(true)}
+                            >
+                              {deployStatus}
+                            </button>
+                          )}
+                          {openDeployContractModal && (
+                            <div className="absolute top-0 left-0 z-50 flex items-center justify-center h-screen w-screen">
+                              <div className="absolute left-1/4 w-1/2 p-5 pb-10 bg-secondary-gray border border-white rounded-lg">
+                                <button
+                                  key={"closeDeployContractModalButton"}
+                                  onClick={() => setOpenDeployContractModal(false)}
+                                  className="absolute top-4 right-4"
+                                >
+                                  <X />
+                                </button>
+                                <h1>
+                                  Input constructor args to {deployStatus.toLowerCase()} your
+                                  contract!
+                                </h1>
+                                {parsedAbi.map(
+                                  (method, i) =>
+                                    method.type == "constructor" &&
+                                    method.inputs.length > 0 &&
+                                    method.inputs.map((input, i) => (
+                                      <input
+                                        key={"constructorArg-" + i}
+                                        type="text"
+                                        name={"constructorArg-" + i}
+                                        placeholder={input.type + " " + input.name}
+                                        className="bg-transparent rounded-lg ml-12"
+                                      />
+                                    ))
+                                )}
+                                <input
+                                  type="hidden"
+                                  name="numOfArgs"
+                                  value={
+                                    parsedAbi[0].type == "constructor" &&
+                                    parsedAbi[0].inputs.length > 0
+                                      ? parsedAbi[0].inputs.length
+                                      : 0
+                                  }
+                                />
+                                <button
+                                  key={"deployContractButtonWithinModal"}
+                                  className="text-xl text-[#f0f0f0] bg-almost-black py-2 px-4 rounded-lg"
+                                  type="submit"
+                                >
+                                  {navigation.state == "submitting" &&
+                                  navigation.formData?.get("formType") == "deployContract" ? (
+                                    <div className="flex flex-row items-center">
+                                      <p>Deploying</p>
+                                      <div className="animate-spin ml-2">
+                                        <Loader size={20} />
+                                      </div>
+                                    </div>
+                                  ) : (
+                                    <p>{deployStatus}</p>
+                                  )}
+                                </button>
+                              </div>
                             </div>
-                          </div>
-                        ) : (
-                          <p>{deployStatus}</p>
-                        )}
-                      </button>
+                          )}
+                        </>
+                      ) : (
+                        <button
+                          key={"deployContractSubmitButton"}
+                          className="text-xl text-[#f0f0f0] bg-almost-black py-2 px-4 rounded-lg"
+                          type="submit"
+                        >
+                          {navigation.state == "submitting" &&
+                          navigation.formData?.get("formType") == "deployContract" ? (
+                            <div className="flex flex-row items-center">
+                              <p>Deploying</p>
+                              <div className="animate-spin ml-2">
+                                <Loader size={20} />
+                              </div>
+                            </div>
+                          ) : (
+                            <p>{deployStatus}</p>
+                          )}
+                        </button>
+                      )}
                     </Form>
                   </div>
                   <table className="table-fixed w-full mt-5">

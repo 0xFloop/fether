@@ -340,9 +340,11 @@ const SetDeployerComponent: React.FC<setupProps> = (props: setupProps) => {
 };
 
 const DeployContractComponent: React.FC<setupProps> = (props: setupProps) => {
-  if (!props.userData?.Repository?.contractAbi) throw new Error("No contract abi found");
+  let data = props.dashboardType == "personal" ? props.userData : props.teamData;
 
-  const parsedAbi = Abi.parse(JSON.parse(props.userData.Repository.contractAbi));
+  if (!data?.Repository?.contractAbi) throw new Error("No contract abi found");
+
+  const parsedAbi = Abi.parse(JSON.parse(data.Repository.contractAbi));
 
   return (
     <div className="h-full w-full flex items-center align-middle justify-center">
