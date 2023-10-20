@@ -199,6 +199,32 @@ export const action = async ({ request }: ActionArgs) => {
             txDetails: null,
             error: null,
           };
+        case "updateConstructorArgs":
+          let numOfArgs = body.get("numOfArgs") as string;
+          let args = [];
+
+          for (let i = 0; i < parseInt(numOfArgs); i++) {
+            let arg = body.get(`constructorArg-${i}`) as string;
+            if (!arg) throw new Error("Error loading constructor arg.");
+            args.push(arg);
+          }
+
+          await db.repository.update({
+            where: { teamId: team.id },
+            data: {
+              cachedConstructorArgs: JSON.stringify(args),
+            },
+          });
+
+          return {
+            originCallForm: "updateConstructorArgs",
+            chosenRepoName: null,
+            repositories: null,
+            solFilesFromChosenRepo: null,
+            chosenFileName: null,
+            txDetails: null,
+            error: null,
+          };
         case "deployContract":
           try {
             if (!team.Repository) throw new Error("No filename found");

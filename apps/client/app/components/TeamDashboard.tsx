@@ -48,6 +48,7 @@ export const TeamDashboard = (props: DashboardProps) => {
   const [addressError, setAddressError] = useState<string | null>(null);
   const [teamSelect, setTeamSelect] = useState(false);
   const [openDeployContractModal, setOpenDeployContractModal] = useState(false);
+  const [constructorArgModal, setConstructorArgModal] = useState(false);
 
   let deployStatus = "Deploy";
 
@@ -420,6 +421,101 @@ export const TeamDashboard = (props: DashboardProps) => {
                         )}
                       </div>
                     </div>
+                    {teamData?.Repository?.cachedConstructorArgs &&
+                      JSON.parse(teamData?.Repository?.cachedConstructorArgs).length > 0 && (
+                        <>
+                          <div className="flex flex-row justify-between rounded-lg">
+                            <p className="text-2xl font-primary text-tertiary-gray">
+                              Constructor Args :
+                            </p>
+                            <button
+                              key="openUpdateConstructorArgModalButton"
+                              onClick={() => {
+                                setConstructorArgModal(true);
+                              }}
+                            >
+                              <Edit
+                                className="transform active:scale-75 transition-transform"
+                                size={20}
+                              />
+                            </button>
+                          </div>
+                          {constructorArgModal && (
+                            <div className="absolute top-0 left-0 z-50 flex items-center justify-center h-screen w-screen">
+                              <div className="absolute left-1/4 w-1/2 p-5 pb-10 bg-secondary-gray border border-white rounded-lg">
+                                <Form method="post" key="updateConstructorArgsForm">
+                                  <input
+                                    type="hidden"
+                                    name="githubInstallationId"
+                                    value={userData?.githubInstallationId?.toString()}
+                                  />
+                                  <input
+                                    key="updateConstructorArgsFormType"
+                                    type="hidden"
+                                    name="formType"
+                                    value="updateConstructorArgs"
+                                  />
+                                  <button
+                                    key="closeUpdateConstructorArgModalButton"
+                                    onClick={() => setConstructorArgModal(false)}
+                                    className="absolute top-4 right-4"
+                                  >
+                                    <X />
+                                  </button>
+                                  <h1>
+                                    Current cached constructor args:{" "}
+                                    {teamData.Repository.cachedConstructorArgs}
+                                  </h1>
+                                  <h1>Input new constructor args below.</h1>
+                                  {parsedAbi.map(
+                                    (method, i) =>
+                                      method.type == "constructor" &&
+                                      method.inputs.length > 0 &&
+                                      method.inputs.map((input, i) => (
+                                        <input
+                                          key={"constructorArg-" + i}
+                                          type="text"
+                                          name={"constructorArg-" + i}
+                                          placeholder={input.type + " " + input.name}
+                                          className="bg-transparent rounded-lg ml-12"
+                                        />
+                                      ))
+                                  )}
+                                  <input
+                                    key="numOfArgsFromInputNewConstructorArgs"
+                                    type="hidden"
+                                    name="numOfArgs"
+                                    value={
+                                      parsedAbi[0].type == "constructor" &&
+                                      parsedAbi[0].inputs.length > 0
+                                        ? parsedAbi[0].inputs.length
+                                        : 0
+                                    }
+                                  />
+                                  <button
+                                    key="updateConstructorArgsButton"
+                                    className="text-xl text-[#f0f0f0] bg-almost-black py-2 px-4 rounded-lg"
+                                    type="submit"
+                                  >
+                                    {navigation.state == "submitting" &&
+                                    navigation.formData?.get("formType") ==
+                                      "updateConstructorArgs" ? (
+                                      <div className="flex flex-row items-center">
+                                        <p>Updating</p>
+                                        <div className="animate-spin ml-2">
+                                          <Loader size={20} />
+                                        </div>
+                                      </div>
+                                    ) : (
+                                      <p>Update</p>
+                                    )}
+                                  </button>
+                                </Form>
+                              </div>
+                            </div>
+                          )}
+                        </>
+                      )}
                     <div className="flex flex-row justify-between rounded-lg">
                       <p className="text-2xl font-primary text-tertiary-gray">Last Deployment :</p>
                       <p>
