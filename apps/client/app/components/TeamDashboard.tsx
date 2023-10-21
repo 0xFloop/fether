@@ -604,27 +604,24 @@ export const TeamDashboard = (props: DashboardProps) => {
                                               <p>{method.name}</p>
                                               <button
                                                 onClick={async () => {
-                                                  if (Boolean(address)) {
-                                                    setFunctionCalled(method.name);
-                                                    try {
-                                                      let returnedData = await callContractFunction(
-                                                        method,
-                                                        teamData?.Repository?.contractAbi as string,
-                                                        teamData?.Repository
-                                                          ?.contractAddress as `0x${string}`,
-                                                        getFunctionArgsFromInput(method),
-                                                        teamData?.ApiKey?.key as string
-                                                      );
-                                                      setFunctionCalled(null);
+                                                  setFunctionCalled(method.name);
+                                                  try {
+                                                    let returnedData = await callContractFunction(
+                                                      method,
+                                                      teamData?.Repository?.contractAbi as string,
+                                                      teamData?.Repository
+                                                        ?.contractAddress as `0x${string}`,
+                                                      getFunctionArgsFromInput(method),
+                                                      teamData?.ApiKey?.key as string
+                                                    );
+                                                    setFunctionCalled(null);
 
-                                                      setFunctionReturn(returnedData);
-                                                    } catch (error) {
-                                                      setFunctionCalled(null);
-                                                    }
+                                                    setFunctionReturn(returnedData);
+                                                  } catch (error) {
+                                                    setFunctionCalled(null);
                                                   }
                                                 }}
                                                 className="text-[#f0f0f0] bg-almost-black py-2 px-4 rounded-lg disabled:bg-[#cbcbcb]"
-                                                disabled={!Boolean(address)}
                                               >
                                                 {functionCalled == method.name ? (
                                                   <div className="flex flex-row items-center">
@@ -675,30 +672,25 @@ export const TeamDashboard = (props: DashboardProps) => {
                                                 </div>
                                                 <button
                                                   onClick={async () => {
-                                                    if (Boolean(address)) {
-                                                      setFunctionCalled(method.name);
-                                                      console.log(method);
-                                                      try {
-                                                        let returnedData =
-                                                          await callContractFunction(
-                                                            method,
-                                                            teamData?.Repository
-                                                              ?.contractAbi as string,
-                                                            teamData?.Repository
-                                                              ?.contractAddress as `0x${string}`,
-                                                            getFunctionArgsFromInput(method),
-                                                            teamData?.ApiKey?.key as string
-                                                          );
-                                                        setFunctionCalled(null);
+                                                    setFunctionCalled(method.name);
+                                                    console.log(method);
+                                                    try {
+                                                      let returnedData = await callContractFunction(
+                                                        method,
+                                                        teamData?.Repository?.contractAbi as string,
+                                                        teamData?.Repository
+                                                          ?.contractAddress as `0x${string}`,
+                                                        getFunctionArgsFromInput(method),
+                                                        teamData?.ApiKey?.key as string
+                                                      );
+                                                      setFunctionCalled(null);
 
-                                                        setFunctionReturn(returnedData);
-                                                      } catch (error) {
-                                                        setFunctionCalled(null);
-                                                      }
+                                                      setFunctionReturn(returnedData);
+                                                    } catch (error) {
+                                                      setFunctionCalled(null);
                                                     }
                                                   }}
                                                   className="text-[#f0f0f0] bg-almost-black py-2 px-4  rounded-lg disabled:bg-[#cbcbcb]"
-                                                  disabled={!Boolean(address)}
                                                 >
                                                   {functionCalled == method.name ? (
                                                     <div className="flex flex-row items-center">
