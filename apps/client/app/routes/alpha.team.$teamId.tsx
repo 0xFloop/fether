@@ -30,7 +30,10 @@ import {
 import { deployContract } from "~/utils/viem.server";
 import { createPublicClient, createTestClient, http, isAddress, parseEther } from "viem";
 import { TeamDashboard } from "~/components/TeamDashboard";
-
+import rainbowStylesUrl from "@rainbow-me/rainbowkit/styles.css";
+export function links() {
+  return [{ rel: "stylesheet", href: rainbowStylesUrl }];
+}
 export const loader = async ({ params, request }: LoaderArgs) => {
   const user = await userGetSession(request.headers.get("Cookie"));
   if (!user.has("userId")) throw redirect("/");
