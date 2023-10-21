@@ -22,6 +22,8 @@ import { isAddress } from "viem";
 import { callContractFunction, getFunctionArgsFromInput, sleep, timeSince } from "~/utils/helpers";
 import { CustomConnectButton } from "./ConnectButton";
 import { AbiFunction as AbiFunctionType, AbiParameter } from "abitype";
+import { Abi } from "abitype/zod";
+
 import React from "react";
 import * as Accordion from "@radix-ui/react-accordion";
 import TxViewer from "./TxViewer";
@@ -36,6 +38,7 @@ export interface DashboardProps {
 
 export const PersonalDashboard = (props: DashboardProps) => {
   const userData = props.userData;
+  const parsedAbi = Abi.parse(JSON.parse(userData?.Repository?.contractAbi as string));
   const actionArgs = props.actionArgs;
   const navigation = props.navigation;
   const displayCodes = useContext(DisplayCodesContext);
@@ -52,6 +55,8 @@ export const PersonalDashboard = (props: DashboardProps) => {
   const [addressError, setAddressError] = useState<string | null>(null);
   const [teamSelect, setTeamSelect] = useState(false);
   const [createTeam, setCreateTeam] = useState(false);
+  const [openDeployContractModal, setOpenDeployContractModal] = useState(false);
+  const [constructorArgModal, setConstructorArgModal] = useState(false);
 
   let deployStatus = "Deploy";
 
@@ -90,6 +95,7 @@ export const PersonalDashboard = (props: DashboardProps) => {
       setAddressError("Error: Invalid Address");
     }
   };
+
   return (
     <div className="selection:bg-accent selection:text-primary-gray max-w-screen h-auto min-h-screen display flex flex-col items-center justify-center text-[#a38282]">
       {userData &&
@@ -118,7 +124,7 @@ export const PersonalDashboard = (props: DashboardProps) => {
                   </p>
                   <div className="flex flex-row justify-evenly mt-4">
                     {userData?.IssuedInviteCodes?.map((code) => (
-                      <div className="flex flex-col items-center">
+                      <div key={code.inviteCode} className="flex flex-col items-center">
                         <p
                           className={code.keyStatus == "UNUSED" ? "text-green-400" : "text-red-400"}
                         >
@@ -472,6 +478,101 @@ export const PersonalDashboard = (props: DashboardProps) => {
                         )}
                       </div>
                     </div>
+                    {userData?.Repository?.cachedConstructorArgs &&
+                      JSON.parse(userData?.Repository?.cachedConstructorArgs).length > 0 && (
+                        <>
+                          <div className="flex flex-row justify-between rounded-lg">
+                            <p className="text-2xl font-primary text-tertiary-gray">
+                              Constructor Args :
+                            </p>
+                            <button
+                              key="openUpdateConstructorArgModalButton"
+                              onClick={() => {
+                                setConstructorArgModal(true);
+                              }}
+                            >
+                              <Edit
+                                className="transform active:scale-75 transition-transform"
+                                size={20}
+                              />
+                            </button>
+                          </div>
+                          {constructorArgModal && (
+                            <div className="absolute top-0 left-0 z-50 flex items-center justify-center h-screen w-screen">
+                              <div className="absolute left-1/4 w-1/2 p-5 pb-10 bg-secondary-gray border border-white rounded-lg">
+                                <Form method="post" key="updateConstructorArgsForm">
+                                  <input
+                                    type="hidden"
+                                    name="githubInstallationId"
+                                    value={userData?.githubInstallationId?.toString()}
+                                  />
+                                  <input
+                                    key="updateConstructorArgsFormType"
+                                    type="hidden"
+                                    name="formType"
+                                    value="updateConstructorArgs"
+                                  />
+                                  <button
+                                    key="closeUpdateConstructorArgModalButton"
+                                    onClick={() => setConstructorArgModal(false)}
+                                    className="absolute top-4 right-4"
+                                  >
+                                    <X />
+                                  </button>
+                                  <h1>
+                                    Current cached constructor args:{" "}
+                                    {userData.Repository.cachedConstructorArgs}
+                                  </h1>
+                                  <h1>Input new constructor args below.</h1>
+                                  {parsedAbi.map(
+                                    (method, i) =>
+                                      method.type == "constructor" &&
+                                      method.inputs.length > 0 &&
+                                      method.inputs.map((input, i) => (
+                                        <input
+                                          key={"constructorArg-" + i}
+                                          type="text"
+                                          name={"constructorArg-" + i}
+                                          placeholder={input.type + " " + input.name}
+                                          className="bg-transparent rounded-lg ml-12"
+                                        />
+                                      ))
+                                  )}
+                                  <input
+                                    key="numOfArgsFromInputNewConstructorArgs"
+                                    type="hidden"
+                                    name="numOfArgs"
+                                    value={
+                                      parsedAbi[0].type == "constructor" &&
+                                      parsedAbi[0].inputs.length > 0
+                                        ? parsedAbi[0].inputs.length
+                                        : 0
+                                    }
+                                  />
+                                  <button
+                                    key="updateConstructorArgsButton"
+                                    className="text-xl text-[#f0f0f0] bg-almost-black py-2 px-4 rounded-lg"
+                                    type="submit"
+                                  >
+                                    {navigation.state == "submitting" &&
+                                    navigation.formData?.get("formType") ==
+                                      "updateConstructorArgs" ? (
+                                      <div className="flex flex-row items-center">
+                                        <p>Updating</p>
+                                        <div className="animate-spin ml-2">
+                                          <Loader size={20} />
+                                        </div>
+                                      </div>
+                                    ) : (
+                                      <p>Update</p>
+                                    )}
+                                  </button>
+                                </Form>
+                              </div>
+                            </div>
+                          )}
+                        </>
+                      )}
                     <div className="flex flex-row justify-between rounded-lg">
                       <p className="text-2xl font-primary text-tertiary-gray">Last Deployment :</p>
                       <p>
@@ -526,93 +627,91 @@ export const PersonalDashboard = (props: DashboardProps) => {
                     <ul className="flex flex-col gap-2 rounded-lg">
                       <p className="text-2xl pb-1 border-b border-b-[#363636] font-primary">Read</p>
                       <div className="py-2">
-                        {JSON.parse(userData?.Repository?.contractAbi as string).map(
-                          (method: AbiFunctionType, i: number) => (
-                            <div key={i}>
-                              {(method.stateMutability == "view" ||
+                        {parsedAbi.map((method, i: number) => (
+                          <div key={i}>
+                            {method.type == "function" &&
+                              (method.stateMutability == "view" ||
                                 method.stateMutability == "pure") &&
-                                method.type == "function" && (
-                                  <li className="text-lg py-1">
-                                    <div className="flex flex-row justify-between items-center">
-                                      {JSON.stringify(method["name"]).replace(/['"]+/g, "")}
-                                      <button
-                                        onClick={async () => {
-                                          setFunctionCalled(method.name);
+                              method.type == "function" && (
+                                <li className="text-lg py-1">
+                                  <div className="flex flex-row justify-between items-center">
+                                    {JSON.stringify(method["name"]).replace(/['"]+/g, "")}
+                                    <button
+                                      onClick={async () => {
+                                        setFunctionCalled(method.name);
 
-                                          let returnedData = await callContractFunction(
-                                            method,
-                                            userData?.Repository?.contractAbi as string,
-                                            userData?.Repository?.contractAddress as `0x${string}`,
-                                            getFunctionArgsFromInput(method),
-                                            userData?.ApiKey?.key as string
-                                          );
-                                          setFunctionCalled(null);
+                                        let returnedData = await callContractFunction(
+                                          method,
+                                          userData?.Repository?.contractAbi as string,
+                                          userData?.Repository?.contractAddress as `0x${string}`,
+                                          getFunctionArgsFromInput(method),
+                                          userData?.ApiKey?.key as string
+                                        );
+                                        setFunctionCalled(null);
 
-                                          setFunctionReturn(returnedData);
-                                        }}
-                                        className="text-[#f0f0f0] bg-almost-black py-2 px-4 rounded-lg"
-                                      >
-                                        {functionCalled == method.name ? (
-                                          <div className="flex flex-row items-center">
-                                            <p>Calling </p>
-                                            <div className="ml-2 animate-spin">
-                                              <Loader size={20} />
-                                            </div>
+                                        setFunctionReturn(returnedData);
+                                      }}
+                                      className="text-[#f0f0f0] bg-almost-black py-2 px-4 rounded-lg"
+                                    >
+                                      {functionCalled == method.name ? (
+                                        <div className="flex flex-row items-center">
+                                          <p>Calling </p>
+                                          <div className="ml-2 animate-spin">
+                                            <Loader size={20} />
                                           </div>
-                                        ) : (
-                                          <>Call</>
-                                        )}
-                                      </button>
-                                    </div>
-                                    {functionReturn?.methodName == method.name &&
-                                      method.outputs.length > 0 && (
-                                        <div className="flex flex-col break-words">
-                                          <p>Returned:</p>
-                                          {method.outputs.map((output, index) => (
-                                            <div
-                                              key={index}
-                                              className="bg-transparent 100% rounded-lg flex flex-row"
-                                            >
-                                              <p className="text-tertiary-gray">
-                                                {functionReturn.returnItems[index].name}:{" "}
-                                              </p>
-                                              {functionReturn.returnItems[index].type ==
-                                              "address" ? (
-                                                <div className="flex items-center justify-between">
-                                                  <p className="ml-4">
-                                                    {functionReturn.returnItems[index].value.slice(
-                                                      0,
-                                                      8
-                                                    )}
-                                                    ••••
-                                                    {functionReturn.returnItems[index].value.slice(
-                                                      37
-                                                    )}
-                                                  </p>
-                                                  <Copy
-                                                    className="transform ml-4 active:scale-75 transition-transform"
-                                                    size={20}
-                                                    onClick={() =>
-                                                      navigator.clipboard.writeText(
-                                                        functionReturn.returnItems[index].value
-                                                      )
-                                                    }
-                                                  />
-                                                </div>
-                                              ) : (
-                                                <p className="ml-4 break-[anywhere]">
-                                                  {functionReturn.returnItems[index].value}
-                                                </p>
-                                              )}
-                                            </div>
-                                          ))}
                                         </div>
+                                      ) : (
+                                        <>Call</>
                                       )}
-                                  </li>
-                                )}
-                            </div>
-                          )
-                        )}
+                                    </button>
+                                  </div>
+                                  {functionReturn?.methodName == method.name &&
+                                    method.outputs.length > 0 && (
+                                      <div className="flex flex-col break-words">
+                                        <p>Returned:</p>
+                                        {method.outputs.map((output, index) => (
+                                          <div
+                                            key={index}
+                                            className="bg-transparent 100% rounded-lg flex flex-row"
+                                          >
+                                            <p className="text-tertiary-gray">
+                                              {functionReturn.returnItems[index].name}:{" "}
+                                            </p>
+                                            {functionReturn.returnItems[index].type == "address" ? (
+                                              <div className="flex items-center justify-between">
+                                                <p className="ml-4">
+                                                  {functionReturn.returnItems[index].value.slice(
+                                                    0,
+                                                    8
+                                                  )}
+                                                  ••••
+                                                  {functionReturn.returnItems[index].value.slice(
+                                                    37
+                                                  )}
+                                                </p>
+                                                <Copy
+                                                  className="transform ml-4 active:scale-75 transition-transform"
+                                                  size={20}
+                                                  onClick={() =>
+                                                    navigator.clipboard.writeText(
+                                                      functionReturn.returnItems[index].value
+                                                    )
+                                                  }
+                                                />
+                                              </div>
+                                            ) : (
+                                              <p className="ml-4 break-[anywhere]">
+                                                {functionReturn.returnItems[index].value}
+                                              </p>
+                                            )}
+                                          </div>
+                                        ))}
+                                      </div>
+                                    )}
+                                </li>
+                              )}
+                          </div>
+                        ))}
                       </div>
                       <p className="text-2xl border-b border-b-[#363636] pb-1 font-primary">
                         Write
@@ -692,9 +791,9 @@ export const PersonalDashboard = (props: DashboardProps) => {
                                           <Accordion.Content>
                                             <div className="flex flex-row justify-between mt-4">
                                               <div className="flex flex-col mt-2 gap-2">
-                                                {method.inputs.map((input) =>
+                                                {method.inputs.map((input, i) =>
                                                   input.type == "tuple" ? (
-                                                    <>
+                                                    <React.Fragment key={i}>
                                                       {input.internalType}
                                                       {
                                                         //@ts-ignore
@@ -710,7 +809,7 @@ export const PersonalDashboard = (props: DashboardProps) => {
                                                           )
                                                         )
                                                       }
-                                                    </>
+                                                    </React.Fragment>
                                                   ) : (
                                                     <input
                                                       key={input.name}
@@ -797,7 +896,6 @@ export const PersonalDashboard = (props: DashboardProps) => {
                 <div className="flex-1  bg-secondary-gray border border-secondary-border  shadow-md	 p-5 rounded-lg ">
                   <div className="flex flex-row justify-between align-middle items-center">
                     <p className="font-primary">Transactions :</p>
-
                     <Form method="post" className="flex items-center">
                       <input
                         type="hidden"
@@ -805,23 +903,109 @@ export const PersonalDashboard = (props: DashboardProps) => {
                         value={userData.githubInstallationId?.toString() as string}
                       />
                       <input type="hidden" name="formType" value="deployContract" />
+                      {parsedAbi[0].type == "constructor" && parsedAbi[0].inputs.length > 0 ? (
+                        <>
+                          {!openDeployContractModal && (
+                            <button
+                              key={"openContractDeployerModalButton"}
+                              type="button"
+                              className="text-xl text-[#f0f0f0] bg-almost-black py-2 px-4 rounded-lg"
+                              onClick={() => setOpenDeployContractModal(true)}
+                            >
+                              {deployStatus}
+                            </button>
+                          )}
+                          {openDeployContractModal && (
+                            <div className="absolute top-0 left-0 z-50 flex items-center justify-center h-screen w-screen">
+                              <div className="absolute left-1/4 w-1/2 p-5 pb-10 bg-secondary-gray border border-white rounded-lg">
+                                <button
+                                  key={"closeDeployContractModalButton"}
+                                  onClick={() => setOpenDeployContractModal(false)}
+                                  className="absolute top-4 right-4"
+                                >
+                                  <X />
+                                </button>
+                                <h1>
+                                  Input constructor args to {deployStatus.toLowerCase()} your
+                                  contract!
+                                </h1>
 
-                      <button
-                        className="text-xl text-[#f0f0f0] bg-almost-black py-2 px-4 rounded-lg"
-                        type="submit"
-                      >
-                        {navigation.state == "submitting" &&
-                        navigation.formData?.get("formType") == "deployContract" ? (
-                          <div className="flex flex-row items-center">
-                            <p>Deploying</p>{" "}
-                            <div className="animate-spin ml-2">
-                              <Loader size={20} />
+                                <input
+                                  className="focus:outline-none rounded-xl focus:border-none ring-0 focus:ring-0"
+                                  type="checkbox"
+                                  name="useCachedArgs"
+                                  id="useCachedArgs"
+                                />
+                                <label
+                                  className="ml-2 text-base align-middle"
+                                  htmlFor="useCachedArgs"
+                                >
+                                  Use cached constructor args?
+                                </label>
+                                {parsedAbi.map(
+                                  (method, i) =>
+                                    method.type == "constructor" &&
+                                    method.inputs.length > 0 &&
+                                    method.inputs.map((input, i) => (
+                                      <input
+                                        key={"constructorArg-" + i}
+                                        type="text"
+                                        name={"constructorArg-" + i}
+                                        placeholder={input.type + " " + input.name}
+                                        className="bg-transparent rounded-lg ml-12"
+                                      />
+                                    ))
+                                )}
+                                <input
+                                  type="hidden"
+                                  name="numOfArgs"
+                                  value={
+                                    parsedAbi[0].type == "constructor" &&
+                                    parsedAbi[0].inputs.length > 0
+                                      ? parsedAbi[0].inputs.length
+                                      : 0
+                                  }
+                                />
+                                <button
+                                  key={"deployContractButtonWithinModal"}
+                                  className="text-xl text-[#f0f0f0] bg-almost-black py-2 px-4 rounded-lg"
+                                  type="submit"
+                                >
+                                  {navigation.state == "submitting" &&
+                                  navigation.formData?.get("formType") == "deployContract" ? (
+                                    <div className="flex flex-row items-center">
+                                      <p>Deploying</p>
+                                      <div className="animate-spin ml-2">
+                                        <Loader size={20} />
+                                      </div>
+                                    </div>
+                                  ) : (
+                                    <p>{deployStatus}</p>
+                                  )}
+                                </button>
+                              </div>
                             </div>
-                          </div>
-                        ) : (
-                          <p>{deployStatus}</p>
-                        )}
-                      </button>
+                          )}
+                        </>
+                      ) : (
+                        <button
+                          key={"deployContractSubmitButton"}
+                          className="text-xl text-[#f0f0f0] bg-almost-black py-2 px-4 rounded-lg"
+                          type="submit"
+                        >
+                          {navigation.state == "submitting" &&
+                          navigation.formData?.get("formType") == "deployContract" ? (
+                            <div className="flex flex-row items-center">
+                              <p>Deploying</p>
+                              <div className="animate-spin ml-2">
+                                <Loader size={20} />
+                              </div>
+                            </div>
+                          ) : (
+                            <p>{deployStatus}</p>
+                          )}
+                        </button>
+                      )}
                     </Form>
                   </div>
                   <table className="table-fixed w-full mt-5">

@@ -2,7 +2,12 @@ import { ActionArgs, LoaderArgs, V2_MetaFunction, redirect } from "@vercel/remix
 import { useActionData, useLoaderData, useNavigation } from "@remix-run/react";
 import { db } from "../utils/db.server";
 import { getSession as userGetSession } from "../utils/alphaSession.server";
-import { getRootDir, getSolFileNames, getUserRepositories } from "../utils/octo.server";
+import {
+  getRootDir,
+  getSolFileNames,
+  getUserRepositories,
+  chooseFileToTrack,
+} from "../utils/octo.server";
 
 import { deployContract } from "~/utils/viem.server";
 import { useEffect, useState } from "react";
@@ -21,6 +26,14 @@ export function links() {
 import { createTestClient, http, parseEther, isAddress, createPublicClient } from "viem";
 import SetupWizard from "~/components/SetupWizard";
 import { PersonalDashboard } from "~/components/PersonalDashboard";
+
+//TODO: add ability to manually update constructor args
+//TODO: fix view functions that take params
+//TODO: add ability to set your branch to deploy from
+//      (currently deploys from main regardless of branch that was commit to)
+
+//STRETCHTODO: add ability to deploy multiple contracts
+//STRETCHTODO: add ability to switch between deployments for all your branches
 
 export const meta: V2_MetaFunction<typeof loader> = ({ data }) => {
   return [{ title: ("Fether | " + data?.userData?.username) as string }];
@@ -111,6 +124,7 @@ export const action = async ({ request }: ActionArgs): Promise<DashboardActionRe
           if (!foundryRootDir) {
             foundryRootDir = await getRootDir(githubInstallationId as string);
           }
+          console.log({ foundryRootDir });
           let fileNameArray: string[] = await getSolFileNames(
             githubInstallationId as string,
             foundryRootDir as string
@@ -125,35 +139,83 @@ export const action = async ({ request }: ActionArgs): Promise<DashboardActionRe
             error: null,
           };
         case "chooseFileToTrack":
-          await db.repository.update({
-            where: { userId: associatedUser.id },
-            data: {
-              filename: body.get("chosenFileName") ? (body.get("chosenFileName") as string) : null,
-              contractAbi: null,
-              contractAddress: null,
-              deployerAddress: null,
-            },
-          });
-          await db.transaction.deleteMany({
-            where: { repositoryId: associatedUser.Repository?.id as string },
-          });
+          let fileName = body.get("chosenFileName") as string;
+          if (!fileName) throw new Error("No file name provided");
+
+          await chooseFileToTrack(
+            githubInstallationId as string,
+            fileName,
+            associatedUser.Repository
+          );
 
           return {
             originCallForm: "chooseFileToTrack",
             chosenRepoName: null,
             repositories: null,
             solFilesFromChosenRepo: null,
-            chosenFileName: body.get("chosenFileName") as string,
+            chosenFileName: fileName,
+            txDetails: null,
+            error: null,
+          };
+
+        case "updateConstructorArgs":
+          let numOfArgs = body.get("numOfArgs") as string;
+          let args = [];
+
+          for (let i = 0; i < parseInt(numOfArgs); i++) {
+            let arg = body.get(`constructorArg-${i}`) as string;
+            if (!arg) throw new Error("Error loading constructor arg.");
+            args.push(arg);
+          }
+
+          await db.repository.update({
+            where: { userId: associatedUser.id },
+            data: {
+              cachedConstructorArgs: JSON.stringify(args),
+            },
+          });
+
+          return {
+            originCallForm: "updateConstructorArgs",
+            chosenRepoName: null,
+            repositories: null,
+            solFilesFromChosenRepo: null,
+            chosenFileName: null,
             txDetails: null,
             error: null,
           };
         case "deployContract":
           try {
+            let numOfArgs = body.get("numOfArgs") as string;
+            let useCachedArgs = body.get("useCachedArgs") as string;
+
+            let args = [];
+
+            if (useCachedArgs == "on" && associatedUser?.Repository?.cachedConstructorArgs) {
+              args = JSON.parse(associatedUser?.Repository?.cachedConstructorArgs);
+            } else if (numOfArgs) {
+              for (let i = 0; i < parseInt(numOfArgs); i++) {
+                let arg = body.get(`constructorArg-${i}`) as string;
+                if (!arg) throw new Error("Error loading constructor arg.");
+                args.push(arg);
+              }
+            }
+
+            if (!associatedUser?.Repository?.cachedConstructorArgs) {
+              await db.repository.update({
+                where: { userId: associatedUser.id },
+                data: {
+                  cachedConstructorArgs: JSON.stringify(args),
+                },
+              });
+            }
+
             await deployContract(
               githubInstallationId as string,
               associatedUser.Repository,
               associatedUser.ApiKey?.key as string,
-              associatedUser.username
+              associatedUser.username,
+              args
             );
           } catch (e: any) {
             if (e.message == "Not Found") {
@@ -384,7 +446,7 @@ export const loader = async ({ request }: LoaderArgs) => {
     },
   });
   let setupStep = determineSetupStep(userData, null);
-
+  console.log({ setupStep });
   return { userData, setupStep };
 };
 

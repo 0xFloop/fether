@@ -69,19 +69,20 @@ model Team {
 }
 
 model Repository {
-  id              String    @id @unique @default(cuid())
-  repoName        String
-  repoId          String
-  userId          String?   @unique
-  teamId          String?   @unique
-  associatedUser  User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  associatedTeam  Team?     @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  filename        String?
-  contractAddress String?
-  contractAbi     String?   @db.Text
-  foundryRootDir  String?
-  deployerAddress String?
-  lastDeployed    DateTime?
+  id                    String    @id @unique @default(cuid())
+  repoName              String
+  repoId                String
+  userId                String?   @unique
+  teamId                String?   @unique
+  associatedUser        User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  associatedTeam        Team?     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  filename              String?
+  contractAddress       String?
+  contractAbi           String?   @db.Text
+  cachedConstructorArgs String?   @db.Text
+  foundryRootDir        String?
+  deployerAddress       String?
+  lastDeployed          DateTime?
 
   createdAt DateTime      @default(now())
   updatedAt DateTime      @default(now()) @updatedAt

@@ -21,7 +21,12 @@ import {
   zodTeamName,
 } from "~/utils/helpers";
 import { useEffect, useState } from "react";
-import { getRootDirTeam, getSolFileNames, getUserRepositories } from "~/utils/octo.server";
+import {
+  chooseFileToTrack,
+  getRootDirTeam,
+  getSolFileNames,
+  getUserRepositories,
+} from "~/utils/octo.server";
 import { deployContract } from "~/utils/viem.server";
 import { createPublicClient, createTestClient, http, isAddress, parseEther } from "viem";
 import { TeamDashboard } from "~/components/TeamDashboard";
@@ -180,37 +185,79 @@ export const action = async ({ request }: ActionArgs) => {
             error: null,
           };
         case "chooseFileToTrack":
-          await db.repository.update({
-            where: { teamId: team.id },
-            data: {
-              filename: body.get("chosenFileName") ? (body.get("chosenFileName") as string) : null,
-              contractAbi: null,
-              contractAddress: null,
-              deployerAddress: null,
-            },
-          });
-          await db.transaction.deleteMany({
-            where: { repositoryId: team.Repository?.id as string },
-          });
+          let fileName = body.get("chosenFileName") as string;
+          if (!fileName) throw new Error("No file name provided");
+
+          await chooseFileToTrack(githubInstallationId as string, fileName, team.Repository);
 
           return {
             originCallForm: "chooseFileToTrack",
             chosenRepoName: null,
             repositories: null,
             solFilesFromChosenRepo: null,
-            chosenFileName: body.get("chosenFileName") as string,
+            chosenFileName: fileName,
+            txDetails: null,
+            error: null,
+          };
+        case "updateConstructorArgs":
+          let numOfArgs = body.get("numOfArgs") as string;
+          let args = [];
+
+          for (let i = 0; i < parseInt(numOfArgs); i++) {
+            let arg = body.get(`constructorArg-${i}`) as string;
+            if (!arg) throw new Error("Error loading constructor arg.");
+            args.push(arg);
+          }
+
+          await db.repository.update({
+            where: { teamId: team.id },
+            data: {
+              cachedConstructorArgs: JSON.stringify(args),
+            },
+          });
+
+          return {
+            originCallForm: "updateConstructorArgs",
+            chosenRepoName: null,
+            repositories: null,
+            solFilesFromChosenRepo: null,
+            chosenFileName: null,
             txDetails: null,
             error: null,
           };
         case "deployContract":
           try {
             if (!team.Repository) throw new Error("No filename found");
-            console.log(team.Repository);
+            let numOfArgs = body.get("numOfArgs") as string;
+            let useCachedArgs = body.get("useCachedArgs") as string;
+
+            let args = [];
+
+            if (useCachedArgs == "on" && team.Repository.cachedConstructorArgs) {
+              args = JSON.parse(team.Repository.cachedConstructorArgs);
+            } else if (numOfArgs) {
+              for (let i = 0; i < parseInt(numOfArgs); i++) {
+                let arg = body.get(`constructorArg-${i}`) as string;
+                if (!arg) throw new Error("Error loading constructor arg.");
+                args.push(arg);
+              }
+            }
+
+            if (!team.Repository.cachedConstructorArgs) {
+              await db.repository.update({
+                where: { teamId: team.id },
+                data: {
+                  cachedConstructorArgs: JSON.stringify(args),
+                },
+              });
+            }
+
             await deployContract(
               githubInstallationId as string,
               team.Repository,
               team.ApiKey?.key as string,
-              teamFromUser.username
+              teamFromUser.username,
+              args
             );
           } catch (e: any) {
             if (e.message == "Not Found") {

@@ -1,6 +1,7 @@
 import { App as Octo } from "octokit";
 import { db } from "~/utils/db.server";
 import { z } from "zod";
+import { RepoWithActivity } from "~/types";
 
 function getGithubPk() {
   const githubAppPk = process.env.appPK as string;
@@ -208,6 +209,47 @@ export const getSolFileNames = async (
   }
 
   return fileNames;
+};
+export const chooseFileToTrack = async (
+  githubInstallationId: string,
+  newFileName: string,
+  repoData: RepoWithActivity
+) => {
+  const octokit = await octo.getInstallationOctokit(parseInt(githubInstallationId));
+  if (!repoData?.foundryRootDir && repoData?.foundryRootDir != "") throw new Error("Not Found");
+
+  let rootDir = repoData.foundryRootDir;
+
+  let userName = repoData.repoName.split("/")[0];
+  let repoName = repoData.repoName.split("/")[1];
+
+  let byteCodePath = rootDir + "/out/" + newFileName + "/" + newFileName?.split(".")[0] + ".json";
+
+  let contentsReq = await octokit.request("GET /repos/{owner}/{repo}/contents/{path}", {
+    owner: userName,
+    repo: repoName,
+    path: byteCodePath,
+    headers: {
+      "X-GitHub-Api-Version": "2022-11-28",
+      Accept: "application/vnd.github.raw",
+    },
+  });
+  let fileJSON = JSON.parse(contentsReq.data.toString());
+  let dbAbi = JSON.stringify(fileJSON.abi);
+
+  await db.repository.update({
+    where: { id: repoData?.id },
+    data: {
+      filename: newFileName,
+      contractAbi: dbAbi,
+      cachedConstructorArgs: null,
+      contractAddress: null,
+      deployerAddress: null,
+    },
+  });
+  await db.transaction.deleteMany({
+    where: { repositoryId: repoData.id as string },
+  });
 };
 
 export const zodArrayOfGithubFiles = z.array(

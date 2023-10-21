@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { TeamWithKeyRepoActivityMembers, UserWithKeyRepoActivityTeam } from "~/types";
 import { action } from "~/routes/alpha.dashboard";
 import { isAddress } from "viem";
+import { Abi } from "abitype/zod";
 
 type setupStep = {
   stepNumber: string;
@@ -339,9 +340,39 @@ const SetDeployerComponent: React.FC<setupProps> = (props: setupProps) => {
 };
 
 const DeployContractComponent: React.FC<setupProps> = (props: setupProps) => {
+  let data = props.dashboardType == "personal" ? props.userData : props.teamData;
+
+  if (!data?.Repository?.contractAbi) throw new Error("No contract abi found");
+
+  const parsedAbi = Abi.parse(JSON.parse(data.Repository.contractAbi));
+
   return (
     <div className="h-full w-full flex items-center align-middle justify-center">
       <Form method="post">
+        {parsedAbi[0].type == "constructor" &&
+          parsedAbi[0].inputs.length > 0 &&
+          parsedAbi.map(
+            (method, i) =>
+              method.type == "constructor" &&
+              method.inputs.length > 0 &&
+              method.inputs.map((input, i) => (
+                <input
+                  type="text"
+                  name={"constructorArg-" + i}
+                  placeholder={input.type + " " + input.name}
+                  className="bg-transparent rounded-lg ml-12"
+                />
+              ))
+          )}
+        <input
+          type="hidden"
+          name="numOfArgs"
+          value={
+            parsedAbi[0].type == "constructor" && parsedAbi[0].inputs.length > 0
+              ? parsedAbi[0].inputs.length
+              : 0
+          }
+        />
         <input
           type="hidden"
           name="githubInstallationId"

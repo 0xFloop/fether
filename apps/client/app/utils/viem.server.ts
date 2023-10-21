@@ -30,19 +30,18 @@ export const deployContract = async (
   githubInstallationId: string,
   repoData: RepoWithActivity,
   apiKey: string,
-  deployerUsername: string
+  deployerUsername: string,
+  args: any[]
 ) => {
+  if (!repoData) throw new Error("Not Found");
+  if (!repoData?.foundryRootDir && repoData?.foundryRootDir != "") throw new Error("Not Found");
   const octokit = await octo.getInstallationOctokit(parseInt(githubInstallationId));
 
-  if (!repoData?.foundryRootDir && repoData?.foundryRootDir != "") throw new Error("Not Found");
-
-  let deployerAddress = repoData.deployerAddress as `0x${string}`;
-
   let rootDir = repoData.foundryRootDir;
-  let fileName = repoData.filename;
-
+  let deployerAddress = repoData?.deployerAddress as `0x${string}`;
   let userName = repoData.repoName.split("/")[0];
   let repoName = repoData.repoName.split("/")[1];
+  let fileName = repoData.filename;
 
   let byteCodePath = rootDir + "/out/" + fileName + "/" + fileName?.split(".")[0] + ".json";
 
@@ -55,6 +54,11 @@ export const deployContract = async (
       Accept: "application/vnd.github.raw",
     },
   });
+  let fileJSON = JSON.parse(contentsReq.data.toString());
+  let validatedJSON = zodContractBuildFileSchema.parse(fileJSON);
+  let bytecode = validatedJSON.bytecode.object as `0x${string}`;
+  let abi = Abi.parse(fileJSON.abi);
+  let dbAbi = JSON.stringify(fileJSON.abi);
 
   const fetherChain = fetherChainFromKey(apiKey);
 
@@ -74,12 +78,6 @@ export const deployContract = async (
     transport: http(),
   });
 
-  let fileJSON = JSON.parse(contentsReq.data.toString());
-  let validatedJSON = zodContractBuildFileSchema.parse(fileJSON);
-  let bytecode = validatedJSON.bytecode.object as `0x${string}`;
-  let abi = Abi.parse(fileJSON.abi);
-  let dbAbi = JSON.stringify(fileJSON.abi);
-
   if ((await publicClient.getBalance({ address: deployerAddress })) < 1) {
     await adminClient.setBalance({ address: deployerAddress, value: parseEther("1") });
   }
@@ -88,11 +86,23 @@ export const deployContract = async (
     address: deployerAddress,
   });
 
-  let deployHash = await walletClient.deployContract({
-    abi,
-    account: deployerAddress,
-    bytecode,
-  });
+  const constructor = abi.find((x) => x.type == "constructor");
+
+  let deployHash: `0x${string}` = "0x";
+  if (constructor?.type == "constructor" && constructor.inputs.length > 0) {
+    deployHash = await walletClient.deployContract({
+      abi,
+      account: deployerAddress,
+      bytecode,
+      args: args,
+    });
+  } else {
+    deployHash = await walletClient.deployContract({
+      abi,
+      account: deployerAddress,
+      bytecode,
+    });
+  }
 
   await adminClient.stopImpersonatingAccount({ address: deployerAddress });
 
