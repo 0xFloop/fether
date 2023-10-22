@@ -13,6 +13,9 @@ export type SetupWizardProps = DashboardProps & {
 
 const SetupWizard: React.FC<SetupWizardProps> = (props: SetupWizardProps) => {
   if (props.step == 7) throw new Error("Setup wizard error, please sign out and sign back in.");
+
+  //the dumbest solution to a 3 hour bug hunt
+  if (props.step == 6) return <></>;
   return (
     <div className="selection:bg-accent selection:text-primary-gray max-w-screen h-auto min-h-screen display flex flex-col items-center justify-center text-[#a38282]  ">
       <div className="w-11/12 min-w-[800px] max-w-[1100px] h-[750px] flex flex-row justify-between items-center">
