@@ -4,6 +4,7 @@ import { action, loader } from "~/routes/alpha.dashboard";
 import { setupSteps } from "./SetupSteps";
 import { TeamWithKeyRepoActivityMembers, UserWithKeyRepoActivityTeam } from "~/types";
 import { DashboardProps } from "./PersonalDashboard";
+import React from "react";
 
 export type SetupWizardProps = DashboardProps & {
   step: number;
@@ -12,6 +13,9 @@ export type SetupWizardProps = DashboardProps & {
 
 const SetupWizard: React.FC<SetupWizardProps> = (props: SetupWizardProps) => {
   if (props.step == 7) throw new Error("Setup wizard error, please sign out and sign back in.");
+
+  //the dumbest solution to a 3 hour bug hunt
+  if (props.step == 6) return <></>;
   return (
     <div className="selection:bg-accent selection:text-primary-gray max-w-screen h-auto min-h-screen display flex flex-col items-center justify-center text-[#a38282]  ">
       <div className="w-11/12 min-w-[800px] max-w-[1100px] h-[750px] flex flex-row justify-between items-center">
@@ -21,11 +25,10 @@ const SetupWizard: React.FC<SetupWizardProps> = (props: SetupWizardProps) => {
           <p className="text-lg">Let's get things set up for you!</p>
           <div id="step-selector" className="flex flex-col justify-between flex-1">
             {setupSteps.map((step, index) => (
-              <>
+              <React.Fragment key={step.stepNumber}>
                 {(props.dashboardType == "personal" ||
                   (props.dashboardType == "team" && step.name != "02")) && (
                   <button
-                    key={step.stepNumber}
                     id={step.stepNumber}
                     onClick={() => {
                       if (index > 1 && props.step > index) {
@@ -51,7 +54,7 @@ const SetupWizard: React.FC<SetupWizardProps> = (props: SetupWizardProps) => {
                     <p className="ml-2 text-base">{step.name}</p>
                   </button>
                 )}
-              </>
+              </React.Fragment>
             ))}
           </div>
         </div>

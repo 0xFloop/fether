@@ -30,7 +30,10 @@ import {
 import { deployContract } from "~/utils/viem.server";
 import { createPublicClient, createTestClient, http, isAddress, parseEther } from "viem";
 import { TeamDashboard } from "~/components/TeamDashboard";
-
+import rainbowStylesUrl from "@rainbow-me/rainbowkit/styles.css";
+export function links() {
+  return [{ rel: "stylesheet", href: rainbowStylesUrl }];
+}
 export const loader = async ({ params, request }: LoaderArgs) => {
   const user = await userGetSession(request.headers.get("Cookie"));
   if (!user.has("userId")) throw redirect("/");
@@ -413,24 +416,18 @@ export default function Index() {
   const [setupStep, setSetupStep] = useState<number>(loaderData.setupStep);
   useEffect(() => {
     setSetupStep(loaderData.setupStep);
-  }, [
-    loaderData.teamData?.Repository?.filename,
-    loaderData.teamData?.Repository?.repoName,
-    loaderData.teamData?.Repository?.deployerAddress,
-    loaderData.teamData?.ApiKey?.key,
-  ]);
+  }, [loaderData.setupStep]);
   return (
     <>
-      {!(
-        teamData &&
-        teamData.Repository &&
-        teamData.Repository.contractAddress &&
-        teamData.Repository.contractAbi &&
-        teamData.Repository.deployerAddress &&
-        teamData.Repository.filename &&
-        teamData.ApiKey &&
-        teamData.ApiKey.key
-      ) ? (
+      {loaderData.setupStep == 6 ? (
+        <TeamDashboard
+          teamData={teamData}
+          userData={userData}
+          navigation={navigation}
+          actionArgs={actionArgs}
+          dashboardType="team"
+        />
+      ) : (
         <SetupWizard
           teamData={teamData}
           userData={userData}
@@ -439,14 +436,6 @@ export default function Index() {
           dashboardType="team"
           step={setupStep}
           updateStep={(step: number) => setSetupStep(step)}
-        />
-      ) : (
-        <TeamDashboard
-          teamData={teamData}
-          userData={userData}
-          navigation={navigation}
-          actionArgs={actionArgs}
-          dashboardType="team"
         />
       )}
     </>

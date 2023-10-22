@@ -102,6 +102,7 @@ export const callContractFunction = async (
       address: contractAddress,
       abi: parsedAbi,
       functionName: method.name,
+      args: args,
     });
 
     if (typeof returnValue != "object") {
@@ -144,7 +145,6 @@ export const callContractFunction = async (
     });
 
     let returnItems: ContractReturnItem[] = [];
-    console.log(typeof result);
     if (typeof result == "object") {
       for (let i = 0; i < method.outputs.length; i++) {
         let newReturnItem: ContractReturnItem = {
@@ -160,7 +160,7 @@ export const callContractFunction = async (
       let newReturnItem: ContractReturnItem = {
         type: method.outputs[0].type,
         name: method.outputs[0].name ? (method.outputs[0].name as string) : method.outputs[0].type,
-        value: result.toString(),
+        value: result?.toString(),
       };
       returnItems.push(newReturnItem);
     }

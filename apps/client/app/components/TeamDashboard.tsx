@@ -576,81 +576,159 @@ export const TeamDashboard = (props: DashboardProps) => {
                               {(method.stateMutability == "view" ||
                                 method.stateMutability == "pure") &&
                                 method.type == "function" && (
-                                  <li className="text-lg py-1">
-                                    <div className="flex flex-row justify-between items-center">
-                                      {JSON.stringify(method["name"]).replace(/['"]+/g, "")}
-                                      <button
-                                        onClick={async () => {
-                                          setFunctionCalled(method.name);
-
-                                          let returnedData = await callContractFunction(
-                                            method,
-                                            teamData?.Repository?.contractAbi as string,
-                                            teamData?.Repository?.contractAddress as `0x${string}`,
-                                            getFunctionArgsFromInput(method),
-                                            teamData?.ApiKey?.key as string
-                                          );
-                                          setFunctionCalled(null);
-
-                                          setFunctionReturn(returnedData);
-                                        }}
-                                        className="text-[#f0f0f0] bg-almost-black py-2 px-4 rounded-lg"
+                                  <li className="text-lg">
+                                    <>
+                                      <Accordion.Root
+                                        type="multiple"
+                                        className="w-full relative py-2"
                                       >
-                                        {functionCalled == method.name ? (
-                                          <div className="flex flex-row items-center">
-                                            <p>Calling </p>
-                                            <div className="ml-2 animate-spin">
-                                              <Loader size={20} />
+                                        <Accordion.Item
+                                          key={method.name}
+                                          value={method.name as string}
+                                          className=""
+                                        >
+                                          {method.inputs.length > 0 ? (
+                                            <Accordion.Trigger className="group">
+                                              <p>{method.name}</p>
+                                              <div className="absolute  right-0 top-0  transition-transform group-data-[state=open]:rotate-180">
+                                                <ChevronDown
+                                                  size={40}
+                                                  strokeWidth={1.25}
+                                                  strokeLinecap="round"
+                                                  className="w-16"
+                                                />
+                                              </div>
+                                            </Accordion.Trigger>
+                                          ) : (
+                                            <div className="flex flex-row justify-between items-center">
+                                              <p>{method.name}</p>
+                                              <button
+                                                onClick={async () => {
+                                                  setFunctionCalled(method.name);
+                                                  try {
+                                                    let returnedData = await callContractFunction(
+                                                      method,
+                                                      teamData?.Repository?.contractAbi as string,
+                                                      teamData?.Repository
+                                                        ?.contractAddress as `0x${string}`,
+                                                      getFunctionArgsFromInput(method),
+                                                      teamData?.ApiKey?.key as string
+                                                    );
+                                                    setFunctionCalled(null);
+
+                                                    setFunctionReturn(returnedData);
+                                                  } catch (error) {
+                                                    setFunctionCalled(null);
+                                                  }
+                                                }}
+                                                className="text-[#f0f0f0] bg-almost-black py-2 px-4 rounded-lg disabled:bg-[#cbcbcb]"
+                                              >
+                                                {functionCalled == method.name ? (
+                                                  <div className="flex flex-row items-center">
+                                                    <p>Calling </p>
+                                                    <div className="ml-2 animate-spin">
+                                                      <Loader size={20} />
+                                                    </div>
+                                                  </div>
+                                                ) : (
+                                                  <>Call</>
+                                                )}
+                                              </button>
                                             </div>
-                                          </div>
-                                        ) : (
-                                          <>Call</>
-                                        )}
-                                      </button>
-                                    </div>
+                                          )}
+                                          {method.inputs.length > 0 && (
+                                            <Accordion.Content>
+                                              <div className="flex flex-row justify-between mt-4">
+                                                <div className="flex flex-col mt-2 gap-2">
+                                                  {method.inputs.map((input, i) =>
+                                                    input.type == "tuple" ? (
+                                                      <React.Fragment key={i}>
+                                                        {input.internalType}
+                                                        {
+                                                          //@ts-ignore
+                                                          input.components.map(
+                                                            (component: AbiParameter) => (
+                                                              <input
+                                                                key={component.name}
+                                                                id={`${method.name}-${input.name}-${component.name}`}
+                                                                className="bg-transparent rounded-lg ml-12"
+                                                                type="text"
+                                                                placeholder={`${component.type}: ${component.name}`}
+                                                              />
+                                                            )
+                                                          )
+                                                        }
+                                                      </React.Fragment>
+                                                    ) : (
+                                                      <input
+                                                        key={input.name}
+                                                        id={`${method.name}-${input.name}`}
+                                                        className="bg-transparent rounded-lg"
+                                                        type="text"
+                                                        placeholder={`${input.type}: ${input.name}`}
+                                                      />
+                                                    )
+                                                  )}
+                                                </div>
+                                                <button
+                                                  onClick={async () => {
+                                                    setFunctionCalled(method.name);
+                                                    console.log(method);
+                                                    try {
+                                                      let returnedData = await callContractFunction(
+                                                        method,
+                                                        teamData?.Repository?.contractAbi as string,
+                                                        teamData?.Repository
+                                                          ?.contractAddress as `0x${string}`,
+                                                        getFunctionArgsFromInput(method),
+                                                        teamData?.ApiKey?.key as string
+                                                      );
+                                                      setFunctionCalled(null);
+
+                                                      setFunctionReturn(returnedData);
+                                                    } catch (error) {
+                                                      setFunctionCalled(null);
+                                                    }
+                                                  }}
+                                                  className="text-[#f0f0f0] bg-almost-black py-2 px-4  rounded-lg disabled:bg-[#cbcbcb]"
+                                                >
+                                                  {functionCalled == method.name ? (
+                                                    <div className="flex flex-row items-center">
+                                                      <p>Calling </p>
+                                                      <div className="ml-2 animate-spin">
+                                                        <Loader size={20} />
+                                                      </div>
+                                                    </div>
+                                                  ) : (
+                                                    <>Call</>
+                                                  )}
+                                                </button>
+                                              </div>
+                                            </Accordion.Content>
+                                          )}
+                                        </Accordion.Item>
+                                      </Accordion.Root>
+                                    </>
                                     {functionReturn?.methodName == method.name &&
                                       method.outputs.length > 0 && (
-                                        <div className="flex flex-col break-words">
+                                        <>
                                           <p>Returned:</p>
                                           {method.outputs.map((output, index) => (
                                             <div
                                               key={index}
-                                              className="bg-transparent 100% rounded-lg flex flex-row"
+                                              className="bg-transparent w-1/3 rounded-lg flex flex-row"
                                             >
-                                              <p className="text-tertiary-gray">
+                                              <p>
+                                                &nbsp;&nbsp;
                                                 {functionReturn.returnItems[index].name}:{" "}
                                               </p>
-                                              {functionReturn.returnItems[index].type ==
-                                              "address" ? (
-                                                <div className="flex items-center justify-between">
-                                                  <p className="ml-4">
-                                                    {functionReturn.returnItems[index].value.slice(
-                                                      0,
-                                                      8
-                                                    )}
-                                                    ••••
-                                                    {functionReturn.returnItems[index].value.slice(
-                                                      37
-                                                    )}
-                                                  </p>
-                                                  <Copy
-                                                    className="transform ml-4 active:scale-75 transition-transform"
-                                                    size={20}
-                                                    onClick={() =>
-                                                      navigator.clipboard.writeText(
-                                                        functionReturn.returnItems[index].value
-                                                      )
-                                                    }
-                                                  />
-                                                </div>
-                                              ) : (
-                                                <p className="ml-4 break-[anywhere]">
-                                                  {functionReturn.returnItems[index].value}
-                                                </p>
-                                              )}
+                                              <p>
+                                                &nbsp;&nbsp;
+                                                {functionReturn.returnItems[index].value}
+                                              </p>
                                             </div>
                                           ))}
-                                        </div>
+                                        </>
                                       )}
                                   </li>
                                 )}
