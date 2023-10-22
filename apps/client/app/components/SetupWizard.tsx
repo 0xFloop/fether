@@ -4,6 +4,7 @@ import { action, loader } from "~/routes/alpha.dashboard";
 import { setupSteps } from "./SetupSteps";
 import { TeamWithKeyRepoActivityMembers, UserWithKeyRepoActivityTeam } from "~/types";
 import { DashboardProps } from "./PersonalDashboard";
+import React from "react";
 
 export type SetupWizardProps = DashboardProps & {
   step: number;
@@ -21,11 +22,10 @@ const SetupWizard: React.FC<SetupWizardProps> = (props: SetupWizardProps) => {
           <p className="text-lg">Let's get things set up for you!</p>
           <div id="step-selector" className="flex flex-col justify-between flex-1">
             {setupSteps.map((step, index) => (
-              <>
+              <React.Fragment key={step.stepNumber}>
                 {(props.dashboardType == "personal" ||
                   (props.dashboardType == "team" && step.name != "02")) && (
                   <button
-                    key={step.stepNumber}
                     id={step.stepNumber}
                     onClick={() => {
                       if (index > 1 && props.step > index) {
@@ -51,7 +51,7 @@ const SetupWizard: React.FC<SetupWizardProps> = (props: SetupWizardProps) => {
                     <p className="ml-2 text-base">{step.name}</p>
                   </button>
                 )}
-              </>
+              </React.Fragment>
             ))}
           </div>
         </div>
