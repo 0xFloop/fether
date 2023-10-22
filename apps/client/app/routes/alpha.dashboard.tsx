@@ -27,8 +27,9 @@ import { createTestClient, http, parseEther, isAddress, createPublicClient } fro
 import SetupWizard from "~/components/SetupWizard";
 import { PersonalDashboard } from "~/components/PersonalDashboard";
 
-//TODO: add ability to manually update constructor args
-//TODO: fix view functions that take params
+//TODO: fix iconUrl error
+//TODO: add ability to delete a team
+//TODO: fix lock state in setup, maybe a "restart setup" button
 //TODO: add ability to set your branch to deploy from
 //      (currently deploys from main regardless of branch that was commit to)
 
@@ -138,6 +139,7 @@ export const action = async ({ request }: ActionArgs): Promise<DashboardActionRe
             txDetails: null,
             error: null,
           };
+
         case "chooseFileToTrack":
           let fileName = body.get("chosenFileName") as string;
           if (!fileName) throw new Error("No file name provided");
@@ -157,7 +159,6 @@ export const action = async ({ request }: ActionArgs): Promise<DashboardActionRe
             txDetails: null,
             error: null,
           };
-
         case "updateConstructorArgs":
           let numOfArgs = body.get("numOfArgs") as string;
           let args = [];
@@ -446,6 +447,7 @@ export const loader = async ({ request }: LoaderArgs) => {
     },
   });
   let setupStep = determineSetupStep(userData, null);
+  console.log("in setupStep");
   console.log({ setupStep });
   return { userData, setupStep };
 };
@@ -459,26 +461,19 @@ export default function Index() {
 
   useEffect(() => {
     setSetupStep(loaderData.setupStep);
-  }, [
-    loaderData.userData?.memberTeamId,
-    loaderData.userData?.githubInstallationId,
-    loaderData.userData?.Repository?.filename,
-    loaderData.userData?.Repository?.repoName,
-    loaderData.userData?.Repository?.deployerAddress,
-    loaderData.userData?.ApiKey?.key,
-  ]);
+  }, [loaderData.setupStep]);
+
   return (
     <>
-      {!(
-        userData &&
-        userData.Repository &&
-        userData.Repository.contractAddress &&
-        userData.Repository.contractAbi &&
-        userData.Repository.deployerAddress &&
-        userData.Repository.filename &&
-        userData.ApiKey &&
-        userData.ApiKey.key
-      ) ? (
+      {loaderData.setupStep == 6 ? (
+        <PersonalDashboard
+          userData={userData}
+          teamData={null}
+          navigation={navigation}
+          actionArgs={actionArgs}
+          dashboardType="personal"
+        />
+      ) : (
         <SetupWizard
           teamData={null}
           userData={userData}
@@ -487,14 +482,6 @@ export default function Index() {
           dashboardType="personal"
           step={setupStep}
           updateStep={(step: number) => setSetupStep(step)}
-        />
-      ) : (
-        <PersonalDashboard
-          userData={userData}
-          teamData={null}
-          navigation={navigation}
-          actionArgs={actionArgs}
-          dashboardType="personal"
         />
       )}
     </>
