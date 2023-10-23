@@ -377,7 +377,7 @@ export const PersonalDashboard = (props: DashboardProps) => {
                                           type="radio"
                                           name="chosenFileName"
                                           value={fileName}
-                                        />{" "}
+                                        />
                                         {fileName}
                                       </label>
                                     ))}
