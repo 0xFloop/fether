@@ -11,6 +11,7 @@ import {
   commitSession as commitUserSession,
 } from "../utils/alphaSession.server";
 import { Navbar } from "~/components/Navbar";
+import { Footer } from "~/components/Footer";
 
 export const loader = async ({ request }: LoaderArgs) => {
   //validate session cookie
@@ -59,73 +60,53 @@ export default function Index() {
   const data = useActionData<typeof action>();
   const { hasAccess } = useLoaderData<typeof loader>();
   return (
-    <div className="w-screen h-screen overflow-hidden text-white selection:bg-accent selection:text-primary-gray">
-      <Navbar hasAccess={hasAccess} displayInvites={false} />
-      <div className="m-auto relative flex flex-col justify-center items-center p-6 text-center w-full h-full">
-        <div className="font-display flex flex-row absolute bottom-4 left-6 align-bottom items-baseline">
-          <h1 className="text-[100px] leading-[80px] md:text-[150px] md:leading-[120px] font-primary">
-            fether
-          </h1>
+    <div className="w-screen min-h-screen bg-[url('/images/staticGrain.png')] font-primary">
+      <div className="absolute -z-10 left-0 top-0 h-full w-full flex justify-center items-center">
+        <div className=" h-full w-[95%] grid grid-cols-5">
+          <div className="border-x border-x-off-white/25 h-full"></div>
+          <div className="border-r border-r-off-white/25 h-full"></div>
+          <div className="border-r border-r-off-white/25 h-full"></div>
+          <div className="border-r border-r-off-white/25 h-full"></div>
+          <div className="border-r border-r-off-white/25 h-full"></div>
         </div>
-        <div className="font-primary text-lg flex-row hidden md:flex absolute bottom-4 right-6 align-bottom items-baseline">
-          {hasAccess && <Link to="/alpha">Access</Link>}
-          {!hasAccess && !alphaPopup && (
-            <button onClick={() => setAlphaPopup(true)}>Get Access</button>
-          )}
-        </div>
-        {alphaPopup && (
-          <div className="relative left-0 w-full flex flex-col h-full items-center align-middle justify-center">
-            <div className="relative border-2 border-secondary-border bg-secondary-gray rounded p-10">
-              <X
-                size={24}
-                strokeWidth={1.25}
-                strokeLinecap="square"
-                className="absolute right-3 top-3"
-                onClick={() => setAlphaPopup(false)}
-              />
-              <p className="font-sans text-2xl inline-block">Enter invite code</p>
-              <Form
-                method="post"
-                className="mt-10 flex flex-row justify-between items-center relative bg-almost-black rounded-lg overflow-hidden"
-              >
-                <input
-                  type="text"
-                  name="inviteCode"
-                  className="text-black border-0 outline-0 focus:ring-0"
-                />
-                <button
-                  type="submit"
-                  className="font-primary px-2 border-0 outline-0 text-base h-full"
-                >
-                  Submit
-                </button>
-              </Form>
-
-              {data && (
-                <p className="font-sans text-red-500 text-base mt-4 inline-block">{data.message}</p>
-              )}
-            </div>
-          </div>
-        )}
-        {!alphaPopup && (
-          <p className="font-primary text-base md:text-2xl inline-block">
-            <Typewriter
-              options={{
-                strings: [
-                  "Enabling frictionless smart contract <—> frontend testing.",
-                  "Coming soon.",
-                ],
-                autoStart: true,
-                delay: 40,
-                loop: false,
-                deleteSpeed: 10,
-                //@ts-ignore
-                pauseFor: 4000,
-              }}
-            />{" "}
-          </p>
-        )}
       </div>
+      <Navbar hasAccess={hasAccess} displayInvites={false} />
+      <div className="flex flex-col justify-center items-center w-full h-screen">
+        <img
+          src="/images/fetherWideLogo.svg"
+          className="w-[486px] bg-primary-gray bg-[url('/images/staticGrain.png')]"
+          alt="Fether wide logo"
+        />
+        <h1 className="text-3xl text-white mt-6">
+          Enabling frictionless smart contract{" "}
+          <span className="font-sans">
+            {"<"}—{">"}
+          </span>{" "}
+          frontend testing
+        </h1>
+        <Form method="post" className="mt-10 bg-primary-gray">
+          <input
+            type="text"
+            name="inviteCode"
+            placeholder="Enter Invite Code"
+            maxLength={8}
+            className="border bg-primary-gray bg-[url('/images/staticGrain.png')] border-off-white/25 focus:ring-0 focus:border-secondary-orange text-3xl text-off-white/25 py-4 px-32 text-center"
+          />
+          <button type="submit" hidden></button>
+        </Form>
+        <p className="text-red-500 text-base mt-4">{data?.message}</p>
+        <p className="text-white text-base mt-6">
+          Need a code?{" "}
+          <a
+            href="https://twitter.com/messages/compose?recipient_id=1366965946548584448"
+            target="_blank"
+            className="underline"
+          >
+            Get Access
+          </a>
+        </p>
+      </div>
+      <Footer />
     </div>
   );
 }
