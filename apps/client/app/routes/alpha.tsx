@@ -8,6 +8,7 @@ import {
 } from "../utils/alphaSession.server";
 import { WalletProvider } from "~/components/WalletProvider";
 import { createContext, useState, Dispatch, SetStateAction } from "react";
+import { Navbar } from "~/components/Navbar";
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   const session = await getSession(request.headers.get("Cookie"));
@@ -35,33 +36,11 @@ export default function Index() {
   const value = { displayInviteCodes, setDisplayInviteCodes };
 
   return (
-    <div className="relative min-h-screen bg-primary-gray">
-      <div
-        id="navbar"
-        className="absolute w-full h-20 border-b text-white border-b-white flex flex-row justify-between items-center z-60"
-      >
-        <Link to="/" id="logo" className="text-5xl flex-1 pl-8 font-primary">
-          fether
-        </Link>
-        {userHasId && (
-          <div className="flex items-center float-right h-full">
-            <button
-              className="px-8 flex items-center h-full border-r border-r-white"
-              onClick={() => setDisplayInviteCodes(!displayInviteCodes)}
-            >
-              invite
-            </button>
-            <a id="signout" href="/alpha/sign-out" className="px-8">
-              signout
-            </a>
-          </div>
-        )}
-      </div>
-      <DisplayCodesContext.Provider value={value}>
-        <WalletProvider>
-          <Outlet />
-        </WalletProvider>
-      </DisplayCodesContext.Provider>
-    </div>
+    <DisplayCodesContext.Provider value={value}>
+      <WalletProvider>
+        <Navbar hasAccess={userHasId} displayInvites={true} />
+        <Outlet />
+      </WalletProvider>
+    </DisplayCodesContext.Provider>
   );
 }

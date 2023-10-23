@@ -10,6 +10,7 @@ import {
   getSession as getUserSession,
   commitSession as commitUserSession,
 } from "../utils/alphaSession.server";
+import { Navbar } from "~/components/Navbar";
 
 export const loader = async ({ request }: LoaderArgs) => {
   //validate session cookie
@@ -59,6 +60,7 @@ export default function Index() {
   const { hasAccess } = useLoaderData<typeof loader>();
   return (
     <div className="w-screen h-screen overflow-hidden text-white selection:bg-accent selection:text-primary-gray">
+      <Navbar hasAccess={hasAccess} displayInvites={false} />
       <div className="m-auto relative flex flex-col justify-center items-center p-6 text-center w-full h-full">
         <div className="font-display flex flex-row absolute bottom-4 left-6 align-bottom items-baseline">
           <h1 className="text-[100px] leading-[80px] md:text-[150px] md:leading-[120px] font-primary">
@@ -105,7 +107,6 @@ export default function Index() {
             </div>
           </div>
         )}
-
         {!alphaPopup && (
           <p className="font-primary text-base md:text-2xl inline-block">
             <Typewriter
