@@ -60,7 +60,7 @@ export default function Index() {
   const data = useActionData<typeof action>();
   const { hasAccess } = useLoaderData<typeof loader>();
   return (
-    <div className="w-screen min-h-screen bg-[url('/images/staticGrain.png')] font-primary">
+    <div className="w-screen min-h-screen bg-[url('/images/staticGrainSmallerest.png')] font-primary">
       <div className="absolute -z-10 left-0 top-0 h-full w-full flex justify-center items-center">
         <div className=" h-full w-[95%] grid grid-cols-5">
           <div className="border-x border-x-off-white/25 h-full"></div>
@@ -74,7 +74,7 @@ export default function Index() {
       <div className="flex flex-col justify-center items-center w-full h-screen">
         <img
           src="/images/fetherWideLogo.svg"
-          className="w-[486px] bg-primary-gray bg-[url('/images/staticGrain.png')]"
+          className="w-[486px] bg-primary-gray bg-[url('/images/staticGrainSmallerest.png')]"
           alt="Fether wide logo"
         />
         <h1 className="text-3xl text-white mt-6">
@@ -90,7 +90,7 @@ export default function Index() {
             name="inviteCode"
             placeholder="Enter Invite Code"
             maxLength={8}
-            className="border bg-primary-gray bg-[url('/images/staticGrain.png')] border-off-white/25 focus:ring-0 focus:border-secondary-orange text-3xl text-off-white/25 py-4 px-32 text-center"
+            className="border bg-primary-gray bg-[url('/images/staticGrainSmallerest.png')] border-off-white/25 focus:ring-0 focus:border-secondary-orange text-3xl text-off-white/25 py-4 px-32 text-center"
           />
           <button type="submit" hidden></button>
         </Form>
