@@ -31,9 +31,11 @@ export const Navbar = (props: NavbarProps) => {
           <a href="https://docs.fether.xyz" target="_blank">
             DOCS
           </a>
-          <a id="signout" href="/alpha/sign-out">
-            SHARE
-          </a>
+          {props.hasAccess && (
+            <Link id="signout" to="/alpha/sign-out">
+              SIGNOUT
+            </Link>
+          )}
         </div>
         <div className="px-16 h-1/2 flex items-center text-secondary-orange border border-off-white/50 rounded-full">
           {props.hasAccess ? (
@@ -47,7 +49,7 @@ export const Navbar = (props: NavbarProps) => {
                   INVITE
                 </button>
               ) : (
-                <Link to="/alpha">ACCESS</Link>
+                <Link to="/alpha">DASHBOARD</Link>
               )}
             </>
           ) : (

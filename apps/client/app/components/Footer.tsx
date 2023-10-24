@@ -2,7 +2,7 @@ export const Footer = () => {
   return (
     <footer className="h-40 border-t border-off-white grid grid-cols-2">
       <div className="flex items-center">
-        <img src="images/fetherOrangeLogo.svg" alt="fether orange logo" className="ml-6" />
+        <img src="/images/fetherOrangeLogo.svg" alt="fether orange logo" className="ml-6" />
         <div className="ml-10">
           <h1 className="text-off-white/50 text-4xl">Questions?</h1>
           <h1 className="text-white text-3xl mt-1">
