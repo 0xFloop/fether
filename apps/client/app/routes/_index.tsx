@@ -74,10 +74,11 @@ export default function Index() {
       <div className="flex flex-col justify-center items-center w-full h-screen">
         <img
           src="/images/fetherWideLogo.svg"
-          className="w-[486px] bg-primary-gray bg-[url('/images/staticGrainSmallerest.png')]"
+          className="w-[486px] select-none bg-primary-gray bg-[url('/images/staticGrainSmallerest.png')] rounded-full"
           alt="Fether wide logo"
+          draggable={false}
         />
-        <h1 className="text-3xl text-white mt-6">
+        <h1 className="text-3xl select-none text-white mt-6">
           Enabling frictionless smart contract{" "}
           <span className="font-sans">
             {"<"}—{">"}
@@ -85,17 +86,26 @@ export default function Index() {
           frontend testing
         </h1>
         <Form method="post" className="mt-10 bg-primary-gray">
-          <input
-            type="text"
-            name="inviteCode"
-            placeholder="Enter Invite Code"
-            maxLength={8}
-            className="border bg-primary-gray bg-[url('/images/staticGrainSmallerest.png')] border-off-white/25 focus:ring-0 focus:border-secondary-orange text-3xl text-off-white/25 py-4 px-32 text-center"
-          />
+          {hasAccess ? (
+            <Link
+              to="alpha/dashboard"
+              className="border select-none bg-primary-gray bg-[url('/images/staticGrainSmallerest.png')] border-off-white/25 focus:ring-0 focus:border-secondary-orange text-3xl text-secondary-orange py-4 px-32 text-center"
+            >
+              Access Fether
+            </Link>
+          ) : (
+            <input
+              type="text"
+              name="inviteCode"
+              placeholder="Enter Invite Code"
+              maxLength={8}
+              className="border select-none bg-primary-gray bg-[url('/images/staticGrainSmallerest.png')] border-off-white/25 focus:ring-0 focus:border-secondary-orange text-3xl text-off-white/25 py-4 px-32 text-center"
+            />
+          )}
           <button type="submit" hidden></button>
         </Form>
         <p className="text-red-500 text-base mt-4">{data?.message}</p>
-        <p className="text-white text-base mt-6">
+        <p className="text-white text-base mt-6 select-none">
           Need a code?{" "}
           <a
             href="https://twitter.com/messages/compose?recipient_id=1366965946548584448"
