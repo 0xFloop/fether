@@ -10,7 +10,7 @@ import {
   isRouteErrorResponse,
   useRouteError,
 } from "@remix-run/react";
-
+import { Navbar } from "~/components/Navbar";
 import stylesheet from "~/tailwind.css";
 
 export const links: LinksFunction = () => [
@@ -71,24 +71,13 @@ export function ErrorBoundary() {
           <Links />
         </head>
         <body>
-          <div
-            id="navbar"
-            className="absolute w-full h-20 border-b text-white border-b-white flex flex-row justify-between items-center z-50 "
-          >
-            <Link to="/" id="logo" className="text-5xl flex-1 pl-8 font-primary">
-              fether
-            </Link>
-            <div className="flex-1  pr-8">
-              <a id="signout" href="/alpha/sign-out" className="float-right">
-                signout
-              </a>
-            </div>
-          </div>
+          <Navbar hasAccess={false} displayInvites={false} />
           <div className="h-screen w-screen flex flex-col justify-center align-middle items-center bg-primary-gray text-white font-primary">
             <h1>Uh oh ...</h1>
             <p>Something went wrong.</p>
             <pre>Error: {error.message}</pre>
           </div>
+          <Link to="/alpha/dashboard">Back to dashboard</Link>
           <Scripts />
         </body>
       </html>
@@ -102,19 +91,7 @@ export function ErrorBoundary() {
           <Links />
         </head>
         <body>
-          <div
-            id="navbar"
-            className="absolute w-full h-20 border-b text-white border-b-white flex flex-row justify-between items-center z-50 "
-          >
-            <Link to="/" id="logo" className="text-5xl flex-1 pl-8 font-primary">
-              fether
-            </Link>
-            <div className="flex-1  pr-8">
-              <a id="signout" href="/alpha/sign-out" className="float-right">
-                signout
-              </a>
-            </div>
-          </div>
+          <Navbar hasAccess={false} displayInvites={false} />
           <div className="h-screen w-screen flex flex-col justify-center align-middle items-center bg-primary-gray text-white font-primary">
             <h1>Uh oh ...</h1>
             <p>Something went wrong.</p>

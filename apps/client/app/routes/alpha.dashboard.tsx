@@ -27,7 +27,6 @@ import { createTestClient, http, parseEther, isAddress, createPublicClient } fro
 import SetupWizard from "~/components/SetupWizard";
 import { PersonalDashboard } from "~/components/PersonalDashboard";
 
-//TODO: fix iconUrl error
 //TODO: add ability to delete a team
 //TODO: fix lock state in setup, maybe a "restart setup" button
 //TODO: add ability to set your branch to deploy from
