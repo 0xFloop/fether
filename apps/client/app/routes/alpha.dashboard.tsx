@@ -40,9 +40,14 @@ export const meta: V2_MetaFunction<typeof loader> = ({ data }) => {
 };
 export const action = async ({ request }: ActionArgs): Promise<DashboardActionReturn> => {
   const body = await request.formData();
-  const githubInstallationId = body.get("githubInstallationId");
+
+  const user = await userGetSession(request.headers.get("Cookie"));
+  if (!user.has("userId")) throw Error("invalid call");
+
+  const userId = user.get("userId");
+
   const associatedUser = await db.user.findUnique({
-    where: { githubInstallationId: githubInstallationId as string },
+    where: { id: userId as string },
     include: {
       ApiKey: true,
       IssuedInviteCodes: true,
@@ -60,7 +65,9 @@ export const action = async ({ request }: ActionArgs): Promise<DashboardActionRe
       const formType = body.get("formType");
       switch (formType) {
         case "getAllRepos":
-          const repositories = await getUserRepositories(githubInstallationId as string);
+          const repositories = await getUserRepositories(
+            associatedUser.githubInstallationId as string
+          );
           const repoArray = repositories.data.repositories;
           const repoObjArray: RepoData[] = [];
           repoArray.map((repo: any) => {
@@ -122,11 +129,11 @@ export const action = async ({ request }: ActionArgs): Promise<DashboardActionRe
         case "getFilesOfChosenRepo":
           let foundryRootDir = associatedUser.Repository?.foundryRootDir;
           if (!foundryRootDir) {
-            foundryRootDir = await getRootDir(githubInstallationId as string);
+            foundryRootDir = await getRootDir(associatedUser.githubInstallationId as string);
           }
           console.log({ foundryRootDir });
           let fileNameArray: string[] = await getSolFileNames(
-            githubInstallationId as string,
+            associatedUser.githubInstallationId as string,
             foundryRootDir as string
           );
           return {
@@ -144,7 +151,7 @@ export const action = async ({ request }: ActionArgs): Promise<DashboardActionRe
           if (!fileName) throw new Error("No file name provided");
 
           await chooseFileToTrack(
-            githubInstallationId as string,
+            associatedUser.githubInstallationId as string,
             fileName,
             associatedUser.Repository
           );
@@ -211,7 +218,7 @@ export const action = async ({ request }: ActionArgs): Promise<DashboardActionRe
             }
 
             await deployContract(
-              githubInstallationId as string,
+              associatedUser.githubInstallationId as string,
               associatedUser.Repository,
               associatedUser.ApiKey?.key as string,
               associatedUser.username,
