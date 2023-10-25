@@ -35,7 +35,7 @@ export default function App() {
         <Links />
       </head>
       <body>
-        <div className="mx-auto min-h-screen">
+        <div className="mx-auto min-h-screen overflow-x-hidden">
           <Outlet />
         </div>
         <ScrollRestoration />
