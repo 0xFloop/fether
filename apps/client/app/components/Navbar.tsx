@@ -11,7 +11,7 @@ export const Navbar = (props: NavbarProps) => {
   return (
     <div
       id="navbar"
-      className="absolute w-full h-20 border-b text-white z-50 border-b-off-white/25 px-20 flex flex-row justify-between items-center font-primary"
+      className="absolute w-screen h-20 border-b text-white z-50 border-b-off-white/25 px-4 md:px-20 flex flex-row justify-between items-center font-primary"
     >
       <div className="flex flex-row h-full items-center">
         <Link to="/">

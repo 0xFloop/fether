@@ -77,15 +77,23 @@ export default function Index() {
           </div>
         </div>
         <Navbar hasAccess={hasAccess} isSignedIn={isSignedIn} />
-        <div className="flex flex-col justify-center items-center w-full h-screen">
+        <div className="flex flex-col justify-center items-center w-full h-screen px-4">
           <img
             src="/images/fetherWideLogo.svg"
             className="w-[486px] select-none bg-primary-gray bg-[url('/images/staticGrainSmallerest.png')] rounded-full"
             alt="Fether wide logo"
             draggable={false}
           />
-          <h1 className="text-3xl select-none text-white mt-6">
+          <h1 className="text-xl text-center select-none text-white mt-6 hidden md:block">
             Enabling frictionless smart contract{" "}
+            <span className="font-sans">
+              {"<"}—{">"}
+            </span>{" "}
+            frontend testing
+          </h1>
+          <h1 className="text-xl text-center select-none text-white mt-6 md:hidden">
+            Enabling frictionless smart <br />
+            contract{" "}
             <span className="font-sans">
               {"<"}—{">"}
             </span>{" "}
