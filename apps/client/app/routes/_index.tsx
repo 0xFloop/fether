@@ -67,7 +67,7 @@ export default function Index() {
   return (
     <>
       <div className="w-screen min-h-screen overflow-x-hidden bg-[url('/images/staticGrainSmallerest.png')] font-primary">
-        <div className="absolute -z-10 left-0 top-0 h-full w-full flex justify-center items-center">
+        <div className="absolute -z-10 left-0 top-0 h-full w-full min-h-screen flex justify-center items-center">
           <div className=" h-full w-[95%] grid grid-cols-5">
             <div className="border-x border-x-off-white/25 h-full"></div>
             <div className="border-r border-r-off-white/25 h-full"></div>
