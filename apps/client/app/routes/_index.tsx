@@ -17,11 +17,16 @@ export const loader = async ({ request }: LoaderArgs) => {
   //validate session cookie
   const session = await getSession(request.headers.get("Cookie"));
   const userSession = await getUserSession(request.headers.get("Cookie"));
-
-  if (session.has("inviteCode") || userSession.has("userId")) {
-    return json({ hasAccess: true });
+  let hasAccess = false;
+  let isSignedIn = false;
+  if (session.has("inviteCode")) {
+    hasAccess = true;
   }
-  return json({ hasAccess: false });
+  if (userSession.has("userId")) {
+    isSignedIn = true;
+  }
+
+  return json({ hasAccess, isSignedIn });
 };
 
 export async function action({ request }: ActionArgs) {
@@ -58,7 +63,7 @@ export async function action({ request }: ActionArgs) {
 export default function Index() {
   const [alphaPopup, setAlphaPopup] = useState<boolean>(false);
   const data = useActionData<typeof action>();
-  const { hasAccess } = useLoaderData<typeof loader>();
+  const { hasAccess, isSignedIn } = useLoaderData<typeof loader>();
   return (
     <>
       <div className="w-screen min-h-screen overflow-x-hidden bg-[url('/images/staticGrainSmallerest.png')] font-primary">
@@ -71,7 +76,7 @@ export default function Index() {
             <div className="border-r border-r-off-white/25 h-full"></div>
           </div>
         </div>
-        <Navbar hasAccess={hasAccess} displayInvites={false} />
+        <Navbar hasAccess={hasAccess} isSignedIn={isSignedIn} />
         <div className="flex flex-col justify-center items-center w-full h-screen">
           <img
             src="/images/fetherWideLogo.svg"
@@ -87,13 +92,25 @@ export default function Index() {
             frontend testing
           </h1>
           <Form method="post" className="mt-10 bg-primary-gray">
-            {hasAccess ? (
-              <Link
-                to="alpha/dashboard"
-                className="border select-none bg-primary-gray bg-[url('/images/staticGrainSmallerest.png')] border-off-white/25 focus:ring-0 focus:border-secondary-orange text-3xl text-secondary-orange py-4 px-32 text-center"
-              >
-                Access Fether
-              </Link>
+            {hasAccess || isSignedIn ? (
+              <>
+                {isSignedIn ? (
+                  <Link
+                    to="alpha/dashboard"
+                    className="border select-none bg-secondary-orange border-off-white/25 text-white py-4 px-14 text-xl text-center rounded-full"
+                  >
+                    Access Dashboard
+                  </Link>
+                ) : (
+                  <Link
+                    id="signin"
+                    to="/alpha/login"
+                    className="border select-none bg-secondary-orange border-off-white/25 text-white py-4 px-14 text-xl text-center rounded-full"
+                  >
+                    Log In
+                  </Link>
+                )}
+              </>
             ) : (
               <input
                 type="text"

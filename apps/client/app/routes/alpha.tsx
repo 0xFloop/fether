@@ -11,9 +11,12 @@ import {
   useRouteError,
 } from "@remix-run/react";
 import { db } from "../utils/db.server";
-import { getSession, commitSession } from "../utils/alphaAccessKeySession.server";
 import {
-  getSession as userGetSession,
+  getSession as getInviteKeySession,
+  commitSession,
+} from "../utils/alphaAccessKeySession.server";
+import {
+  getSession as getUserIdSession,
   commitSession as userCommitSession,
 } from "../utils/alphaSession.server";
 import { WalletProvider } from "~/components/WalletProvider";
@@ -22,15 +25,25 @@ import { Navbar } from "~/components/Navbar";
 import { Footer } from "~/components/Footer";
 
 export const loader = async ({ request, params }: LoaderArgs) => {
-  const session = await getSession(request.headers.get("Cookie"));
-  const user = await userGetSession(request.headers.get("Cookie"));
+  const inviteKeySession = await getInviteKeySession(request.headers.get("Cookie"));
+  const user = await getUserIdSession(request.headers.get("Cookie"));
   const url = new URL(request.url);
   if (url.pathname === "/alpha" || url.pathname === "/alpha/") {
     if (user.has("userId")) throw redirect("/alpha/dashboard");
-    else if (session.has("inviteCode")) throw redirect("/alpha/login");
+    else if (inviteKeySession.has("inviteCode")) throw redirect("/alpha/login");
     else throw redirect("/");
   }
-  return user.has("userId");
+  let hasAccess = false;
+  let isSignedIn = false;
+
+  if (inviteKeySession.has("inviteCode")) {
+    hasAccess = true;
+  }
+  if (user.has("userId")) {
+    isSignedIn = true;
+  }
+
+  return json({ hasAccess, isSignedIn });
 };
 type DisplayCodesContextType = {
   displayInviteCodes: boolean;
@@ -42,14 +55,14 @@ export const DisplayCodesContext = createContext<DisplayCodesContextType>({
 });
 
 export default function Index() {
-  const userHasId = useLoaderData<typeof loader>();
+  const { hasAccess, isSignedIn } = useLoaderData<typeof loader>();
   const [displayInviteCodes, setDisplayInviteCodes] = useState<boolean>(false);
   const value = { displayInviteCodes, setDisplayInviteCodes };
 
   return (
     <DisplayCodesContext.Provider value={value}>
       <WalletProvider>
-        <Navbar hasAccess={userHasId} displayInvites={true} />
+        <Navbar hasAccess={hasAccess} isSignedIn={isSignedIn} />
         <Outlet />
         <Footer />
       </WalletProvider>
@@ -59,7 +72,7 @@ export default function Index() {
 
 export function ErrorBoundary() {
   const error = useRouteError();
-  const userHasId = useLoaderData<typeof loader>();
+  const { hasAccess, isSignedIn } = useLoaderData<typeof loader>();
 
   if (error instanceof Error) {
     return (
@@ -70,7 +83,7 @@ export function ErrorBoundary() {
           <Links />
         </head>
         <body>
-          <Navbar hasAccess={userHasId} displayInvites={false} />
+          <Navbar hasAccess={hasAccess} isSignedIn={isSignedIn} />
           <div className="h-screen w-screen flex flex-col justify-center align-middle items-center bg-primary-gray text-white font-primary">
             <h1>Uh oh ...</h1>
             <p>Something went wrong.</p>
@@ -95,7 +108,7 @@ export function ErrorBoundary() {
           <Links />
         </head>
         <body>
-          <Navbar hasAccess={userHasId} displayInvites={false} />
+          <Navbar hasAccess={hasAccess} isSignedIn={isSignedIn} />
           <div className="h-screen w-screen flex flex-col justify-center align-middle items-center bg-primary-gray text-white font-primary">
             <h1>Uh oh ...</h1>
             <p>Something went wrong.</p>
