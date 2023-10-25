@@ -125,13 +125,13 @@ export default function Index() {
                 name="inviteCode"
                 placeholder="Enter Invite Code"
                 maxLength={8}
-                className="border select-none bg-primary-gray bg-[url('/images/staticGrainSmallerest.png')] border-off-white/25 focus:ring-0 focus:border-secondary-orange text-3xl text-off-white/25 py-4 px-32 text-center"
+                className="border select-none bg-primary-gray bg-[url('/images/staticGrainSmallerest.png')] border-off-white/25 focus:ring-0 focus:border-secondary-orange text-base md:text-3xl text-off-white/25 py-4 px-16 md:px-32 text-center"
               />
             )}
             <button type="submit" hidden></button>
           </Form>
           <p className="text-red-500 text-base mt-4">{data?.message}</p>
-          <p className="text-white text-base mt-6 select-none">
+          <p className="text-white text-xs md:text-base mt-2 md:mt-6 select-none">
             Need a code?{" "}
             <a
               href="https://twitter.com/messages/compose?recipient_id=1366965946548584448"

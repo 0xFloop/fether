@@ -58,7 +58,7 @@ export const Navbar = (props: NavbarProps) => {
               href="https://twitter.com/messages/compose?recipient_id=1366965946548584448"
               target="_blank"
             >
-              GET ACCESS
+              Get Access
             </a>
           )}
         </div>
@@ -110,8 +110,9 @@ export const Navbar = (props: NavbarProps) => {
               <a
                 href="https://twitter.com/messages/compose?recipient_id=1366965946548584448"
                 target="_blank"
+                className="border-b border-b-secondary-orange"
               >
-                GET ACCESS
+                Get Access
               </a>
             )}
           </div>
