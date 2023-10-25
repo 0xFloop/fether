@@ -35,7 +35,7 @@ export default function App() {
         <Links />
       </head>
       <body>
-        <div className="mx-auto min-h-screen">
+        <div className="mx-auto min-h-screen overflow-x-hidden">
           <Outlet />
         </div>
         <ScrollRestoration />
@@ -44,62 +44,4 @@ export default function App() {
       </body>
     </html>
   );
-}
-
-export function ErrorBoundary() {
-  const error = useRouteError();
-
-  // when true, this is what used to go to `CatchBoundary`
-  // if (isRouteErrorResponse(error)) {
-  //   return (
-  //     <div className="h-80">
-  //       <h1>Oops</h1>
-  //       <p>Status: {error.status}</p>
-  //       <p>{error.data.message}</p>
-  //     </div>
-  //   );
-  // }
-
-  // Don't forget to typecheck with your own logic.
-  // Any value can be thrown, not just errors!
-  if (error instanceof Error) {
-    return (
-      <html>
-        <head>
-          <title>Oh no!</title>
-          <Meta />
-          <Links />
-        </head>
-        <body>
-          <Navbar hasAccess={false} displayInvites={false} />
-          <div className="h-screen w-screen flex flex-col justify-center align-middle items-center bg-primary-gray text-white font-primary">
-            <h1>Uh oh ...</h1>
-            <p>Something went wrong.</p>
-            <pre>Error: {error.message}</pre>
-          </div>
-          <Link to="/alpha/dashboard">Back to dashboard</Link>
-          <Scripts />
-        </body>
-      </html>
-    );
-  } else {
-    return (
-      <html>
-        <head>
-          <title>Oh no!</title>
-          <Meta />
-          <Links />
-        </head>
-        <body>
-          <Navbar hasAccess={false} displayInvites={false} />
-          <div className="h-screen w-screen flex flex-col justify-center align-middle items-center bg-primary-gray text-white font-primary">
-            <h1>Uh oh ...</h1>
-            <p>Something went wrong.</p>
-            <pre>Error: {JSON.stringify(error)}</pre>
-          </div>
-          <Scripts />
-        </body>
-      </html>
-    );
-  }
 }

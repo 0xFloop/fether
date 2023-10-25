@@ -87,10 +87,23 @@ export const loader = async ({ params, request }: LoaderArgs) => {
 };
 export const action = async ({ request }: ActionArgs) => {
   const body = await request.formData();
-  const githubInstallationId = body.get("githubInstallationId");
+
+  const user = await userGetSession(request.headers.get("Cookie"));
+  if (!user.has("userId"))
+    return {
+      originCallForm: null,
+      chosenRepoName: null,
+      repositories: null,
+      solFilesFromChosenRepo: null,
+      chosenFileName: null,
+      txDetails: null,
+      error: "User not found.",
+    };
+
+  let userId = user.get("userId");
 
   const teamFromUser = await db.user.findUnique({
-    where: { githubInstallationId: githubInstallationId as string },
+    where: { id: userId as string },
     include: {
       MemberTeam: {
         include: {
@@ -172,10 +185,13 @@ export const action = async ({ request }: ActionArgs) => {
         case "getFilesOfChosenRepo":
           let foundryRootDir = team.Repository?.foundryRootDir;
           if (!foundryRootDir) {
-            foundryRootDir = await getRootDirTeam(team.id, githubInstallationId as string);
+            foundryRootDir = await getRootDirTeam(
+              team.id,
+              teamFromUser.githubInstallationId as string
+            );
           }
           let fileNameArray: string[] = await getSolFileNames(
-            githubInstallationId as string,
+            teamFromUser.githubInstallationId as string,
             foundryRootDir as string
           );
           return {
@@ -191,7 +207,11 @@ export const action = async ({ request }: ActionArgs) => {
           let fileName = body.get("chosenFileName") as string;
           if (!fileName) throw new Error("No file name provided");
 
-          await chooseFileToTrack(githubInstallationId as string, fileName, team.Repository);
+          await chooseFileToTrack(
+            teamFromUser.githubInstallationId as string,
+            fileName,
+            team.Repository
+          );
 
           return {
             originCallForm: "chooseFileToTrack",
@@ -256,7 +276,7 @@ export const action = async ({ request }: ActionArgs) => {
             }
 
             await deployContract(
-              githubInstallationId as string,
+              teamFromUser.githubInstallationId as string,
               team.Repository,
               team.ApiKey?.key as string,
               teamFromUser.username,
@@ -282,7 +302,6 @@ export const action = async ({ request }: ActionArgs) => {
             error: null,
           };
         case "fundWallet":
-          let currentBalance = body.get("currentBalance") as `${number}`;
           const adminClient = createTestClient({
             chain: fetherChainFromKey(team.ApiKey?.key as string),
             mode: "anvil",
@@ -324,6 +343,18 @@ export const action = async ({ request }: ActionArgs) => {
           }
           return {
             originCallForm: "setDeployerAddress",
+            chosenRepoName: null,
+            repositories: null,
+            solFilesFromChosenRepo: null,
+            chosenFileName: null,
+            txDetails: null,
+            error: null,
+          };
+        case "deleteTeam":
+          if (team.ownerId !== userId) throw new Error("You are not the owner of this team.");
+          await db.team.delete({ where: { id: team.id } });
+          return {
+            originCallForm: "deleteTeam",
             chosenRepoName: null,
             repositories: null,
             solFilesFromChosenRepo: null,

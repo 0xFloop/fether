@@ -524,6 +524,22 @@ export const TeamDashboard = (props: DashboardProps) => {
                           : "N/A"}
                       </p>
                     </div>
+                    {userData?.id == teamData?.ownerId && (
+                      <div className="flex flex-row justify-between rounded-lg">
+                        <p className="text-2xl font-primary text-tertiary-gray">Delete Team :</p>
+                        <Form method="post">
+                          <input
+                            type="hidden"
+                            name="githubInstallationId"
+                            value={userData?.githubInstallationId?.toString()}
+                          />
+                          <input type="hidden" name="formType" value="deleteTeam" />
+                          <button type="submit" className="border border-red-500 px-2 text-red-500">
+                            DELETE
+                          </button>
+                        </Form>
+                      </div>
+                    )}
                   </div>
 
                   <div className="flex flex-col bg-secondary-gray  border border-secondary-border  shadow-md	 p-5 rounded-lg">

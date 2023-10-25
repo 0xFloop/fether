@@ -26,9 +26,8 @@ export function links() {
 import { createTestClient, http, parseEther, isAddress, createPublicClient } from "viem";
 import SetupWizard from "~/components/SetupWizard";
 import { PersonalDashboard } from "~/components/PersonalDashboard";
+import { Footer } from "~/components/Footer";
 
-//TODO: add ability to delete a team
-//TODO: fix lock state in setup, maybe a "restart setup" button
 //TODO: add ability to set your branch to deploy from
 //      (currently deploys from main regardless of branch that was commit to)
 
@@ -40,9 +39,14 @@ export const meta: V2_MetaFunction<typeof loader> = ({ data }) => {
 };
 export const action = async ({ request }: ActionArgs): Promise<DashboardActionReturn> => {
   const body = await request.formData();
-  const githubInstallationId = body.get("githubInstallationId");
+
+  const user = await userGetSession(request.headers.get("Cookie"));
+  if (!user.has("userId")) throw Error("invalid call");
+
+  const userId = user.get("userId");
+
   const associatedUser = await db.user.findUnique({
-    where: { githubInstallationId: githubInstallationId as string },
+    where: { id: userId as string },
     include: {
       ApiKey: true,
       IssuedInviteCodes: true,
@@ -60,7 +64,9 @@ export const action = async ({ request }: ActionArgs): Promise<DashboardActionRe
       const formType = body.get("formType");
       switch (formType) {
         case "getAllRepos":
-          const repositories = await getUserRepositories(githubInstallationId as string);
+          const repositories = await getUserRepositories(
+            associatedUser.githubInstallationId as string
+          );
           const repoArray = repositories.data.repositories;
           const repoObjArray: RepoData[] = [];
           repoArray.map((repo: any) => {
@@ -122,11 +128,11 @@ export const action = async ({ request }: ActionArgs): Promise<DashboardActionRe
         case "getFilesOfChosenRepo":
           let foundryRootDir = associatedUser.Repository?.foundryRootDir;
           if (!foundryRootDir) {
-            foundryRootDir = await getRootDir(githubInstallationId as string);
+            foundryRootDir = await getRootDir(associatedUser.githubInstallationId as string);
           }
           console.log({ foundryRootDir });
           let fileNameArray: string[] = await getSolFileNames(
-            githubInstallationId as string,
+            associatedUser.githubInstallationId as string,
             foundryRootDir as string
           );
           return {
@@ -144,7 +150,7 @@ export const action = async ({ request }: ActionArgs): Promise<DashboardActionRe
           if (!fileName) throw new Error("No file name provided");
 
           await chooseFileToTrack(
-            githubInstallationId as string,
+            associatedUser.githubInstallationId as string,
             fileName,
             associatedUser.Repository
           );
@@ -211,7 +217,7 @@ export const action = async ({ request }: ActionArgs): Promise<DashboardActionRe
             }
 
             await deployContract(
-              githubInstallationId as string,
+              associatedUser.githubInstallationId as string,
               associatedUser.Repository,
               associatedUser.ApiKey?.key as string,
               associatedUser.username,
@@ -463,7 +469,16 @@ export default function Index() {
   }, [loaderData.setupStep]);
 
   return (
-    <>
+    <div className="relative w-screen min-h-screen h-full overflow-x-hidden bg-[url('/images/staticGrainSmallerest.png')] font-primary">
+      <div className="absolute -z-10 left-0 top-0 h-full w-full flex justify-center items-center">
+        <div className=" h-full w-[95%] grid grid-cols-5">
+          <div className="border-x border-x-off-white/25 h-full"></div>
+          <div className="border-r border-r-off-white/25 h-full"></div>
+          <div className="border-r border-r-off-white/25 h-full"></div>
+          <div className="border-r border-r-off-white/25 h-full"></div>
+          <div className="border-r border-r-off-white/25 h-full"></div>
+        </div>
+      </div>
       {loaderData.setupStep == 6 ? (
         <PersonalDashboard
           userData={userData}
@@ -483,6 +498,6 @@ export default function Index() {
           updateStep={(step: number) => setSetupStep(step)}
         />
       )}
-    </>
+    </div>
   );
 }
