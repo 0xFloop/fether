@@ -1,7 +1,7 @@
 export const Footer = () => {
   return (
-    <footer className="h-40 border-t border-off-white grid grid-cols-2">
-      <div className="flex items-center">
+    <footer className="py-6 w-screen border-t border-off-white flex flex-col md:flex-row bg-[url('/images/staticGrainSmallerest.png')]">
+      <div className="flex flex-1 items-center">
         <img src="/images/fetherOrangeLogo.svg" alt="fether orange logo" className="ml-6" />
         <div className="ml-10">
           <h1 className="text-off-white/50 text-4xl">Questions?</h1>
@@ -13,7 +13,7 @@ export const Footer = () => {
           </h1>
         </div>
       </div>
-      <div className="text-white flex justify-center gap-20">
+      <div className="text-white flex flex-1 w-full justify-center gap-20 mt-10 md:mt-0">
         <div className="flex flex-col justify-center">
           <a href="">Terms of service</a>
           <a href="">Privacy policy</a>
