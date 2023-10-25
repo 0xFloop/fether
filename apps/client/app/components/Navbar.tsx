@@ -1,12 +1,13 @@
 import { Link } from "@remix-run/react";
-import { useContext } from "react";
+import { AlignJustify, MenuIcon, X } from "lucide-react";
+import { useContext, useState } from "react";
 import { DisplayCodesContext } from "~/routes/alpha";
 
-type NavbarProps = { hasAccess: boolean; displayInvites: boolean };
+type NavbarProps = { hasAccess: boolean; isSignedIn: boolean };
 
 export const Navbar = (props: NavbarProps) => {
   const displayCodes = useContext(DisplayCodesContext);
-
+  const [menuActive, setMenuActive] = useState(false);
   return (
     <div
       id="navbar"
@@ -20,7 +21,7 @@ export const Navbar = (props: NavbarProps) => {
           BETA VERSION <span className="text-secondary-orange"> 0.0.03</span>
         </p>
       </div>
-      <div className="flex gap-16 items-center float-right h-full">
+      <div className="hidden lg:flex gap-16 items-center float-right h-full">
         <div className="text-sm flex gap-4">
           <a
             href="https://twitter.com/messages/compose?recipient_id=1366965946548584448"
@@ -31,25 +32,25 @@ export const Navbar = (props: NavbarProps) => {
           <a href="https://docs.fether.xyz" target="_blank">
             DOCS
           </a>
-          {props.hasAccess && (
-            <Link id="signout" to="/alpha/sign-out">
-              SIGNOUT
-            </Link>
+          {props.isSignedIn && (
+            <button
+              onClick={() => displayCodes.setDisplayInviteCodes(!displayCodes.displayInviteCodes)}
+            >
+              INVITE
+            </button>
           )}
         </div>
-        <div className="px-16 h-1/2 flex items-center text-secondary-orange border border-off-white/50 rounded-full">
-          {props.hasAccess ? (
+        <div className="px-16 h-1/2 flex items-center text-secondary-orange border border-off-white rounded-full">
+          {props.hasAccess || props.isSignedIn ? (
             <>
-              {props.displayInvites ? (
-                <button
-                  onClick={() =>
-                    displayCodes.setDisplayInviteCodes(!displayCodes.displayInviteCodes)
-                  }
-                >
-                  INVITE
-                </button>
+              {props.isSignedIn ? (
+                <Link id="signout" to="/alpha/sign-out">
+                  Sign Out
+                </Link>
               ) : (
-                <Link to="/alpha">DASHBOARD</Link>
+                <Link id="signin" to="/alpha/login">
+                  Log In
+                </Link>
               )}
             </>
           ) : (
@@ -61,6 +62,62 @@ export const Navbar = (props: NavbarProps) => {
             </a>
           )}
         </div>
+      </div>
+      <div className="lg:hidden relative">
+        <button onClick={() => setMenuActive(!menuActive)}>
+          {menuActive ? <X size={30} /> : <AlignJustify size={30} />}
+        </button>
+        {menuActive ? (
+          <div className="flex flex-col absolute bg-black text-white px-8 py-16 right-0 rounded-lg">
+            <ul>
+              <li className=" border-b">
+                <a
+                  href="https://twitter.com/messages/compose?recipient_id=1366965946548584448"
+                  target="_blank"
+                >
+                  Support
+                </a>
+              </li>
+              <li className="border-b">
+                <a href="https://docs.fether.xyz" target="_blank">
+                  Documentation
+                </a>
+              </li>
+              {props.isSignedIn && (
+                <button
+                  className="border-b w-full text-left"
+                  onClick={() =>
+                    displayCodes.setDisplayInviteCodes(!displayCodes.displayInviteCodes)
+                  }
+                >
+                  Invite
+                </button>
+              )}
+            </ul>
+            {props.hasAccess || props.isSignedIn ? (
+              <div className="border-b border-b-secondary-orange">
+                {props.isSignedIn ? (
+                  <Link id="signout" to="/alpha/sign-out">
+                    Sign Out
+                  </Link>
+                ) : (
+                  <Link id="signin" to="/alpha/login">
+                    Log In
+                  </Link>
+                )}
+              </div>
+            ) : (
+              <a
+                href="https://twitter.com/messages/compose?recipient_id=1366965946548584448"
+                target="_blank"
+              >
+                GET ACCESS
+              </a>
+            )}
+          </div>
+        ) : (
+          <></>
+        )}
       </div>
     </div>
   );
