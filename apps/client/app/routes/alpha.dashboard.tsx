@@ -27,10 +27,10 @@ export function links() {
 import { createTestClient, http, parseEther, isAddress, createPublicClient } from "viem";
 import SetupWizard from "~/components/SetupWizard";
 import { PersonalDashboard } from "~/components/PersonalDashboard";
-import { Footer } from "~/components/Footer";
+import { BackgroundLines } from "~/components/BackgroundLines";
 
-//TODO: redeploy only from selected branch
-//      (currently deploys from main regardless of branch that was commit to)
+//TODO: redesign dashboard selector page
+//TODO: test the branch specific redeploys
 
 //STRETCHTODO: add ability to deploy multiple contracts
 //STRETCHTODO: add ability to switch between deployments for all your branches
@@ -530,15 +530,7 @@ export default function Index() {
 
   return (
     <div className="relative w-screen min-h-screen h-full overflow-x-hidden bg-[url('/images/staticGrainSmallerest.png')] font-primary">
-      <div className="absolute -z-10 left-0 top-0 h-full w-full flex justify-center items-center">
-        <div className=" h-full w-[95%] grid grid-cols-5">
-          <div className="border-x border-x-off-white/25 h-full"></div>
-          <div className="border-r border-r-off-white/25 h-full"></div>
-          <div className="border-r border-r-off-white/25 h-full"></div>
-          <div className="border-r border-r-off-white/25 h-full"></div>
-          <div className="border-r border-r-off-white/25 h-full"></div>
-        </div>
-      </div>
+      <BackgroundLines />
       {loaderData.setupStep == 7 ? (
         <PersonalDashboard
           userData={userData}
