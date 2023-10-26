@@ -6,7 +6,7 @@ contract SecretKeeper is Ownable {
     string public saucesSecretPhrase;
     uint256 public secretNumber;
     SecretStorage public secretInStorage =
-        SecretStorage(6969, "deez super nuts");
+        SecretStorage(6969, "deez super duper nuts");
 
     struct SecretStorage {
         uint secretNumber;
