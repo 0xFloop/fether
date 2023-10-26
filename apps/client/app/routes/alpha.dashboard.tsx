@@ -73,7 +73,7 @@ export const action = async ({ request }: ActionArgs): Promise<DashboardActionRe
           repoArray.map((repo: any) => {
             repoObjArray.push({ repoName: repo.full_name, repoId: repo.id.toString() });
           });
-          console.log({ repoArray });
+
           return {
             originCallForm: "getRepos",
             chosenRepoName: null,
@@ -88,7 +88,6 @@ export const action = async ({ request }: ActionArgs): Promise<DashboardActionRe
           const chosenRepoData = body.get("chosenRepoData");
 
           if (chosenRepoData) {
-            console.log(chosenRepoData);
             const chosenRepoName = chosenRepoData.toString().split(",")[0];
             const chosenRepoId = chosenRepoData.toString().split(",")[1];
 
@@ -135,7 +134,7 @@ export const action = async ({ request }: ActionArgs): Promise<DashboardActionRe
             associatedUser.Repository?.repoName as string,
             associatedUser.githubInstallationId as string
           );
-          console.log(branches);
+
           return {
             originCallForm: "getBranchesOfChosenRepo",
             chosenRepoName: null,
@@ -176,7 +175,7 @@ export const action = async ({ request }: ActionArgs): Promise<DashboardActionRe
           if (!foundryRootDir) {
             foundryRootDir = await getRootDir(associatedUser.githubInstallationId as string);
           }
-          console.log({ foundryRootDir });
+
           let fileNameArray: string[] = await getSolFileNames(
             associatedUser.githubInstallationId as string,
             foundryRootDir as string
@@ -315,6 +314,7 @@ export const action = async ({ request }: ActionArgs): Promise<DashboardActionRe
             originCallForm: "fundWallet",
             chosenRepoName: null,
             repositories: null,
+            branches: null,
             solFilesFromChosenRepo: null,
             chosenFileName: null,
             txDetails: null,
@@ -513,8 +513,7 @@ export const loader = async ({ request }: LoaderArgs) => {
     },
   });
   let setupStep = determineSetupStep(userData, null);
-  console.log("in setupStep");
-  console.log({ setupStep });
+
   return { userData, setupStep };
 };
 

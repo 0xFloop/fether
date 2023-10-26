@@ -193,7 +193,7 @@ export const action = async ({ request }: ActionArgs) => {
             team.Repository?.repoName as string,
             teamFromUser.githubInstallationId as string
           );
-          console.log(branches);
+
           return {
             originCallForm: "getBranchesOfChosenRepo",
             chosenRepoName: null,
