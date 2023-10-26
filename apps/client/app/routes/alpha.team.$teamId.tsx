@@ -18,7 +18,6 @@ import {
   fetherChainFromKey,
   getTransactionDetails,
   spacify,
-  zodTeamName,
 } from "~/utils/helpers";
 import { useEffect, useState } from "react";
 import {
@@ -62,7 +61,8 @@ export const loader = async ({ params, request }: LoaderArgs) => {
       },
     },
   });
-  if (!teamData) throw new Error("Team not found!");
+  if (!teamData) throw redirect("/alpha/dashboard");
+
   if (!teamData.Members?.find((member) => member.id === userId)) {
     throw new Error("You are not a member of this team! Contact the team owner to request access.");
   }
