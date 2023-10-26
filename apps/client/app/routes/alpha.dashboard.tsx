@@ -7,6 +7,7 @@ import {
   getSolFileNames,
   getUserRepositories,
   chooseFileToTrack,
+  getRepositoryBranches,
 } from "../utils/octo.server";
 
 import { deployContract } from "~/utils/viem.server";
@@ -28,7 +29,7 @@ import SetupWizard from "~/components/SetupWizard";
 import { PersonalDashboard } from "~/components/PersonalDashboard";
 import { Footer } from "~/components/Footer";
 
-//TODO: add ability to set your branch to deploy from
+//TODO: redeploy only from selected branch
 //      (currently deploys from main regardless of branch that was commit to)
 
 //STRETCHTODO: add ability to deploy multiple contracts
@@ -77,6 +78,7 @@ export const action = async ({ request }: ActionArgs): Promise<DashboardActionRe
             originCallForm: "getRepos",
             chosenRepoName: null,
             repositories: repoObjArray,
+            branches: null,
             solFilesFromChosenRepo: null,
             chosenFileName: null,
             txDetails: null,
@@ -86,7 +88,6 @@ export const action = async ({ request }: ActionArgs): Promise<DashboardActionRe
           const chosenRepoData = body.get("chosenRepoData");
 
           if (chosenRepoData) {
-            console.log(chosenRepoData);
             const chosenRepoName = chosenRepoData.toString().split(",")[0];
             const chosenRepoId = chosenRepoData.toString().split(",")[1];
 
@@ -100,6 +101,7 @@ export const action = async ({ request }: ActionArgs): Promise<DashboardActionRe
               update: {
                 repoName: chosenRepoName as string,
                 repoId: chosenRepoId as string,
+                branchName: null,
                 contractAbi: null,
                 contractAddress: null,
                 filename: null,
@@ -110,6 +112,7 @@ export const action = async ({ request }: ActionArgs): Promise<DashboardActionRe
               originCallForm: "chooseRepo",
               chosenRepoName: chosenRepoName,
               repositories: null,
+              branches: null,
               solFilesFromChosenRepo: null,
               chosenFileName: null,
               txDetails: null,
@@ -120,6 +123,48 @@ export const action = async ({ request }: ActionArgs): Promise<DashboardActionRe
             originCallForm: "chooseRepo",
             chosenRepoName: null,
             repositories: null,
+            branches: null,
+            solFilesFromChosenRepo: null,
+            chosenFileName: null,
+            txDetails: null,
+            error: null,
+          };
+        case "getBranchesOfChosenRepo":
+          let branches = await getRepositoryBranches(
+            associatedUser.Repository?.repoName as string,
+            associatedUser.githubInstallationId as string
+          );
+
+          return {
+            originCallForm: "getBranchesOfChosenRepo",
+            chosenRepoName: null,
+            repositories: null,
+            branches: branches,
+            solFilesFromChosenRepo: null,
+            chosenFileName: null,
+            txDetails: null,
+            error: null,
+          };
+        case "chooseBranch":
+          let choosenBranch = body.get("choosenBranch");
+          if (!choosenBranch) throw new Error("No branch chosen");
+
+          await db.repository.update({
+            where: { id: associatedUser.Repository?.id as string },
+            data: {
+              branchName: choosenBranch as string,
+              contractAbi: null,
+              contractAddress: null,
+              filename: null,
+              foundryRootDir: null,
+            },
+          });
+
+          return {
+            originCallForm: "chooseBranch",
+            chosenRepoName: null,
+            repositories: null,
+            branches: null,
             solFilesFromChosenRepo: null,
             chosenFileName: null,
             txDetails: null,
@@ -130,7 +175,7 @@ export const action = async ({ request }: ActionArgs): Promise<DashboardActionRe
           if (!foundryRootDir) {
             foundryRootDir = await getRootDir(associatedUser.githubInstallationId as string);
           }
-          console.log({ foundryRootDir });
+
           let fileNameArray: string[] = await getSolFileNames(
             associatedUser.githubInstallationId as string,
             foundryRootDir as string
@@ -139,6 +184,7 @@ export const action = async ({ request }: ActionArgs): Promise<DashboardActionRe
             originCallForm: "getFilesOfChosenRepo",
             chosenRepoName: null,
             repositories: null,
+            branches: null,
             solFilesFromChosenRepo: fileNameArray,
             chosenFileName: null,
             txDetails: null,
@@ -159,6 +205,7 @@ export const action = async ({ request }: ActionArgs): Promise<DashboardActionRe
             originCallForm: "chooseFileToTrack",
             chosenRepoName: null,
             repositories: null,
+            branches: null,
             solFilesFromChosenRepo: null,
             chosenFileName: fileName,
             txDetails: null,
@@ -185,6 +232,7 @@ export const action = async ({ request }: ActionArgs): Promise<DashboardActionRe
             originCallForm: "updateConstructorArgs",
             chosenRepoName: null,
             repositories: null,
+            branches: null,
             solFilesFromChosenRepo: null,
             chosenFileName: null,
             txDetails: null,
@@ -237,6 +285,7 @@ export const action = async ({ request }: ActionArgs): Promise<DashboardActionRe
             originCallForm: "deployContract",
             chosenRepoName: null,
             repositories: null,
+            branches: null,
             solFilesFromChosenRepo: null,
             chosenFileName: null,
             txDetails: null,
@@ -265,6 +314,7 @@ export const action = async ({ request }: ActionArgs): Promise<DashboardActionRe
             originCallForm: "fundWallet",
             chosenRepoName: null,
             repositories: null,
+            branches: null,
             solFilesFromChosenRepo: null,
             chosenFileName: null,
             txDetails: null,
@@ -286,6 +336,7 @@ export const action = async ({ request }: ActionArgs): Promise<DashboardActionRe
             originCallForm: "setDeployerAddress",
             chosenRepoName: null,
             repositories: null,
+            branches: null,
             solFilesFromChosenRepo: null,
             chosenFileName: null,
             txDetails: null,
@@ -299,6 +350,7 @@ export const action = async ({ request }: ActionArgs): Promise<DashboardActionRe
               originCallForm: "getTransaction",
               chosenRepoName: null,
               repositories: null,
+              branches: null,
               solFilesFromChosenRepo: null,
               chosenFileName: null,
               txDetails: null,
@@ -311,6 +363,7 @@ export const action = async ({ request }: ActionArgs): Promise<DashboardActionRe
             originCallForm: "getTransaction",
             chosenRepoName: null,
             repositories: null,
+            branches: null,
             solFilesFromChosenRepo: null,
             chosenFileName: null,
             txDetails: txDetails,
@@ -323,6 +376,7 @@ export const action = async ({ request }: ActionArgs): Promise<DashboardActionRe
               originCallForm: "createTeam",
               chosenRepoName: null,
               repositories: null,
+              branches: null,
               solFilesFromChosenRepo: null,
               chosenFileName: null,
               txDetails: null,
@@ -336,6 +390,7 @@ export const action = async ({ request }: ActionArgs): Promise<DashboardActionRe
               originCallForm: "createTeam",
               chosenRepoName: null,
               repositories: null,
+              branches: null,
               solFilesFromChosenRepo: null,
               chosenFileName: null,
               txDetails: null,
@@ -347,6 +402,7 @@ export const action = async ({ request }: ActionArgs): Promise<DashboardActionRe
               originCallForm: "createTeam",
               chosenRepoName: null,
               repositories: null,
+              branches: null,
               solFilesFromChosenRepo: null,
               chosenFileName: null,
               txDetails: null,
@@ -376,6 +432,7 @@ export const action = async ({ request }: ActionArgs): Promise<DashboardActionRe
             originCallForm: "createTeam",
             chosenRepoName: null,
             repositories: null,
+            branches: null,
             solFilesFromChosenRepo: null,
             chosenFileName: null,
             txDetails: null,
@@ -386,6 +443,7 @@ export const action = async ({ request }: ActionArgs): Promise<DashboardActionRe
             originCallForm: "",
             chosenRepoName: null,
             repositories: null,
+            branches: null,
             solFilesFromChosenRepo: null,
             chosenFileName: null,
             txDetails: null,
@@ -398,6 +456,7 @@ export const action = async ({ request }: ActionArgs): Promise<DashboardActionRe
           originCallForm: "",
           chosenRepoName: null,
           repositories: null,
+          branches: null,
           solFilesFromChosenRepo: null,
           chosenFileName: null,
           txDetails: null,
@@ -409,6 +468,7 @@ export const action = async ({ request }: ActionArgs): Promise<DashboardActionRe
           originCallForm: null,
           chosenRepoName: null,
           repositories: null,
+          branches: null,
           solFilesFromChosenRepo: null,
           chosenFileName: null,
           txDetails: null,
@@ -421,6 +481,7 @@ export const action = async ({ request }: ActionArgs): Promise<DashboardActionRe
       originCallForm: "",
       chosenRepoName: null,
       repositories: null,
+      branches: null,
       solFilesFromChosenRepo: null,
       chosenFileName: null,
       txDetails: null,
@@ -452,8 +513,7 @@ export const loader = async ({ request }: LoaderArgs) => {
     },
   });
   let setupStep = determineSetupStep(userData, null);
-  console.log("in setupStep");
-  console.log({ setupStep });
+
   return { userData, setupStep };
 };
 
@@ -479,7 +539,7 @@ export default function Index() {
           <div className="border-r border-r-off-white/25 h-full"></div>
         </div>
       </div>
-      {loaderData.setupStep == 6 ? (
+      {loaderData.setupStep == 7 ? (
         <PersonalDashboard
           userData={userData}
           teamData={null}

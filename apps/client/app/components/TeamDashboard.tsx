@@ -265,6 +265,87 @@ export const TeamDashboard = (props: DashboardProps) => {
                       )}
                     </div>
                     <div className="flex flex-row justify-between rounded-lg">
+                      <p className="text-2xl font-primary text-tertiary-gray">Branch :</p>
+                      <div className="flex flex-row items-center">
+                        <p>{teamData?.Repository?.branchName} &nbsp;</p>{" "}
+                        <div>
+                          <Form method="post">
+                            <input
+                              type="hidden"
+                              name="githubInstallationId"
+                              value={userData?.githubInstallationId as string}
+                            />
+                            <input type="hidden" name="formType" value="getBranchesOfChosenRepo" />
+                            <button type="submit">
+                              {navigation.state == "submitting" &&
+                              navigation.formData?.get("formType") == "getBranchesOfChosenRepo" ? (
+                                <div className="animate-spin">
+                                  <Loader size={20} />
+                                </div>
+                              ) : (
+                                <Edit
+                                  className="transform active:scale-75 transition-transform"
+                                  size={20}
+                                />
+                              )}
+                            </button>
+                          </Form>
+                          {actionArgs?.originCallForm == "getBranchesOfChosenRepo" && (
+                            <div className="absolute top-0 left-0 z-50 flex items-center justify-center h-screen w-screen">
+                              <div className="p-5 bg-secondary-gray border border-white rounded-lg">
+                                <div className="justify-between flex flex-row">
+                                  <p className="text-2xl">Choose Branch To Track:</p>
+                                  <Form method="post">
+                                    <input
+                                      type="hidden"
+                                      name="githubInstallationId"
+                                      value={userData?.githubInstallationId as string}
+                                    />
+                                    <button type="submit">
+                                      <X />
+                                    </button>
+                                  </Form>
+                                </div>
+                                <Form method="post" className="mt-10">
+                                  <input
+                                    type="hidden"
+                                    name="githubInstallationId"
+                                    value={userData?.githubInstallationId as string}
+                                  />
+                                  <input type="hidden" name="formType" value="chooseBranch" />
+                                  <fieldset className="grid grid-cols-2">
+                                    {actionArgs.branches?.map((branchName, i) => (
+                                      <label key={i} className="text-xl">
+                                        <input
+                                          type="radio"
+                                          name="choosenBranch"
+                                          value={branchName}
+                                        />
+                                        {branchName}
+                                      </label>
+                                    ))}
+                                  </fieldset>
+                                  <br />
+                                  <button
+                                    type="submit"
+                                    className=" bg-accent py-2 px-4  rounded-lg"
+                                  >
+                                    {navigation.state == "submitting" &&
+                                    navigation.formData?.get("formType") == "chooseBranch" ? (
+                                      <p>Submitting....</p>
+                                    ) : (
+                                      <p>Submit</p>
+                                    )}
+                                  </button>
+                                </Form>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-row justify-between rounded-lg">
                       <p className="text-2xl font-primary text-tertiary-gray">Contract :</p>
                       <div className="flex flex-row items-center">
                         <p>{teamData.Repository.filename} &nbsp;</p>{" "}

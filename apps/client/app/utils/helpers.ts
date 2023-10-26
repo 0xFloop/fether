@@ -285,6 +285,7 @@ export enum SetupStepsEnum {
   "GenerateApiKey",
   "InstallFetherKitGithubApp",
   "SelectRepository",
+  "SelectBranch",
   "SelectSmartContract",
   "SetDeployerAddress",
   "DeployContract",
@@ -303,6 +304,8 @@ export const determineSetupStep = (
 
     if (!userData.Repository) return SetupStepsEnum.SelectRepository;
 
+    if (!userData.Repository.branchName) return SetupStepsEnum.SelectBranch;
+
     if (!userData.Repository.filename) return SetupStepsEnum.SelectSmartContract;
 
     if (!userData.Repository.deployerAddress) return SetupStepsEnum.SetDeployerAddress;
@@ -315,6 +318,8 @@ export const determineSetupStep = (
     if (!teamData.ApiKey) return SetupStepsEnum.GenerateApiKey;
 
     if (!teamData.Repository) return SetupStepsEnum.SelectRepository;
+
+    if (!teamData.Repository.branchName) return SetupStepsEnum.SelectBranch;
 
     if (!teamData.Repository.filename) return SetupStepsEnum.SelectSmartContract;
 

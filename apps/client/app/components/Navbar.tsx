@@ -63,14 +63,14 @@ export const Navbar = (props: NavbarProps) => {
           )}
         </div>
       </div>
-      <div className="lg:hidden relative">
-        <button onClick={() => setMenuActive(!menuActive)}>
+      <div className="lg:hidden relative h-full">
+        <button className="h-full" onClick={() => setMenuActive(!menuActive)}>
           {menuActive ? <X size={30} /> : <AlignJustify size={30} />}
         </button>
         {menuActive ? (
-          <div className="flex flex-col absolute bg-black text-white px-8 py-16 right-0 rounded-lg">
+          <div className="bg-[url('/images/staticGrainSmallerest.png')] bg-primary-gray border border-off-white/25 flex flex-col absolute text-white px-8 py-16 right-0 rounded-b-lg">
             <ul>
-              <li className=" border-b">
+              <li className="border-b hover:border-b-secondary-orange">
                 <a
                   href="https://twitter.com/messages/compose?recipient_id=1366965946548584448"
                   target="_blank"
@@ -78,14 +78,14 @@ export const Navbar = (props: NavbarProps) => {
                   Support
                 </a>
               </li>
-              <li className="border-b">
+              <li className="border-b hover:border-b-secondary-orange">
                 <a href="https://docs.fether.xyz" target="_blank">
                   Documentation
                 </a>
               </li>
               {props.isSignedIn && (
                 <button
-                  className="border-b w-full text-left"
+                  className="border-b hover:border-b-secondary-orange w-full text-left"
                   onClick={() =>
                     displayCodes.setDisplayInviteCodes(!displayCodes.displayInviteCodes)
                   }
@@ -95,7 +95,7 @@ export const Navbar = (props: NavbarProps) => {
               )}
             </ul>
             {props.hasAccess || props.isSignedIn ? (
-              <div className="border-b border-b-secondary-orange">
+              <div className="border-b hover:border-b-secondary-orange">
                 {props.isSignedIn ? (
                   <Link id="signout" to="/alpha/sign-out">
                     Sign Out
@@ -110,7 +110,7 @@ export const Navbar = (props: NavbarProps) => {
               <a
                 href="https://twitter.com/messages/compose?recipient_id=1366965946548584448"
                 target="_blank"
-                className="border-b border-b-secondary-orange"
+                className="border-b hover:border-b-secondary-orange"
               >
                 Get Access
               </a>

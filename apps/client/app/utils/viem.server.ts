@@ -7,7 +7,6 @@ import {
   http,
   parseEther,
 } from "viem";
-import { privateKeyToAccount } from "viem/accounts";
 import { App as Octo } from "octokit";
 import { zodContractBuildFileSchema } from "./octo.server";
 import { Abi } from "abitype/zod";
@@ -45,15 +44,19 @@ export const deployContract = async (
 
   let byteCodePath = rootDir + "/out/" + fileName + "/" + fileName?.split(".")[0] + ".json";
 
-  let contentsReq = await octokit.request("GET /repos/{owner}/{repo}/contents/{path}", {
-    owner: userName,
-    repo: repoName,
-    path: byteCodePath,
-    headers: {
-      "X-GitHub-Api-Version": "2022-11-28",
-      Accept: "application/vnd.github.raw",
-    },
-  });
+  let contentsReq = await octokit.request(
+    "GET /repos/{owner}/{repo}/contents/{path}/?ref={branchName}",
+    {
+      owner: userName,
+      repo: repoName,
+      path: byteCodePath,
+      branchName: repoData.branchName,
+      headers: {
+        "X-GitHub-Api-Version": "2022-11-28",
+        Accept: "application/vnd.github.raw",
+      },
+    }
+  );
   let fileJSON = JSON.parse(contentsReq.data.toString());
   let validatedJSON = zodContractBuildFileSchema.parse(fileJSON);
   let bytecode = validatedJSON.bytecode.object as `0x${string}`;
