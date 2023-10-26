@@ -18,7 +18,6 @@ import {
   fetherChainFromKey,
   getTransactionDetails,
   spacify,
-  zodTeamName,
 } from "~/utils/helpers";
 import { useEffect, useState } from "react";
 import {
@@ -32,6 +31,7 @@ import { deployContract } from "~/utils/viem.server";
 import { createPublicClient, createTestClient, http, isAddress, parseEther } from "viem";
 import { TeamDashboard } from "~/components/TeamDashboard";
 import rainbowStylesUrl from "@rainbow-me/rainbowkit/styles.css";
+import { BackgroundLines } from "~/components/BackgroundLines";
 export function links() {
   return [{ rel: "stylesheet", href: rainbowStylesUrl }];
 }
@@ -62,7 +62,8 @@ export const loader = async ({ params, request }: LoaderArgs) => {
       },
     },
   });
-  if (!teamData) throw new Error("Team not found!");
+  if (!teamData) throw redirect("/alpha/dashboard");
+
   if (!teamData.Members?.find((member) => member.id === userId)) {
     throw new Error("You are not a member of this team! Contact the team owner to request access.");
   }
@@ -510,15 +511,7 @@ export default function Index() {
   }, [loaderData.setupStep]);
   return (
     <div className="relative w-screen min-h-screen h-full overflow-x-hidden bg-[url('/images/staticGrainSmallerest.png')] font-primary">
-      <div className="absolute -z-10 left-0 top-0 h-full w-full flex justify-center items-center">
-        <div className=" h-full w-[95%] grid grid-cols-5">
-          <div className="border-x border-x-off-white/25 h-full"></div>
-          <div className="border-r border-r-off-white/25 h-full"></div>
-          <div className="border-r border-r-off-white/25 h-full"></div>
-          <div className="border-r border-r-off-white/25 h-full"></div>
-          <div className="border-r border-r-off-white/25 h-full"></div>
-        </div>
-      </div>
+      <BackgroundLines />
       {loaderData.setupStep == 7 ? (
         <TeamDashboard
           teamData={teamData}

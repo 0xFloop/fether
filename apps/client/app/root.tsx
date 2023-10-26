@@ -29,13 +29,13 @@ export const meta: V2_MetaFunction = () => {
 
 export default function App() {
   return (
-    <html lang="en" className="h-full bg-primary-gray">
+    <html lang="en" className="bg-primary-gray min-h-screen w-screen overflow-x-hidden">
       <head>
         <Meta />
         <Links />
       </head>
       <body>
-        <div className="mx-auto min-h-screen overflow-x-hidden">
+        <div className="mx-auto ">
           <Outlet />
         </div>
         <ScrollRestoration />
@@ -44,4 +44,60 @@ export default function App() {
       </body>
     </html>
   );
+}
+export function ErrorBoundary() {
+  const error = useRouteError();
+
+  if (error instanceof Error) {
+    return (
+      <html>
+        <head>
+          <title>Oh no!</title>
+          <Meta />
+          <Links />
+        </head>
+        <body>
+          <Navbar hasAccess={false} isSignedIn={false} />
+          <div className="h-screen w-screen flex flex-col justify-center align-middle items-center bg-primary-gray text-white font-primary">
+            <h1>Uh oh ...</h1>
+            <p>Something went wrong.</p>
+            <pre>Error: {error.message}</pre>
+            <Link
+              to="/alpha/dashboard"
+              className="mt-4 border border-off-white/25 text-off-white/25 px-4"
+            >
+              Back to dashboard
+            </Link>
+          </div>
+          <Scripts />
+        </body>
+      </html>
+    );
+  } else {
+    return (
+      <html>
+        <head>
+          <title>Oh no!</title>
+          <Meta />
+          <Links />
+        </head>
+        <body>
+          <Navbar hasAccess={false} isSignedIn={false} />
+          <div className="h-screen w-screen flex flex-col justify-center align-middle items-center bg-primary-gray text-white font-primary">
+            <h1>Uh oh ...</h1>
+            <p>Something went wrong.</p>
+            <pre>Error: {JSON.stringify(error)}</pre>
+            <Link
+              to="/alpha/dashboard"
+              className="mt-4 border border-off-white/25 text-off-white/25 px-4"
+            >
+              Back to dashboard
+            </Link>
+          </div>
+
+          <Scripts />
+        </body>
+      </html>
+    );
+  }
 }

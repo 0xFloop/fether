@@ -23,6 +23,7 @@ import { WalletProvider } from "~/components/WalletProvider";
 import { createContext, useState, Dispatch, SetStateAction } from "react";
 import { Navbar } from "~/components/Navbar";
 import { Footer } from "~/components/Footer";
+import { DisplayCodesContextType } from "~/types";
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   const inviteKeySession = await getInviteKeySession(request.headers.get("Cookie"));
@@ -45,10 +46,6 @@ export const loader = async ({ request, params }: LoaderArgs) => {
 
   return json({ hasAccess, isSignedIn });
 };
-type DisplayCodesContextType = {
-  displayInviteCodes: boolean;
-  setDisplayInviteCodes: Dispatch<SetStateAction<boolean>>;
-};
 export const DisplayCodesContext = createContext<DisplayCodesContextType>({
   displayInviteCodes: false,
   setDisplayInviteCodes: () => {},
@@ -68,63 +65,4 @@ export default function Index() {
       </WalletProvider>
     </DisplayCodesContext.Provider>
   );
-}
-
-export function ErrorBoundary() {
-  const error = useRouteError();
-
-  const { hasAccess, isSignedIn } = useLoaderData<typeof loader>();
-
-  if (error instanceof Error) {
-    return (
-      <html>
-        <head>
-          <title>Oh no!</title>
-          <Meta />
-          <Links />
-        </head>
-        <body>
-          <Navbar hasAccess={hasAccess} isSignedIn={isSignedIn} />
-          <div className="h-screen w-screen flex flex-col justify-center align-middle items-center bg-primary-gray text-white font-primary">
-            <h1>Uh oh ...</h1>
-            <p>Something went wrong.</p>
-            <pre>Error: {error.message}</pre>
-            <Link
-              to="/alpha/dashboard"
-              className="mt-4 border border-off-white/25 text-off-white/25 px-4"
-            >
-              Back to dashboard
-            </Link>
-          </div>
-          <Scripts />
-        </body>
-      </html>
-    );
-  } else {
-    return (
-      <html>
-        <head>
-          <title>Oh no!</title>
-          <Meta />
-          <Links />
-        </head>
-        <body>
-          <Navbar hasAccess={hasAccess} isSignedIn={isSignedIn} />
-          <div className="h-screen w-screen flex flex-col justify-center align-middle items-center bg-primary-gray text-white font-primary">
-            <h1>Uh oh ...</h1>
-            <p>Something went wrong.</p>
-            <pre>Error: {JSON.stringify(error)}</pre>
-            <Link
-              to="/alpha/dashboard"
-              className="mt-4 border border-off-white/25 text-off-white/25 px-4"
-            >
-              Back to dashboard
-            </Link>
-          </div>
-
-          <Scripts />
-        </body>
-      </html>
-    );
-  }
 }

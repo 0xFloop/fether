@@ -6,6 +6,7 @@ import {
   getSession as userGetSession,
   commitSession as userCommitSession,
 } from "../utils/alphaSession.server";
+import { BackgroundLines } from "~/components/BackgroundLines";
 
 export const loader = async ({ request }: LoaderArgs) => {
   let redirectUri = process.env.fetherGithubRedirectUri as string;
@@ -25,15 +26,7 @@ export const action = async ({ request }: ActionArgs) => {
 export default function Index() {
   return (
     <div className="relative w-screen flex justify-center items-center min-h-screen h-full overflow-x-hidden bg-[url('/images/staticGrainSmallerest.png')] font-primary">
-      <div className="absolute -z-10 left-0 top-0 h-full w-full flex justify-center items-center">
-        <div className=" h-full w-[95%] grid grid-cols-5">
-          <div className="border-x border-x-off-white/25 h-full"></div>
-          <div className="border-r border-r-off-white/25 h-full"></div>
-          <div className="border-r border-r-off-white/25 h-full"></div>
-          <div className="border-r border-r-off-white/25 h-full"></div>
-          <div className="border-r border-r-off-white/25 h-full"></div>
-        </div>
-      </div>
+      <BackgroundLines />
       <div className="w-[500px] relative flex flex-col items-center px-10 py-20 border-x-2 border-white">
         <img
           className="w-16 absolute top-4 left-10"

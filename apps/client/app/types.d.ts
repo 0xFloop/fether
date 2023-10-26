@@ -1,4 +1,5 @@
 import { ApiKey, Repository, User, Transaction, InviteCode, Team, TeamInviteCode } from "database";
+import { Dispatch, SetStateAction } from "react";
 
 export type UserWithKeyRepoActivityTeam =
   | (User & {
@@ -36,6 +37,11 @@ export type TeamWithKeyRepoActivityMembers =
   | null;
 
 export type RepoData = { repoName: string; repoId: string };
+
+export type DisplayCodesContextType = {
+  displayInviteCodes: boolean;
+  setDisplayInviteCodes: Dispatch<SetStateAction<boolean>>;
+};
 
 export type ContractReturnItem = {
   type: string;
