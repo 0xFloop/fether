@@ -24,19 +24,31 @@ export const action = async ({ request }: ActionArgs) => {
 };
 export default function Index() {
   return (
-    <div className="w-screen h-screen relative flex items-center justify-center text-white">
+    <div className="relative w-screen flex justify-center items-center min-h-screen h-full overflow-x-hidden bg-[url('/images/staticGrainSmallerest.png')] font-primary">
+      <div className="absolute -z-10 left-0 top-0 h-full w-full flex justify-center items-center">
+        <div className=" h-full w-[95%] grid grid-cols-5">
+          <div className="border-x border-x-off-white/25 h-full"></div>
+          <div className="border-r border-r-off-white/25 h-full"></div>
+          <div className="border-r border-r-off-white/25 h-full"></div>
+          <div className="border-r border-r-off-white/25 h-full"></div>
+          <div className="border-r border-r-off-white/25 h-full"></div>
+        </div>
+      </div>
       <div className="w-[500px] relative flex flex-col items-center px-10 py-20 border-x-2 border-white">
         <img
-          className="w-16 absolute top-0 left-0"
+          className="w-16 absolute top-4 left-10"
           src="/images/fetherLogoWhite.svg"
           alt="fether logo"
         />
-        <h1 className="text-xl mt-10">
+        <h1 className="text-xl mt-10 text-white">
           Fether utilizes Log In With GitHub to streamline the GitHub integration necessary for
           continuous contract tracking.
         </h1>
         <Form method="post">
-          <button className="mt-10 px-10 py-5 border-2 border-white rounded" type="submit">
+          <button
+            type="submit"
+            className="border select-none bg-secondary-orange border-off-white/25 text-white py-4 px-14 text-xl text-center rounded-full mt-10"
+          >
             Log in with GitHub
           </button>
         </Form>

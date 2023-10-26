@@ -509,7 +509,16 @@ export default function Index() {
     setSetupStep(loaderData.setupStep);
   }, [loaderData.setupStep]);
   return (
-    <>
+    <div className="relative w-screen min-h-screen h-full overflow-x-hidden bg-[url('/images/staticGrainSmallerest.png')] font-primary">
+      <div className="absolute -z-10 left-0 top-0 h-full w-full flex justify-center items-center">
+        <div className=" h-full w-[95%] grid grid-cols-5">
+          <div className="border-x border-x-off-white/25 h-full"></div>
+          <div className="border-r border-r-off-white/25 h-full"></div>
+          <div className="border-r border-r-off-white/25 h-full"></div>
+          <div className="border-r border-r-off-white/25 h-full"></div>
+          <div className="border-r border-r-off-white/25 h-full"></div>
+        </div>
+      </div>
       {loaderData.setupStep == 7 ? (
         <TeamDashboard
           teamData={teamData}
@@ -529,6 +538,6 @@ export default function Index() {
           updateStep={(step: number) => setSetupStep(step)}
         />
       )}
-    </>
+    </div>
   );
 }
