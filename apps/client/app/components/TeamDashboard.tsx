@@ -50,6 +50,7 @@ export const TeamDashboard = (props: DashboardProps) => {
   const [teamSelect, setTeamSelect] = useState(false);
   const [openDeployContractModal, setOpenDeployContractModal] = useState(false);
   const [constructorArgModal, setConstructorArgModal] = useState(false);
+  const [deleteTeamModal, setDeleteTeamModal] = useState(false);
 
   let deployStatus = "Deploy";
 
@@ -574,17 +575,60 @@ export const TeamDashboard = (props: DashboardProps) => {
                     {userData?.id == teamData?.ownerId && (
                       <div className="flex flex-row justify-between rounded-lg">
                         <p className="text-2xl font-primary text-tertiary-gray">Delete Team :</p>
-                        <Form method="post">
-                          <input
-                            type="hidden"
-                            name="githubInstallationId"
-                            value={userData?.githubInstallationId?.toString()}
-                          />
-                          <input type="hidden" name="formType" value="deleteTeam" />
-                          <button type="submit" className="border border-red-500 px-2 text-red-500">
-                            DELETE
-                          </button>
-                        </Form>
+                        <button
+                          onClick={() => setDeleteTeamModal(true)}
+                          className="border border-red-500 px-2 text-red-500"
+                        >
+                          DELETE
+                        </button>
+                        {deleteTeamModal && (
+                          <div className="fixed top-0 left-0 z-50 flex items-center justify-center h-screen w-screen">
+                            <div className="absolute p-10 bg-secondary-gray border border-white rounded-lg">
+                              <h1 className="w-full text-5xl text-center text-red-500">
+                                !!!CAUTION!!!
+                              </h1>
+                              <p className="mt-4">Deleting this team will:</p>
+                              <ul className="mt-2">
+                                <li>- Remove access for all team members.</li>
+                                <li>- Delete all underlying team data.</li>
+                              </ul>
+                              <p className="mt-4">This can not be undone.</p>
+
+                              <button
+                                key={"closeDeleteTeamModalButton"}
+                                onClick={() => setDeleteTeamModal(false)}
+                                className="absolute top-4 right-4"
+                              >
+                                <X />
+                              </button>
+
+                              <Form method="post" className="flex items-center justify-center">
+                                <input
+                                  type="hidden"
+                                  name="githubInstallationId"
+                                  value={userData?.githubInstallationId?.toString()}
+                                />
+                                <input type="hidden" name="formType" value="deleteTeam" />
+                                <button
+                                  type="submit"
+                                  className="border mt-8 border-red-500 px-2 text-red-500"
+                                >
+                                  {navigation.state == "submitting" &&
+                                  navigation.formData?.get("formType") == "deleteTeam" ? (
+                                    <div className="flex flex-row items-center">
+                                      <p>Deleting Team</p>
+                                      <div className="animate-spin ml-2">
+                                        <Loader size={20} />
+                                      </div>
+                                    </div>
+                                  ) : (
+                                    <p>Delete Team</p>
+                                  )}
+                                </button>
+                              </Form>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
@@ -1151,39 +1195,55 @@ export const TeamDashboard = (props: DashboardProps) => {
                     <p className="font-primary">Members :</p>
                     <button
                       onClick={() => setTeamInviteModal(true)}
-                      className="text-xl text-[#f0f0f0] bg-almost-black py-2 px-4 rounded-lg"
+                      className="text-xl text-off-white bg-almost-black py-2 px-4 rounded-lg"
                     >
                       Invite
                     </button>
                     {teamInviteModal && (
-                      <div className="fixed top-0 left-0 z-50 flex items-center justify-center h-screen w-screen">
-                        <span className="bg-[#2f2f2f] opacity-70 absolute top-0 left-0 h-screen w-screen"></span>
-                        <div className="p-10 bg-[#727272] font-primary relative rounded-lg">
+                      <div className="fixed top-0 left-0 z-50 font-primary flex items-center justify-center h-screen w-screen">
+                        <span className="bg-secondary-gray opacity-70 absolute top-0 left-0 h-screen w-screen"></span>
+                        <div className="p-10 bg-secondary-border relative rounded-lg">
                           <button
                             onClick={() => setTeamInviteModal(false)}
                             className="absolute top-4 right-4"
                           >
                             <X />
                           </button>
-                          <h1 className="text-5xl font-primary font-black">
-                            Invite members to {teamData.name}!
+                          <h1 className="font-black text-4xl">
+                            Invite members to{" "}
+                            <span className="text-secondary-orange">{teamData.name}</span>!
                           </h1>
-                          <p className="mt-4">Send them one of your invite links below!</p>
-                          <p className="mt-4">{}</p>
+                          <p className="mt-4 text-xl">Send them one of your invite links below!</p>
                           <div className="flex flex-row justify-evenly mt-4">
                             {teamData.InviteCodes?.map((code) => (
-                              <>
-                                <button>{code.inviteCode}</button>
-                                <Copy
-                                  className="transform ml-4 active:scale-75 transition-transform"
-                                  size={20}
-                                  onClick={() =>
-                                    navigator.clipboard.writeText(
-                                      `https://fether.xyz/alpha/team/${teamData.id}/join/${code.inviteCode}`
-                                    )
+                              <div className="flex flex-col items-center">
+                                <p
+                                  className={
+                                    code.keyStatus == "UNUSED"
+                                      ? "text-green-400" + " text-base"
+                                      : "text-red-400" + " text-base"
                                   }
-                                />
-                              </>
+                                >
+                                  {code.keyStatus.slice(0, 1) +
+                                    code.keyStatus.toLowerCase().slice(1)}
+                                </p>
+                                <div className="flex flex-row text-base items-center">
+                                  <p>{code.inviteCode}</p>
+                                  {code.keyStatus == "UNUSED" && (
+                                    <button>
+                                      <Copy
+                                        className="transform ml-4 active:scale-75 transition-transform"
+                                        size={16}
+                                        onClick={() =>
+                                          navigator.clipboard.writeText(
+                                            `https://fether.xyz/alpha/team/${teamData.id}/join/${code.inviteCode}`
+                                          )
+                                        }
+                                      />
+                                    </button>
+                                  )}
+                                </div>
+                              </div>
                             ))}
                           </div>
                         </div>
