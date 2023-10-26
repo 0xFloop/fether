@@ -28,7 +28,7 @@ export default function Index() {
       <div className="w-[500px] relative flex flex-col items-center px-10 py-20 border-x-2 border-white">
         <img
           className="w-16 absolute top-0 left-0"
-          src="/images/fetherWhiteTransparent.svg"
+          src="/images/fetherLogoWhite.svg"
           alt="fether logo"
         />
         <h1 className="text-xl mt-10">

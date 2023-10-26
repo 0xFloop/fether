@@ -43,6 +43,27 @@ export const getUserRepositories = async (githubInstallationId: string) => {
   return repositories;
 };
 
+export const getRepositoryBranches = async (repoName: string, githubInstallationId: string) => {
+  const octokit = await octo.getInstallationOctokit(parseInt(githubInstallationId));
+  let ownerName = repoName.split("/")[0];
+  let _repoName = repoName.split("/")[1];
+  console.log("repoName", repoName);
+  console.log("ownerName", ownerName);
+  let branches = await octokit.request("GET /repos/{owner}/{repo}/branches", {
+    owner: ownerName,
+    repo: _repoName,
+    headers: {
+      "X-GitHub-Api-Version": "2022-11-28",
+      Accept: "application/vnd.github.raw",
+    },
+  });
+  let branchNames = [];
+  for (let branch of branches.data) {
+    branchNames.push(branch.name);
+  }
+  return branchNames;
+};
+
 export const getRootDir = async (githubInstallationId: string): Promise<string> => {
   try {
     const octokit = await octo.getInstallationOctokit(parseInt(githubInstallationId));

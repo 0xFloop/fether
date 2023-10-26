@@ -72,6 +72,7 @@ export default function Index() {
 
 export function ErrorBoundary() {
   const error = useRouteError();
+
   const { hasAccess, isSignedIn } = useLoaderData<typeof loader>();
 
   if (error instanceof Error) {

@@ -12,13 +12,13 @@ export type SetupWizardProps = DashboardProps & {
 };
 
 const SetupWizard: React.FC<SetupWizardProps> = (props: SetupWizardProps) => {
-  if (props.step == 7) throw new Error("Setup wizard error, please sign out and sign back in.");
+  if (props.step == 8) throw new Error("Setup wizard error, please sign out and sign back in.");
 
   //the dumbest solution to a 3 hour bug hunt
-  if (props.step == 6) return <></>;
+  if (props.step == 7) return <></>;
   return (
     <div className="selection:bg-accent selection:text-primary-gray max-w-screen h-auto min-h-screen display flex flex-col items-center justify-center text-[#a38282]  ">
-      <div className="w-11/12 min-w-[800px] max-w-[1100px] h-[750px] flex flex-row justify-between items-center">
+      <div className="w-11/12 min-w-[800px] max-w-[1100px] h-[850px] flex flex-row justify-between items-center">
         <div className="text-white border border-secondary-border rounded-l-3xl h-full w-1/3 min-w-[350px] p-4 bg-[#1E1E1E] flex flex-col gap-4">
           <p className="text-lg mt-4 bg-accent w-20 rounded-lg text-center">Alpha</p>
           <h1 className="text-5xl">Welcome to Fether setup wizard</h1>

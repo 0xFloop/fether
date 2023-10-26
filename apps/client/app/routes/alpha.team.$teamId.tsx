@@ -23,6 +23,7 @@ import {
 import { useEffect, useState } from "react";
 import {
   chooseFileToTrack,
+  getRepositoryBranches,
   getRootDirTeam,
   getSolFileNames,
   getUserRepositories,
@@ -94,6 +95,7 @@ export const action = async ({ request }: ActionArgs) => {
       originCallForm: null,
       chosenRepoName: null,
       repositories: null,
+      branches: null,
       solFilesFromChosenRepo: null,
       chosenFileName: null,
       txDetails: null,
@@ -134,6 +136,7 @@ export const action = async ({ request }: ActionArgs) => {
             originCallForm: "getRepos",
             chosenRepoName: null,
             repositories: repoObjArray,
+            branches: null,
             solFilesFromChosenRepo: null,
             chosenFileName: null,
             txDetails: null,
@@ -156,6 +159,7 @@ export const action = async ({ request }: ActionArgs) => {
               update: {
                 repoName: chosenRepoName as string,
                 repoId: chosenRepoId as string,
+                branchName: null,
                 contractAbi: null,
                 contractAddress: null,
                 filename: null,
@@ -167,6 +171,7 @@ export const action = async ({ request }: ActionArgs) => {
               originCallForm: "chooseRepo",
               chosenRepoName: chosenRepoName,
               repositories: null,
+              branches: null,
               solFilesFromChosenRepo: null,
               chosenFileName: null,
               txDetails: null,
@@ -177,6 +182,48 @@ export const action = async ({ request }: ActionArgs) => {
             originCallForm: "chooseRepo",
             chosenRepoName: null,
             repositories: null,
+            branches: null,
+            solFilesFromChosenRepo: null,
+            chosenFileName: null,
+            txDetails: null,
+            error: null,
+          };
+        case "getBranchesOfChosenRepo":
+          let branches = await getRepositoryBranches(
+            team.Repository?.repoName as string,
+            teamFromUser.githubInstallationId as string
+          );
+          console.log(branches);
+          return {
+            originCallForm: "getBranchesOfChosenRepo",
+            chosenRepoName: null,
+            repositories: null,
+            branches: branches,
+            solFilesFromChosenRepo: null,
+            chosenFileName: null,
+            txDetails: null,
+            error: null,
+          };
+        case "chooseBranch":
+          let choosenBranch = body.get("choosenBranch");
+          if (!choosenBranch) throw new Error("No branch chosen");
+
+          await db.repository.update({
+            where: { id: team.Repository?.id as string },
+            data: {
+              branchName: choosenBranch as string,
+              contractAbi: null,
+              contractAddress: null,
+              filename: null,
+              foundryRootDir: null,
+            },
+          });
+
+          return {
+            originCallForm: "chooseBranch",
+            chosenRepoName: null,
+            repositories: null,
+            branches: null,
             solFilesFromChosenRepo: null,
             chosenFileName: null,
             txDetails: null,
@@ -198,6 +245,7 @@ export const action = async ({ request }: ActionArgs) => {
             originCallForm: "getFilesOfChosenRepo",
             chosenRepoName: null,
             repositories: null,
+            branches: null,
             solFilesFromChosenRepo: fileNameArray,
             chosenFileName: null,
             txDetails: null,
@@ -217,6 +265,7 @@ export const action = async ({ request }: ActionArgs) => {
             originCallForm: "chooseFileToTrack",
             chosenRepoName: null,
             repositories: null,
+            branches: null,
             solFilesFromChosenRepo: null,
             chosenFileName: fileName,
             txDetails: null,
@@ -243,6 +292,7 @@ export const action = async ({ request }: ActionArgs) => {
             originCallForm: "updateConstructorArgs",
             chosenRepoName: null,
             repositories: null,
+            branches: null,
             solFilesFromChosenRepo: null,
             chosenFileName: null,
             txDetails: null,
@@ -296,6 +346,7 @@ export const action = async ({ request }: ActionArgs) => {
             originCallForm: "deployContract",
             chosenRepoName: null,
             repositories: null,
+            branches: null,
             solFilesFromChosenRepo: null,
             chosenFileName: null,
             txDetails: null,
@@ -324,6 +375,7 @@ export const action = async ({ request }: ActionArgs) => {
             originCallForm: "fundWallet",
             chosenRepoName: null,
             repositories: null,
+            branches: null,
             solFilesFromChosenRepo: null,
             chosenFileName: null,
             txDetails: null,
@@ -345,6 +397,7 @@ export const action = async ({ request }: ActionArgs) => {
             originCallForm: "setDeployerAddress",
             chosenRepoName: null,
             repositories: null,
+            branches: null,
             solFilesFromChosenRepo: null,
             chosenFileName: null,
             txDetails: null,
@@ -357,6 +410,7 @@ export const action = async ({ request }: ActionArgs) => {
             originCallForm: "deleteTeam",
             chosenRepoName: null,
             repositories: null,
+            branches: null,
             solFilesFromChosenRepo: null,
             chosenFileName: null,
             txDetails: null,
@@ -370,6 +424,7 @@ export const action = async ({ request }: ActionArgs) => {
               originCallForm: "getTransaction",
               chosenRepoName: null,
               repositories: null,
+              branches: null,
               solFilesFromChosenRepo: null,
               chosenFileName: null,
               txDetails: null,
@@ -382,6 +437,7 @@ export const action = async ({ request }: ActionArgs) => {
             originCallForm: "getTransaction",
             chosenRepoName: null,
             repositories: null,
+            branches: null,
             solFilesFromChosenRepo: null,
             chosenFileName: null,
             txDetails: txDetails,
@@ -392,6 +448,7 @@ export const action = async ({ request }: ActionArgs) => {
             originCallForm: "",
             chosenRepoName: null,
             repositories: null,
+            branches: null,
             solFilesFromChosenRepo: null,
             chosenFileName: null,
             txDetails: null,
@@ -404,6 +461,7 @@ export const action = async ({ request }: ActionArgs) => {
           originCallForm: "",
           chosenRepoName: null,
           repositories: null,
+          branches: null,
           solFilesFromChosenRepo: null,
           chosenFileName: null,
           txDetails: null,
@@ -415,6 +473,7 @@ export const action = async ({ request }: ActionArgs) => {
           originCallForm: null,
           chosenRepoName: null,
           repositories: null,
+          branches: null,
           solFilesFromChosenRepo: null,
           chosenFileName: null,
           txDetails: null,
@@ -427,6 +486,7 @@ export const action = async ({ request }: ActionArgs) => {
       originCallForm: "",
       chosenRepoName: null,
       repositories: null,
+      branches: null,
       solFilesFromChosenRepo: null,
       chosenFileName: null,
       txDetails: null,
@@ -450,7 +510,7 @@ export default function Index() {
   }, [loaderData.setupStep]);
   return (
     <>
-      {loaderData.setupStep == 6 ? (
+      {loaderData.setupStep == 7 ? (
         <TeamDashboard
           teamData={teamData}
           userData={userData}

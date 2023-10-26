@@ -159,7 +159,96 @@ const SelectRepoComponent: React.FC<setupProps> = (props: setupProps) => {
     </div>
   );
 };
+const SelectBranchComponent: React.FC<setupProps> = (props: setupProps) => {
+  const data = props.dashboardType == "personal" ? props.userData : props.teamData;
+  const [branchChosen, setBranchChosen] = useState(false);
+  let submit = useSubmit();
+  useEffect(() => {
+    submit(
+      {
+        githubInstallationId: props.userData?.githubInstallationId as string,
+        formType: "getBranchesOfChosenRepo",
+      },
+      {
+        method: "post",
+        encType: "application/x-www-form-urlencoded",
+      }
+    );
+  }, []);
+  return (
+    <div className="h-full w-full flex flex-col gap-4 items-center">
+      {props.actionArgs?.originCallForm != "getBranchesOfChosenRepo" ? (
+        <div className="h-full w-full flex justify-center">
+          {props.navigation.state == "submitting" &&
+            props.navigation.formData &&
+            props.navigation.formData.get("formType") == "getBranchesOfChosenRepo" && (
+              <div className="flex flex-row items-center">
+                Loading branches
+                <div className="ml-1 animate-spin">
+                  <Loader size={20} />
+                </div>
+              </div>
+            )}
+        </div>
+      ) : (
+        <>
+          {data?.Repository?.branchName && <p>Current Branch: {data.Repository.branchName}</p>}
+          {data?.Repository?.branchName && (
+            <button
+              onClick={() => props.updateStep(3)}
+              className="py-3 px-5 bg-accent border rounded-lg border-[#6161FF] absolute bottom-7 right-10"
+            >
+              <p>Next</p>
+            </button>
+          )}
+          <Form className="overflow-y-auto" method="post">
+            <input
+              type="hidden"
+              name="githubInstallationId"
+              value={props.userData?.githubInstallationId?.toString()}
+            />
+            <input type="hidden" name="formType" value="chooseBranch" />
 
+            <fieldset id="repoSelector" className="grid grid-cols-2">
+              {props.actionArgs.branches?.map((branchName: string) => (
+                <label key={branchName} className="text-xl">
+                  <input
+                    type="radio"
+                    id="choosenBranch"
+                    name="choosenBranch"
+                    value={branchName}
+                    onClick={() => setBranchChosen(true)}
+                  />
+                  {branchName}
+                </label>
+              ))}
+            </fieldset>
+            <br />
+            {branchChosen && (
+              <button
+                type="submit"
+                className="py-3 px-5 bg-accent border rounded-lg border-[#6161FF]  absolute bottom-7 right-10"
+              >
+                {props.navigation.state == "submitting" &&
+                props.navigation.formData &&
+                props.navigation.formData.get("formType") == "chooseBranch" ? (
+                  <div className="flex flex-row items-center">
+                    Submitting
+                    <div className="ml-1 animate-spin">
+                      <Loader size={20} />
+                    </div>
+                  </div>
+                ) : (
+                  <p>Submit</p>
+                )}
+              </button>
+            )}
+          </Form>
+        </>
+      )}
+    </div>
+  );
+};
 const SelectSmartContract: React.FC<setupProps> = (props: setupProps) => {
   const [fileChosen, setFileChosen] = useState(false);
   let submit = useSubmit();
@@ -452,6 +541,23 @@ export const setupSteps: setupStep[] = [
   },
   {
     stepNumber: "04",
+    name: "Select Branch",
+    description:
+      "Select which branch from your chosen repository that you would like Fether to be tracking.",
+    iconUrl: "/images/folder.svg",
+    actionComponent: (props: setupProps) => (
+      <SelectBranchComponent
+        dashboardType={props.dashboardType}
+        userData={props.userData}
+        teamData={props.teamData}
+        navigation={props.navigation}
+        actionArgs={props.actionArgs}
+        updateStep={props.updateStep}
+      />
+    ),
+  },
+  {
+    stepNumber: "05",
     name: "Select Smart Contract",
     description:
       "Select which solidity file from your chosen repository that you would like Fether to be tracking for you.",
@@ -468,7 +574,7 @@ export const setupSteps: setupStep[] = [
     ),
   },
   {
-    stepNumber: "05",
+    stepNumber: "06",
     name: "Set Deployer Address",
     description:
       "Set which Ethereum address you would like to be the deployer of your smart contract. This is the address that will have will have any deployer based ownership.",
@@ -485,7 +591,7 @@ export const setupSteps: setupStep[] = [
     ),
   },
   {
-    stepNumber: "06",
+    stepNumber: "07",
     name: "Deploy Contract",
     description:
       "You are all set up! Click below to deploy your first instance of a Fethered smart contract!",

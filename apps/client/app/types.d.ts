@@ -63,6 +63,7 @@ export type DashboardActionReturn = {
   originCallForm: string | null;
   chosenRepoName: string | null;
   repositories: RepoData[] | null;
+  branches: string[] | null;
   solFilesFromChosenRepo: string[] | null;
   chosenFileName: string | null;
   txDetails: TxDetails | null;
