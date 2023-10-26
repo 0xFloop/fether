@@ -29,10 +29,14 @@ export const action = async ({ request }: ActionArgs) => {
 
     for (let i = 0; i < associatedRepositories.length; i++) {
       let associatedRepo = associatedRepositories[i];
-
+      let branchChanged = reqBody.ref.split("/").slice(-1)[0] == associatedRepo.branchName;
       let associatedData = associatedRepo.associatedUser
         ? associatedRepo.associatedUser
         : associatedRepo.associatedTeam;
+
+      if (!branchChanged) {
+        continue;
+      }
 
       if (associatedData?.ApiKey) {
         for (let i = 0; i < reqBody.commits.length; i++) {
@@ -55,11 +59,12 @@ export const action = async ({ request }: ActionArgs) => {
                   rootDir + "/out/" + fileName + "/" + fileName?.split(".")[0] + ".json";
 
                 let contentsReq = await octokit.request(
-                  "GET /repos/{owner}/{repo}/contents/{path}",
+                  "GET /repos/{owner}/{repo}/contents/{path}/?ref={branchName}",
                   {
                     owner: userName,
                     repo: repoName,
                     path: byteCodePath,
+                    branchName: associatedRepo.branchName,
                     headers: {
                       "X-GitHub-Api-Version": "2022-11-28",
                       Accept: "application/vnd.github.raw",
