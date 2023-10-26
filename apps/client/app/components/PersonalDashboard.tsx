@@ -128,22 +128,20 @@ export const PersonalDashboard = (props: DashboardProps) => {
                         </button>
                       </div>
                       {teamSelect && (
-                        <div className="absolute top-full p-4 min-w-[33%] right-0 bg-tertiary-gray z-50 rounded-md">
-                          <h1>Dashboard Selector</h1>
-                          <div>
-                            <p>Personal Account:</p>
-                            <p>{userData?.username}</p>
-                          </div>
+                        <div className="absolute top-full p-4 min-w-[33%] right-0 bg-secondary-border z-50 rounded-md">
+                          <h1 className="text-2xl">Dashboard Selector</h1>
+                          <p className="text-xl mt-4 text-secondary-orange">Personal Account:</p>
+                          <p>{userData?.username}</p>
                           {userData?.memberTeamId ? (
                             <div>
-                              <p>Team:</p>
+                              <p className="text-xl mt-4 text-secondary-orange">Team:</p>
                               <Link to={`/alpha/team/${userData.MemberTeam?.id}`}>
                                 {userData.MemberTeam?.name}
                               </Link>
                             </div>
                           ) : (
                             <div>
-                              <div className="flex flex-row justify-between">
+                              <div className="flex flex-row mt-4 justify-between">
                                 <p>Create Team</p>
                                 <button onClick={() => setCreateTeam(!createTeam)}>
                                   {createTeam ? <X size={20} /> : <PlusCircle size={20} />}
@@ -163,7 +161,7 @@ export const PersonalDashboard = (props: DashboardProps) => {
                                     maxLength={20}
                                     name="teamName"
                                     placeholder="Team Name"
-                                    className="text-black bg-transparent outline-none border-0 px-0 text-left focus:ring-0"
+                                    className="bg-transparent outline-none border-0 px-0 text-left focus:ring-0"
                                   />
                                   <button
                                     type="submit"
@@ -175,7 +173,7 @@ export const PersonalDashboard = (props: DashboardProps) => {
                                         <Loader size={20} />
                                       </div>
                                     ) : (
-                                      "Create Team"
+                                      "Create"
                                     )}
                                   </button>
                                 </Form>
