@@ -97,7 +97,7 @@ export const PersonalDashboard = (props: DashboardProps) => {
   };
 
   return (
-    <div className="selection:bg-accent selection:text-primary-gray max-w-screen h-auto min-h-screen display flex flex-col items-center justify-center text-[#a38282]">
+    <div className="max-w-screen h-auto min-h-screen display flex flex-col items-center justify-center text-[#a38282]">
       {userData &&
         userData.Repository &&
         userData.Repository.contractAddress &&
@@ -108,7 +108,7 @@ export const PersonalDashboard = (props: DashboardProps) => {
         userData.ApiKey.key && (
           <div id="content" className="w-3/4 max-w-7xl mx-auto rounded-lg mt-40 pb-40 text-white">
             {displayCodes.displayInviteCodes && (
-              <div className="absolute top-0 left-0 z-50 flex items-center justify-center h-screen w-screen">
+              <div className="fixed top-0 left-0 z-50 flex items-center justify-center h-screen w-screen">
                 <span className="bg-[#2f2f2f] opacity-70 absolute top-0 left-0 h-screen w-screen"></span>
                 <div className="p-10 bg-[#727272] font-primary relative rounded-lg">
                   <button
@@ -165,7 +165,7 @@ export const PersonalDashboard = (props: DashboardProps) => {
                         </button>
                       </div>
                       {teamSelect && (
-                        <div className="absolute top-full p-4 w-full bg-tertiary-gray z-50 rounded-md">
+                        <div className="absolute top-full p-4 min-w-[33%] right-0 bg-tertiary-gray z-50 rounded-md">
                           <h1>Dashboard Selector</h1>
                           <div>
                             <p>Personal Account:</p>
@@ -271,8 +271,8 @@ export const PersonalDashboard = (props: DashboardProps) => {
                         </Form>
                       </div>
                       {actionArgs?.originCallForm == "getRepos" && (
-                        <div className="absolute top-0 left-0 z-50 flex items-center justify-center h-screen w-screen">
-                          <div className="absolutew-1/2 p-5 bg-secondary-gray border border-white rounded-lg">
+                        <div className="fixed top-0 left-0 z-50 flex items-center justify-center h-screen w-screen">
+                          <div className="absolute w-1/2 p-5 bg-secondary-gray border border-white rounded-lg">
                             <div className="w-full justify-between flex flex-row">
                               <p className="text-2xl">Choose Repository :</p>
                               <Form method="post">
@@ -308,7 +308,10 @@ export const PersonalDashboard = (props: DashboardProps) => {
                               </fieldset>
                               <br />
 
-                              <button type="submit" className=" bg-accent py-2 px-4  rounded-lg">
+                              <button
+                                type="submit"
+                                className=" bg-secondary-orange py-2 px-4  rounded-lg"
+                              >
                                 {navigation.state == "submitting" &&
                                 navigation.formData?.get("formType") == "getChosenRepo" ? (
                                   <p>Submitting....</p>
@@ -348,7 +351,7 @@ export const PersonalDashboard = (props: DashboardProps) => {
                             </button>
                           </Form>
                           {actionArgs?.originCallForm == "getBranchesOfChosenRepo" && (
-                            <div className="absolute top-0 left-0 z-50 flex items-center justify-center h-screen w-screen">
+                            <div className="fixed top-0 left-0 z-50 flex items-center justify-center h-screen w-screen">
                               <div className="p-5 bg-secondary-gray border border-white rounded-lg">
                                 <div className="justify-between flex flex-row">
                                   <p className="text-2xl">Choose Branch To Track:</p>
@@ -377,7 +380,7 @@ export const PersonalDashboard = (props: DashboardProps) => {
                                           type="radio"
                                           name="choosenBranch"
                                           value={branchName}
-                                        />
+                                        />{" "}
                                         {branchName}
                                       </label>
                                     ))}
@@ -385,7 +388,7 @@ export const PersonalDashboard = (props: DashboardProps) => {
                                   <br />
                                   <button
                                     type="submit"
-                                    className=" bg-accent py-2 px-4  rounded-lg"
+                                    className=" bg-secondary-orange py-2 px-4  rounded-lg"
                                   >
                                     {navigation.state == "submitting" &&
                                     navigation.formData?.get("formType") == "chooseBranch" ? (
@@ -428,7 +431,7 @@ export const PersonalDashboard = (props: DashboardProps) => {
                             </button>
                           </Form>
                           {actionArgs?.originCallForm == "getFilesOfChosenRepo" && (
-                            <div className="absolute top-0 left-0 z-50 flex items-center justify-center h-screen w-screen">
+                            <div className="fixed top-0 left-0 z-50 flex items-center justify-center h-screen w-screen">
                               <div className="p-5 bg-secondary-gray border border-white rounded-lg">
                                 <div className="justify-between flex flex-row">
                                   <p className="text-2xl">Choose File To Track:</p>
@@ -465,7 +468,7 @@ export const PersonalDashboard = (props: DashboardProps) => {
                                   <br />
                                   <button
                                     type="submit"
-                                    className=" bg-accent py-2 px-4  rounded-lg"
+                                    className=" bg-secondary-orange py-2 px-4  rounded-lg"
                                   >
                                     {navigation.state == "submitting" &&
                                     navigation.formData?.get("formType") == "chooseFileToTrack" ? (
@@ -509,7 +512,7 @@ export const PersonalDashboard = (props: DashboardProps) => {
                           </button>
                         </Form>
                         {deployerModal && actionArgs?.originCallForm != "setDeployerAddress" && (
-                          <div className="absolute top-0 left-0 z-50 flex items-center justify-center h-screen w-screen">
+                          <div className="fixed top-0 left-0 z-50 flex items-center justify-center h-screen w-screen">
                             <div className="absolute left-1/4 w-1/2 p-5 pb-10 bg-secondary-gray border border-white rounded-lg">
                               <div className="w-full justify-between flex flex-row">
                                 <p className="text-2xl">Update Deployer Address:</p>
@@ -537,7 +540,7 @@ export const PersonalDashboard = (props: DashboardProps) => {
                                     onChange={handleAddressChange}
                                   />
                                   <button
-                                    className="text-white h-full flex-1 text-xl disabled:bg-tertiary-gray bg-accent py-2 px-4"
+                                    className="text-white h-full flex-1 text-xl disabled:bg-tertiary-gray bg-secondary-orange py-2 px-4"
                                     type="submit"
                                     disabled={!addressValid}
                                   >
@@ -578,7 +581,7 @@ export const PersonalDashboard = (props: DashboardProps) => {
                             </button>
                           </div>
                           {constructorArgModal && (
-                            <div className="absolute top-0 left-0 z-50 flex items-center justify-center h-screen w-screen">
+                            <div className="fixed top-0 left-0 z-50 flex items-center justify-center h-screen w-screen">
                               <div className="absolute left-1/4 w-1/2 p-5 pb-10 bg-secondary-gray border border-white rounded-lg">
                                 <Form method="post" key="updateConstructorArgsForm">
                                   <input

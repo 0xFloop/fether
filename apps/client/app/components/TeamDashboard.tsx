@@ -88,7 +88,7 @@ export const TeamDashboard = (props: DashboardProps) => {
     }
   };
   return (
-    <div className="selection:bg-accent selection:text-primary-gray max-w-screen h-auto min-h-screen display flex flex-col items-center justify-center text-[#a38282]">
+    <div className="max-w-screen h-auto min-h-screen display flex flex-col items-center justify-center text-[#a38282]">
       {teamData &&
         teamData.Repository &&
         teamData.Repository.contractAddress &&
@@ -214,7 +214,7 @@ export const TeamDashboard = (props: DashboardProps) => {
                         </Form>
                       </div>
                       {actionArgs?.originCallForm == "getRepos" && (
-                        <div className="absolute top-0 left-0 z-50 flex items-center justify-center h-screen w-screen">
+                        <div className="fixed top-0 left-0 z-50 flex items-center justify-center h-screen w-screen">
                           <div className="absolutew-1/2 p-5 bg-secondary-gray border border-white rounded-lg">
                             <div className="w-full justify-between flex flex-row">
                               <p className="text-2xl">Choose Repository :</p>
@@ -251,7 +251,10 @@ export const TeamDashboard = (props: DashboardProps) => {
                               </fieldset>
                               <br />
 
-                              <button type="submit" className=" bg-accent py-2 px-4  rounded-lg">
+                              <button
+                                type="submit"
+                                className=" bg-secondary-orange py-2 px-4  rounded-lg"
+                              >
                                 {navigation.state == "submitting" &&
                                 navigation.formData?.get("formType") == "getChosenRepo" ? (
                                   <p>Submitting....</p>
@@ -291,7 +294,7 @@ export const TeamDashboard = (props: DashboardProps) => {
                             </button>
                           </Form>
                           {actionArgs?.originCallForm == "getBranchesOfChosenRepo" && (
-                            <div className="absolute top-0 left-0 z-50 flex items-center justify-center h-screen w-screen">
+                            <div className="fixed top-0 left-0 z-50 flex items-center justify-center h-screen w-screen">
                               <div className="p-5 bg-secondary-gray border border-white rounded-lg">
                                 <div className="justify-between flex flex-row">
                                   <p className="text-2xl">Choose Branch To Track:</p>
@@ -320,7 +323,7 @@ export const TeamDashboard = (props: DashboardProps) => {
                                           type="radio"
                                           name="choosenBranch"
                                           value={branchName}
-                                        />
+                                        />{" "}
                                         {branchName}
                                       </label>
                                     ))}
@@ -328,7 +331,7 @@ export const TeamDashboard = (props: DashboardProps) => {
                                   <br />
                                   <button
                                     type="submit"
-                                    className=" bg-accent py-2 px-4  rounded-lg"
+                                    className=" bg-secondary-orange py-2 px-4  rounded-lg"
                                   >
                                     {navigation.state == "submitting" &&
                                     navigation.formData?.get("formType") == "chooseBranch" ? (
@@ -372,7 +375,7 @@ export const TeamDashboard = (props: DashboardProps) => {
                             </button>
                           </Form>
                           {actionArgs?.originCallForm == "getFilesOfChosenRepo" && (
-                            <div className="absolute top-0 left-0 z-50 flex items-center justify-center h-screen w-screen">
+                            <div className="fixed top-0 left-0 z-50 flex items-center justify-center h-screen w-screen">
                               <div className="p-5 bg-secondary-gray border border-white rounded-lg">
                                 <div className="justify-between flex flex-row">
                                   <p className="text-2xl">Choose File To Track:</p>
@@ -409,7 +412,7 @@ export const TeamDashboard = (props: DashboardProps) => {
                                   <br />
                                   <button
                                     type="submit"
-                                    className=" bg-accent py-2 px-4  rounded-lg"
+                                    className=" bg-secondary-orange py-2 px-4  rounded-lg"
                                   >
                                     {navigation.state == "submitting" &&
                                     navigation.formData?.get("formType") == "chooseFileToTrack" ? (
@@ -453,7 +456,7 @@ export const TeamDashboard = (props: DashboardProps) => {
                           </button>
                         </Form>
                         {deployerModal && actionArgs?.originCallForm != "setDeployerAddress" && (
-                          <div className="absolute top-0 left-0 z-50 flex items-center justify-center h-screen w-screen">
+                          <div className="fixed top-0 left-0 z-50 flex items-center justify-center h-screen w-screen">
                             <div className="absolute left-1/4 w-1/2 p-5 pb-10 bg-secondary-gray border border-white rounded-lg">
                               <div className="w-full justify-between flex flex-row">
                                 <p className="text-2xl">Update Deployer Address:</p>
@@ -481,7 +484,7 @@ export const TeamDashboard = (props: DashboardProps) => {
                                     onChange={handleAddressChange}
                                   />
                                   <button
-                                    className="text-white h-full flex-1 text-xl disabled:bg-tertiary-gray bg-accent py-2 px-4"
+                                    className="text-white h-full flex-1 text-xl disabled:bg-tertiary-gray bg-secondary-orange py-2 px-4"
                                     type="submit"
                                     disabled={!addressValid}
                                   >
