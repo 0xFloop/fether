@@ -8,7 +8,7 @@ contract SecretKeeper is Ownable {
     SecretStorage public secretInStorage =
         SecretStorage(
             6969,
-            "wow deez super duper uber mega ultra hella giga nuts"
+            "wow holy deez super duper uber mega ultra hella giga nuts"
         );
 
     struct SecretStorage {
