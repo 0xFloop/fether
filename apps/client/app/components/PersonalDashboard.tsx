@@ -27,6 +27,7 @@ import { Abi } from "abitype/zod";
 import React from "react";
 import * as Accordion from "@radix-ui/react-accordion";
 import TxViewer from "./TxViewer";
+import { InviteFriendsModal } from "./InviteFriendsModal";
 
 export interface DashboardProps {
   userData: UserWithKeyRepoActivityTeam;
@@ -108,45 +109,7 @@ export const PersonalDashboard = (props: DashboardProps) => {
         userData.ApiKey.key && (
           <div id="content" className="w-3/4 max-w-7xl mx-auto rounded-lg mt-40 pb-40 text-white">
             {displayCodes.displayInviteCodes && (
-              <div className="fixed top-0 left-0 z-50 flex items-center justify-center h-screen w-screen">
-                <span className="bg-[#2f2f2f] opacity-70 absolute top-0 left-0 h-screen w-screen"></span>
-                <div className="p-10 bg-[#727272] font-primary relative rounded-lg">
-                  <button
-                    onClick={() => displayCodes.setDisplayInviteCodes(false)}
-                    className="absolute top-4 right-4"
-                  >
-                    <X />
-                  </button>
-                  <h1 className="text-5xl font-primary font-black">Invite friends!</h1>
-                  <p className="mt-4">Have a friend you think might benefit from fether?</p>
-                  <p className="mt-4">
-                    Send them one of your invite codes below and they can try it out!
-                  </p>
-                  <div className="flex flex-row justify-evenly mt-4">
-                    {userData?.IssuedInviteCodes?.map((code) => (
-                      <div key={code.inviteCode} className="flex flex-col items-center">
-                        <p
-                          className={code.keyStatus == "UNUSED" ? "text-green-400" : "text-red-400"}
-                        >
-                          {code.keyStatus.slice(0, 1) + code.keyStatus.toLowerCase().slice(1)}
-                        </p>
-
-                        <div className="flex flex-row items-center">
-                          <p>{code.inviteCode}</p>
-                          {code.keyStatus == "UNUSED" && (
-                            <button onClick={() => navigator.clipboard.writeText(code.inviteCode)}>
-                              <Copy
-                                className="transform ml-4 active:scale-75 transition-transform"
-                                size={16}
-                              />
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
+              <InviteFriendsModal userData={userData} displayCodes={displayCodes} />
             )}
             <div className="text-4xl flex gap-10 flex-col xl:flex-row justify-between rounded-lg">
               <div className="w-full xl:w-2/5 ">

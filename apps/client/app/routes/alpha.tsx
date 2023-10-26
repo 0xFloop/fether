@@ -23,6 +23,7 @@ import { WalletProvider } from "~/components/WalletProvider";
 import { createContext, useState, Dispatch, SetStateAction } from "react";
 import { Navbar } from "~/components/Navbar";
 import { Footer } from "~/components/Footer";
+import { DisplayCodesContextType } from "~/types";
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   const inviteKeySession = await getInviteKeySession(request.headers.get("Cookie"));
@@ -44,10 +45,6 @@ export const loader = async ({ request, params }: LoaderArgs) => {
   }
 
   return json({ hasAccess, isSignedIn });
-};
-type DisplayCodesContextType = {
-  displayInviteCodes: boolean;
-  setDisplayInviteCodes: Dispatch<SetStateAction<boolean>>;
 };
 export const DisplayCodesContext = createContext<DisplayCodesContextType>({
   displayInviteCodes: false,
