@@ -754,7 +754,7 @@ export const PersonalDashboard = (props: DashboardProps) => {
                                                 setFunctionCalled(null);
                                               }
                                             }}
-                                            className="text-[#f0f0f0] bg-almost-black py-2 px-4 rounded-lg disabled:bg-[#cbcbcb]"
+                                            className="text-[#f0f0f0] bg-almost-black py-2 px-6 rounded-full disabled:bg-[#cbcbcb]"
                                           >
                                             {functionCalled == method.name ? (
                                               <div className="flex flex-row items-center">
@@ -823,7 +823,7 @@ export const PersonalDashboard = (props: DashboardProps) => {
                                                   setFunctionCalled(null);
                                                 }
                                               }}
-                                              className="text-[#f0f0f0] bg-almost-black py-2 px-4  rounded-lg disabled:bg-[#cbcbcb]"
+                                              className="text-[#f0f0f0] bg-almost-black py-2 px-6  rounded-full disabled:bg-[#cbcbcb]"
                                             >
                                               {functionCalled == method.name ? (
                                                 <div className="flex flex-row items-center">
@@ -924,7 +924,7 @@ export const PersonalDashboard = (props: DashboardProps) => {
                                                   }
                                                 }
                                               }}
-                                              className="text-[#f0f0f0] bg-almost-black py-2 px-4 rounded-lg disabled:bg-[#cbcbcb]"
+                                              className="text-[#f0f0f0] bg-almost-black py-2 px-6 rounded-full disabled:bg-[#cbcbcb]"
                                               disabled={!Boolean(address)}
                                             >
                                               {functionCalled == method.name ? (
@@ -995,7 +995,7 @@ export const PersonalDashboard = (props: DashboardProps) => {
                                                     }
                                                   }
                                                 }}
-                                                className="text-[#f0f0f0] bg-almost-black py-2 px-4  rounded-lg disabled:bg-[#cbcbcb]"
+                                                className="text-[#f0f0f0] bg-almost-black py-2 px-6  rounded-full disabled:bg-[#cbcbcb]"
                                                 disabled={!Boolean(address)}
                                               >
                                                 {functionCalled == method.name ? (

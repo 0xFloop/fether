@@ -29,8 +29,8 @@ import SetupWizard from "~/components/SetupWizard";
 import { PersonalDashboard } from "~/components/PersonalDashboard";
 import { BackgroundLines } from "~/components/BackgroundLines";
 
-//TODO: redesign dashboard selector page
 //TODO: test the branch specific redeploys
+//TODO: fix/improve fether blockchain setup
 
 //STRETCHTODO: add ability to deploy multiple contracts
 //STRETCHTODO: add ability to switch between deployments for all your branches
