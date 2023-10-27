@@ -2,10 +2,10 @@
 pragma solidity ^0.8.13;
 
 contract Counter {
-    uint256 number = 420;
-    string letter = "F";
+    uint256 number = 6969;
+    string letter = "asdfsdf";
 
-    function setLeNumber(uint256 newNumber) public {
+    function setTheCooleseNumber(uint256 newNumber) public {
         number = newNumber;
     }
 
