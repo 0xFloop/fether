@@ -35,8 +35,10 @@ export const action = async ({ request }: ActionArgs) => {
         : associatedRepo.associatedTeam;
 
       if (!branchChanged) {
+        console.log("branch changed, but not the one we're looking for");
         continue;
       }
+      console.log("correct branch changed");
 
       if (associatedData?.ApiKey) {
         for (let i = 0; i < reqBody.commits.length; i++) {
