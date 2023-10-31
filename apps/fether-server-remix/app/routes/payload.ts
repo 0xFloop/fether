@@ -60,6 +60,8 @@ export const action = async ({ request }: ActionArgs) => {
                 let byteCodePath =
                   rootDir + "/out/" + fileName + "/" + fileName?.split(".")[0] + ".json";
 
+                console.log(associatedRepo.branchName);
+
                 let contentsReq = await octokit.request(
                   "GET /repos/{owner}/{repo}/contents/{path}/?ref={branchName}",
                   {
