@@ -3,7 +3,7 @@ pragma solidity ^0.8.13;
 
 contract Counter {
     uint256 number = 6969;
-    string letter = "asdfsdfsadasdfsdf";
+    string letter = "asdfsdfsadasdfsasdfsdfdf";
 
     function setTheNumberDevBranch(uint256 newNumber) public {
         number = newNumber;

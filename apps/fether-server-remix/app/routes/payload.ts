@@ -63,7 +63,7 @@ export const action = async ({ request }: ActionArgs) => {
                 console.log(associatedRepo.branchName);
 
                 let contentsReq = await octokit.request(
-                  "GET /repos/{owner}/{repo}/contents/{path}/?ref={branchName}",
+                  "GET /repos/{owner}/{repo}/contents/{path}?ref={branchName}",
                   {
                     owner: userName,
                     repo: repoName,
