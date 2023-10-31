@@ -38,30 +38,50 @@ export function links() {
 export const loader = async ({ params, request }: LoaderArgs) => {
   const user = await userGetSession(request.headers.get("Cookie"));
   if (!user.has("userId")) throw redirect("/");
-  let userId = user.get("userId");
-  const userData = await db.user.findUnique({
-    where: { id: userId },
-    include: {
-      IssuedInviteCodes: true,
-    },
-  });
-  const teamData: TeamWithKeyRepoActivityMembers = await db.team.findUnique({
-    where: { id: params.teamId },
-    include: {
-      ApiKey: true,
-      InviteCodes: true,
-      Members: true,
-      Repository: {
-        include: {
-          Activity: {
-            orderBy: {
-              timestamp: "desc",
+  let userData: UserWithKeyRepoActivityTeam;
+  const userId = user.get("userId");
+  try {
+    userData = await db.user.findUnique({
+      where: { id: userId as string },
+      include: {
+        ApiKey: true,
+        IssuedInviteCodes: true,
+        MemberTeam: true,
+        Repository: {
+          include: {
+            Activity: true,
+          },
+        },
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    throw Error("Error loading user data");
+  }
+  let teamData: TeamWithKeyRepoActivityMembers;
+  try {
+    teamData = await db.team.findUnique({
+      where: { id: params.teamId },
+      include: {
+        ApiKey: true,
+        InviteCodes: true,
+        Members: true,
+        Repository: {
+          include: {
+            Activity: {
+              orderBy: {
+                timestamp: "desc",
+              },
             },
           },
         },
       },
-    },
-  });
+    });
+  } catch (error) {
+    console.error(error);
+    throw new Error("Error loading team data.");
+  }
+
   if (!teamData) throw redirect("/alpha/dashboard");
 
   if (!teamData.Members?.find((member) => member.id === userId)) {

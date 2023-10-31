@@ -29,8 +29,8 @@ import SetupWizard from "~/components/SetupWizard";
 import { PersonalDashboard } from "~/components/PersonalDashboard";
 import { BackgroundLines } from "~/components/BackgroundLines";
 
-//TODO: test the branch specific redeploys
 //TODO: fix/improve fether blockchain setup
+//TODO: update team dash to new dashboard
 
 //STRETCHTODO: add ability to deploy multiple contracts
 //STRETCHTODO: add ability to switch between deployments for all your branches
@@ -43,22 +43,26 @@ export const action = async ({ request }: ActionArgs): Promise<DashboardActionRe
 
   const user = await userGetSession(request.headers.get("Cookie"));
   if (!user.has("userId")) throw Error("invalid call");
-
+  let associatedUser: UserWithKeyRepoActivityTeam;
   const userId = user.get("userId");
-
-  const associatedUser = await db.user.findUnique({
-    where: { id: userId as string },
-    include: {
-      ApiKey: true,
-      IssuedInviteCodes: true,
-      MemberTeam: true,
-      Repository: {
-        include: {
-          Activity: true,
+  try {
+    associatedUser = await db.user.findUnique({
+      where: { id: userId as string },
+      include: {
+        ApiKey: true,
+        IssuedInviteCodes: true,
+        MemberTeam: true,
+        Repository: {
+          include: {
+            Activity: true,
+          },
         },
       },
-    },
-  });
+    });
+  } catch (error) {
+    console.error(error);
+    throw Error("Error loading user data");
+  }
 
   if (associatedUser) {
     try {
@@ -495,23 +499,26 @@ export const loader = async ({ request }: LoaderArgs) => {
   const user = await userGetSession(request.headers.get("Cookie"));
   if (!user.has("userId")) throw redirect("/alpha/login");
 
-  const userData: UserWithKeyRepoActivityTeam = await db.user.findUnique({
-    where: { id: user.get("userId") },
-    include: {
-      ApiKey: true,
-      IssuedInviteCodes: true,
-      MemberTeam: true,
-      Repository: {
-        include: {
-          Activity: {
-            orderBy: {
-              timestamp: "desc",
-            },
+  let userData: UserWithKeyRepoActivityTeam;
+  const userId = user.get("userId");
+  try {
+    userData = await db.user.findUnique({
+      where: { id: userId as string },
+      include: {
+        ApiKey: true,
+        IssuedInviteCodes: true,
+        MemberTeam: true,
+        Repository: {
+          include: {
+            Activity: true,
           },
         },
       },
-    },
-  });
+    });
+  } catch (error) {
+    console.error(error);
+    throw Error("Error loading user data");
+  }
   let setupStep = determineSetupStep(userData, null);
 
   return { userData, setupStep };
