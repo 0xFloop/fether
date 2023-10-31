@@ -18,6 +18,7 @@ import * as Accordion from "@radix-ui/react-accordion";
 import TxViewer from "./TxViewer";
 import { Abi } from "abitype/zod";
 import { InviteFriendsModal } from "./InviteFriendsModal";
+import { DashboardSelector } from "./DashboardSelector";
 
 export interface DashboardProps {
   userData: UserWithKeyRepoActivityTeam;
@@ -120,16 +121,11 @@ export const TeamDashboard = (props: DashboardProps) => {
                         </button>
                       </div>
                       {teamSelect && (
-                        <div className="absolute top-full p-4 w-full bg-tertiary-gray z-50 rounded-md">
-                          <h1>Dashboard Selector</h1>
-                          <div>
-                            <p>Personal Account:</p>
-                            <div>
-                              <Link to={`/alpha/dashboard`}>{userData?.username}</Link>
-                            </div>
-                          </div>
-                          <p>Team: {teamData.name}</p>
-                        </div>
+                        <DashboardSelector
+                          userData={userData}
+                          navigation={navigation}
+                          actionArgs={actionArgs}
+                        />
                       )}
                     </div>
                     <div className="flex flex-row justify-between rounded-lg">

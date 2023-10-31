@@ -28,6 +28,7 @@ import React from "react";
 import * as Accordion from "@radix-ui/react-accordion";
 import TxViewer from "./TxViewer";
 import { InviteFriendsModal } from "./InviteFriendsModal";
+import { DashboardSelector } from "./DashboardSelector";
 
 export interface DashboardProps {
   userData: UserWithKeyRepoActivityTeam;
@@ -55,7 +56,6 @@ export const PersonalDashboard = (props: DashboardProps) => {
   const [addressValid, setAddressValid] = useState<boolean>(false);
   const [addressError, setAddressError] = useState<string | null>(null);
   const [teamSelect, setTeamSelect] = useState(false);
-  const [createTeam, setCreateTeam] = useState(false);
   const [openDeployContractModal, setOpenDeployContractModal] = useState(false);
   const [constructorArgModal, setConstructorArgModal] = useState(false);
 
@@ -101,9 +101,9 @@ export const PersonalDashboard = (props: DashboardProps) => {
     <div className="max-w-screen font-primary h-auto min-h-screen display flex flex-col items-center justify-center">
       <div
         id="dashboard-top-bar"
-        className="mt-20 px-20 border-b border-b-off-white/25 text-white w-full bg-[#27262B] h-32 flex flex-row items-center justify-between"
+        className="mt-20 px-20 border-b border-b-off-white/25 text-white w-full bg-[#27262B] h-32 flex flex-row items-center justify-between relative"
       >
-        <div className="flex flex-col justify-between rounded-lg relative">
+        <div className="flex flex-col justify-between rounded-lg">
           <p className="text-sm font-primary text-tertiary-gray">Current Dashboard :</p>
           <div className="flex flex-row align-middle gap-1">
             <p className="text-3xl">{userData?.username}</p>
@@ -113,59 +113,11 @@ export const PersonalDashboard = (props: DashboardProps) => {
             </button>
           </div>
           {teamSelect && (
-            <div className="absolute top-full p-4 min-w-[33%] right-0 bg-secondary-border z-50 rounded-md">
-              <h1 className="text-2xl">Dashboard Selector</h1>
-              <p className="text-xl mt-4 text-secondary-orange">Personal Account:</p>
-              <p>{userData?.username}</p>
-              {userData?.memberTeamId ? (
-                <div>
-                  <p className="text-xl mt-4 text-secondary-orange">Team:</p>
-                  <Link to={`/alpha/team/${userData.MemberTeam?.id}`}>
-                    {userData.MemberTeam?.name}
-                  </Link>
-                </div>
-              ) : (
-                <div>
-                  <div className="flex flex-row mt-4 justify-between">
-                    <p>Create Team</p>
-                    <button onClick={() => setCreateTeam(!createTeam)}>
-                      {createTeam ? <X size={20} /> : <PlusCircle size={20} />}
-                    </button>
-                  </div>
-
-                  {createTeam && (
-                    <Form method="post" className="flex flex-col">
-                      <input
-                        type="hidden"
-                        name="githubInstallationId"
-                        value={userData?.githubInstallationId as string}
-                      />
-                      <input type="hidden" name="formType" value="createTeam" />
-                      <input
-                        type="text"
-                        maxLength={20}
-                        name="teamName"
-                        placeholder="Team Name"
-                        className="bg-transparent outline-none border-0 px-0 text-left focus:ring-0"
-                      />
-                      <button type="submit" className="flex items-center justify-center">
-                        {navigation.state == "submitting" &&
-                        navigation.formData?.get("formType") == "createTeam" ? (
-                          <div className="animate-spin">
-                            <Loader size={20} />
-                          </div>
-                        ) : (
-                          "Create"
-                        )}
-                      </button>
-                    </Form>
-                  )}
-                  {actionArgs?.originCallForm == "createTeam" && actionArgs.error && (
-                    <p className="text-red-500 text-base">{actionArgs.error}</p>
-                  )}
-                </div>
-              )}
-            </div>
+            <DashboardSelector
+              userData={userData}
+              navigation={navigation}
+              actionArgs={actionArgs}
+            />
           )}
         </div>
         <div className="flex flex-col ml-16">
