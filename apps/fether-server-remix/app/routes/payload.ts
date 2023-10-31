@@ -79,6 +79,7 @@ export const action = async ({ request }: ActionArgs) => {
 
                 let bytecode = validatedJSON.bytecode.object as `0x${string}`;
                 let abi = Abi.parse(fileJSON.abi);
+                console.log(abi);
                 let dbAbi = JSON.stringify(fileJSON.abi);
                 let deployerAddress = associatedRepo.deployerAddress as `0x${string}`;
 

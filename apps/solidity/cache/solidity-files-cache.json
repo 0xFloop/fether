@@ -952,8 +952,8 @@
       }
     },
     "src/Counter.sol": {
-      "lastModificationDate": 1698776134447,
-      "contentHash": "80c2ec2fd66e073a9c7bab790c1066c6",
+      "lastModificationDate": 1698776291553,
+      "contentHash": "470d466777cc550825217b015756d296",
       "sourceName": "src/Counter.sol",
       "solcConfig": {
         "settings": {
