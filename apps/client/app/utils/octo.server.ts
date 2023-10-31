@@ -89,15 +89,19 @@ export const getRootDir = async (githubInstallationId: string): Promise<string> 
 
     for (let i = 0; i < repoRootFolder.data.length; i++) {
       if (repoRootFolder.data[i].type == "dir" && repoRootFolder.data[i].name == "apps") {
-        let appsFolder = await octokit.request("GET /repos/{owner}/{repo}/contents/{path}", {
-          owner: ownerName,
-          repo: repoName,
-          path: repoRootFolder.data[i].path,
-          headers: {
-            "X-GitHub-Api-Version": "2022-11-28",
-            Accept: "application/vnd.github.raw",
-          },
-        });
+        let appsFolder = await octokit.request(
+          "GET /repos/{owner}/{repo}/contents/{path}?ref={branchName}",
+          {
+            owner: ownerName,
+            repo: repoName,
+            path: repoRootFolder.data[i].path,
+            branchName: repoData?.Repository?.branchName,
+            headers: {
+              "X-GitHub-Api-Version": "2022-11-28",
+              Accept: "application/vnd.github.raw",
+            },
+          }
+        );
         let zodAppsFolderArray = zodArrayOfGithubFiles.safeParse(appsFolder.data);
 
         if (!zodAppsFolderArray.success) throw new Error("No solidity src folder found");
@@ -153,15 +157,19 @@ export const getRootDirTeam = async (
 
     for (let i = 0; i < repoRootFolder.data.length; i++) {
       if (repoRootFolder.data[i].type == "dir" && repoRootFolder.data[i].name == "apps") {
-        let appsFolder = await octokit.request("GET /repos/{owner}/{repo}/contents/{path}", {
-          owner: ownerName,
-          repo: repoName,
-          path: repoRootFolder.data[i].path,
-          headers: {
-            "X-GitHub-Api-Version": "2022-11-28",
-            Accept: "application/vnd.github.raw",
-          },
-        });
+        let appsFolder = await octokit.request(
+          "GET /repos/{owner}/{repo}/contents/{path}?ref={branchName}",
+          {
+            owner: ownerName,
+            repo: repoName,
+            path: repoRootFolder.data[i].path,
+            branchName: repoData?.branchName,
+            headers: {
+              "X-GitHub-Api-Version": "2022-11-28",
+              Accept: "application/vnd.github.raw",
+            },
+          }
+        );
         let zodAppsFolderArray = zodArrayOfGithubFiles.safeParse(appsFolder.data);
 
         if (!zodAppsFolderArray.success) throw new Error("No solidity src folder found");
@@ -209,15 +217,19 @@ export const getSolFileNames = async (
 
   if (!ownerName || !repoName) throw new Error("No owner or repo name found");
 
-  let contractSrcFolder = await octokit.request("GET /repos/{owner}/{repo}/contents/{path}", {
-    owner: ownerName,
-    repo: repoName,
-    path: foundryRootDir == "" ? "src" : foundryRootDir + "/src",
-    headers: {
-      "X-GitHub-Api-Version": "2022-11-28",
-      Accept: "application/vnd.github.raw",
-    },
-  });
+  let contractSrcFolder = await octokit.request(
+    "GET /repos/{owner}/{repo}/contents/{path}?ref={branchName}",
+    {
+      owner: ownerName,
+      repo: repoName,
+      path: foundryRootDir == "" ? "src" : foundryRootDir + "/src",
+      branchName: repoData?.Repository?.branchName,
+      headers: {
+        "X-GitHub-Api-Version": "2022-11-28",
+        Accept: "application/vnd.github.raw",
+      },
+    }
+  );
 
   let zodFileArray = zodArrayOfGithubFiles.safeParse(contractSrcFolder.data);
 
@@ -246,15 +258,19 @@ export const chooseFileToTrack = async (
 
   let byteCodePath = rootDir + "/out/" + newFileName + "/" + newFileName?.split(".")[0] + ".json";
 
-  let contentsReq = await octokit.request("GET /repos/{owner}/{repo}/contents/{path}", {
-    owner: userName,
-    repo: repoName,
-    path: byteCodePath,
-    headers: {
-      "X-GitHub-Api-Version": "2022-11-28",
-      Accept: "application/vnd.github.raw",
-    },
-  });
+  let contentsReq = await octokit.request(
+    "GET /repos/{owner}/{repo}/contents/{path}?ref={branchName}",
+    {
+      owner: userName,
+      repo: repoName,
+      path: byteCodePath,
+      branchName: repoData.branchName,
+      headers: {
+        "X-GitHub-Api-Version": "2022-11-28",
+        Accept: "application/vnd.github.raw",
+      },
+    }
+  );
   let fileJSON = JSON.parse(contentsReq.data.toString());
   let dbAbi = JSON.stringify(fileJSON.abi);
 

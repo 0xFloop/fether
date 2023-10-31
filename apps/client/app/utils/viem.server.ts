@@ -45,7 +45,7 @@ export const deployContract = async (
   let byteCodePath = rootDir + "/out/" + fileName + "/" + fileName?.split(".")[0] + ".json";
 
   let contentsReq = await octokit.request(
-    "GET /repos/{owner}/{repo}/contents/{path}/?ref={branchName}",
+    "GET /repos/{owner}/{repo}/contents/{path}?ref={branchName}",
     {
       owner: userName,
       repo: repoName,
