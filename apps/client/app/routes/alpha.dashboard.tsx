@@ -29,12 +29,12 @@ import SetupWizard from "~/components/SetupWizard";
 import { PersonalDashboard } from "~/components/PersonalDashboard";
 import { BackgroundLines } from "~/components/BackgroundLines";
 
-//TODO: finish construcot args modal update
 //TODO: fix/improve fether blockchain setup
-//TODO: update team dash to new dashboard
+//TODO: fix deployed function calls not working
 
 //STRETCHTODO: add ability to deploy multiple contracts
 //STRETCHTODO: add ability to switch between deployments for all your branches
+//STRETCHTODO: add ability to pull contract and redeploy from mainnet for your contract to interact with
 
 export const meta: V2_MetaFunction<typeof loader> = ({ data }) => {
   return [{ title: ("Fether | " + data?.userData?.username) as string }];
