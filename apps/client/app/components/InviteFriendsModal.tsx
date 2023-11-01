@@ -1,5 +1,6 @@
 import { Copy, X } from "lucide-react";
 import { DisplayCodesContextType, UserWithKeyRepoActivityTeam } from "~/types";
+import { PopupModal } from "./PopupModal";
 
 type InviteModalProps = {
   userData: UserWithKeyRepoActivityTeam;
@@ -8,41 +9,43 @@ type InviteModalProps = {
 
 export const InviteFriendsModal = (props: InviteModalProps) => {
   return (
-    <div className="fixed top-0 left-0 z-50 flex items-center justify-center h-screen w-screen">
-      <span className="bg-primary-gray opacity-70 absolute top-0 left-0 h-screen w-screen"></span>
-      <div className="p-10 bg-secondary-border font-primary relative rounded-lg">
-        <button
-          onClick={() => props.displayCodes.setDisplayInviteCodes(false)}
-          className="absolute top-4 right-4"
-        >
-          <X />
-        </button>
-        <h1 className="text-4xl font-black">Invite friends!</h1>
-        <p className="mt-4 text-xl">Have a friend you think might benefit from fether?</p>
-        <p className="mt-4 text-xl">
-          Send them one of your invite codes below and they can try it out!
+    <PopupModal display={true} displaySetter={props.displayCodes.setDisplayInviteCodes}>
+      <div className="text-center">
+        <h1 className="text-xl font-black">Know someone who needs Fether?</h1>
+        <p className="mt-4 text-base">
+          Send 'em one of your invite codes below and they <br /> can experience the magic
+          themselves.
         </p>
-        <div className="flex flex-row justify-evenly mt-4">
-          {props.userData?.IssuedInviteCodes?.map((code) => (
-            <div className="flex flex-col items-center">
-              <p className={code.keyStatus == "UNUSED" ? "text-green-400" : "text-red-400"}>
-                {code.keyStatus.slice(0, 1) + code.keyStatus.toLowerCase().slice(1)}
-              </p>
-              <div className="flex flex-row text-base items-center">
-                <p>{code.inviteCode}</p>
-                {code.keyStatus == "UNUSED" && (
-                  <button onClick={() => navigator.clipboard.writeText(code.inviteCode)}>
-                    <Copy
-                      className="transform ml-4 active:scale-75 transition-transform"
-                      size={16}
-                    />
-                  </button>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
       </div>
-    </div>
+      <div className="flex flex-row justify-evenly mt-9">
+        {props.userData?.IssuedInviteCodes?.map((code) => (
+          <>
+            {code.keyStatus == "UNUSED" ? (
+              <button
+                className="flex flex-col items-center"
+                onClick={() => navigator.clipboard.writeText(code.inviteCode)}
+              >
+                <div className="border border-off-white rounded-lg py-2 px-4">
+                  <p className="text-off-white/50 text-xs">
+                    {code.keyStatus.slice(0, 1) + code.keyStatus.toLowerCase().slice(1)}
+                  </p>
+                  <p className="font-bold text-base">{code.inviteCode}</p>
+                </div>
+                <p className="font-bold text-base text-secondary-orange mt-2">Copy Code</p>
+              </button>
+            ) : (
+              <button className="flex flex-col items-center">
+                <div className="border border-off-white/25 rounded-lg py-2 px-4">
+                  <p className="text-off-white/50 text-xs">
+                    {code.keyStatus.slice(0, 1) + code.keyStatus.toLowerCase().slice(1)}
+                  </p>
+                  <p className="font-bold text-base text-off-white/25">{code.inviteCode}</p>
+                </div>
+              </button>
+            )}
+          </>
+        ))}
+      </div>
+    </PopupModal>
   );
 };

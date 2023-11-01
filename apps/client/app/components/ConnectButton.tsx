@@ -1,4 +1,5 @@
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { ArrowUpRight } from "lucide-react";
 export const CustomConnectButton = () => {
   return (
     <ConnectButton.Custom>
@@ -35,11 +36,12 @@ export const CustomConnectButton = () => {
                 return (
                   <button
                     data-connected={Boolean(account)}
-                    className="text-[#f0f0f0] bg-almost-black py-2 px-4  rounded-lg"
+                    className="text-secondary-orange text-3xl flex flex-row items-center"
                     onClick={openConnectModal}
                     type="button"
                   >
-                    Connect
+                    Connect Wallet{" "}
+                    <ArrowUpRight className="ml-2" size={24} color="rgb(156 163 175)" />
                   </button>
                 );
               }
@@ -47,7 +49,7 @@ export const CustomConnectButton = () => {
                 return (
                   <button
                     data-connected={Boolean(account)}
-                    className="text-[#f0f0f0] bg-red-500 py-2 px-4 rounded-lg"
+                    className="text-red-500 text-3xl flex flex-row items-center"
                     onClick={openChainModal}
                     type="button"
                   >
@@ -58,11 +60,12 @@ export const CustomConnectButton = () => {
               return (
                 <button
                   data-connected={Boolean(account)}
-                  className="text-[#f0f0f0] bg-almost-black py-2 px-4  rounded-lg"
+                  className="text-secondary-orange text-3xl flex flex-row items-center"
                   onClick={openAccountModal}
                   type="button"
                 >
-                  {account.displayName}
+                  {account.displayName}{" "}
+                  <ArrowUpRight className="ml-2" size={24} color="rgb(156 163 175)" />
                   {/* {account.displayBalance ? ` (${account.displayBalance})` : ""} */}
                 </button>
               );

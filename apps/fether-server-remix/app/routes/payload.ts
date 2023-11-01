@@ -35,8 +35,10 @@ export const action = async ({ request }: ActionArgs) => {
         : associatedRepo.associatedTeam;
 
       if (!branchChanged) {
+        console.log("branch changed, but not the one we're looking for");
         continue;
       }
+      console.log("correct branch changed");
 
       if (associatedData?.ApiKey) {
         for (let i = 0; i < reqBody.commits.length; i++) {
@@ -58,8 +60,10 @@ export const action = async ({ request }: ActionArgs) => {
                 let byteCodePath =
                   rootDir + "/out/" + fileName + "/" + fileName?.split(".")[0] + ".json";
 
+                console.log(associatedRepo.branchName);
+
                 let contentsReq = await octokit.request(
-                  "GET /repos/{owner}/{repo}/contents/{path}/?ref={branchName}",
+                  "GET /repos/{owner}/{repo}/contents/{path}?ref={branchName}",
                   {
                     owner: userName,
                     repo: repoName,
@@ -77,6 +81,7 @@ export const action = async ({ request }: ActionArgs) => {
 
                 let bytecode = validatedJSON.bytecode.object as `0x${string}`;
                 let abi = Abi.parse(fileJSON.abi);
+                console.log(abi);
                 let dbAbi = JSON.stringify(fileJSON.abi);
                 let deployerAddress = associatedRepo.deployerAddress as `0x${string}`;
 

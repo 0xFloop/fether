@@ -1,7 +1,0 @@
-node_modules
-build
-api
-/.cache
-/build
-/public/build
-.env
