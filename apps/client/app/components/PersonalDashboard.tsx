@@ -326,7 +326,11 @@ export const PersonalDashboard = (props: DashboardProps) => {
                           display={constructorArgModal}
                           displaySetter={setConstructorArgModal}
                         >
-                          <Form method="post" key="updateConstructorArgsForm">
+                          <Form
+                            method="post"
+                            key="updateConstructorArgsForm"
+                            className="mt-5 pb-10"
+                          >
                             <input
                               type="hidden"
                               name="githubInstallationId"
@@ -338,26 +342,33 @@ export const PersonalDashboard = (props: DashboardProps) => {
                               name="formType"
                               value="updateConstructorArgs"
                             />
-
-                            <h1>
-                              Current cached constructor args:{" "}
-                              {userData.Repository.cachedConstructorArgs}
-                            </h1>
-                            <h1>Input new constructor args below.</h1>
-                            {parsedAbi.map(
-                              (method, i) =>
-                                method.type == "constructor" &&
-                                method.inputs.length > 0 &&
-                                method.inputs.map((input, i) => (
-                                  <input
-                                    key={"constructorArg-" + i}
-                                    type="text"
-                                    name={"constructorArg-" + i}
-                                    placeholder={input.type + " " + input.name}
-                                    className="bg-transparent rounded-lg ml-12"
-                                  />
-                                ))
-                            )}
+                            <h1>Input new constructor args into the corresponding field.</h1>
+                            <div className="grid grid-cols-2 mt-6">
+                              {parsedAbi.map(
+                                (method, i) =>
+                                  method.type == "constructor" &&
+                                  method.inputs.length > 0 &&
+                                  method.inputs.map((input, i) => (
+                                    <div className="flex flex-col justify-center items-center text-center">
+                                      <p className="text-sm text-off-white/50">
+                                        {input.type + " " + input.name}
+                                      </p>
+                                      <input
+                                        key={"constructorArg-" + i}
+                                        type="text"
+                                        name={"constructorArg-" + i}
+                                        placeholder={
+                                          "Current: " +
+                                          JSON.parse(
+                                            userData?.Repository?.cachedConstructorArgs as string
+                                          )[i]
+                                        }
+                                        className="bg-transparent mt-1 text-center focus:border-off-white  focus:ring-0"
+                                      />
+                                    </div>
+                                  ))
+                              )}
+                            </div>
                             <input
                               key="numOfArgsFromInputNewConstructorArgs"
                               type="hidden"
@@ -368,23 +379,19 @@ export const PersonalDashboard = (props: DashboardProps) => {
                                   : 0
                               }
                             />
-                            <button
-                              key="updateConstructorArgsButton"
-                              className="text-xl text-[#f0f0f0] bg-almost-black py-2 px-4 rounded-lg"
-                              type="submit"
-                            >
-                              {navigation.state == "submitting" &&
-                              navigation.formData?.get("formType") == "updateConstructorArgs" ? (
-                                <div className="flex flex-row items-center">
+                            <div className="flex w-full justify-center mt-10">
+                              <button
+                                type="submit"
+                                className=" bg-secondary-orange py-3 px-20 rounded-full"
+                              >
+                                {navigation.state == "submitting" &&
+                                navigation.formData?.get("formType") == "updateConstructorArgs" ? (
                                   <p>Updating</p>
-                                  <div className="animate-spin ml-2">
-                                    <Loader size={20} />
-                                  </div>
-                                </div>
-                              ) : (
-                                <p>Update</p>
-                              )}
-                            </button>
+                                ) : (
+                                  <p>Update</p>
+                                )}
+                              </button>
+                            </div>
                           </Form>
                         </PopupModal>
                       </>
@@ -671,7 +678,7 @@ export const PersonalDashboard = (props: DashboardProps) => {
                                                 setFunctionCalled(null);
                                               }
                                             }}
-                                            className="text-[#f0f0f0] bg-almost-black py-2 px-6 rounded-full disabled:bg-[#cbcbcb]"
+                                            className="border border-off-white/25  bg-almost-black py-2 px-6 rounded-full disabled:bg-[#cbcbcb]"
                                           >
                                             {functionCalled == method.name ? (
                                               <div className="flex flex-row items-center">
@@ -740,7 +747,7 @@ export const PersonalDashboard = (props: DashboardProps) => {
                                                   setFunctionCalled(null);
                                                 }
                                               }}
-                                              className="text-[#f0f0f0] bg-almost-black py-2 px-6  rounded-full disabled:bg-[#cbcbcb]"
+                                              className="border border-off-white/25 bg-almost-black py-2 px-6  rounded-full disabled:bg-[#cbcbcb]"
                                             >
                                               {functionCalled == method.name ? (
                                                 <div className="flex flex-row items-center">
@@ -841,7 +848,7 @@ export const PersonalDashboard = (props: DashboardProps) => {
                                                   }
                                                 }
                                               }}
-                                              className="text-[#f0f0f0] bg-almost-black py-2 px-6 rounded-full disabled:bg-[#cbcbcb]"
+                                              className="border border-off-white/25  bg-almost-black py-2 px-6 rounded-full disabled:bg-[#cbcbcb]"
                                               disabled={!Boolean(address)}
                                             >
                                               {functionCalled == method.name ? (
@@ -912,7 +919,7 @@ export const PersonalDashboard = (props: DashboardProps) => {
                                                     }
                                                   }
                                                 }}
-                                                className="text-[#f0f0f0] bg-almost-black py-2 px-6  rounded-full disabled:bg-[#cbcbcb]"
+                                                className="border border-off-white/25  bg-almost-black py-2 px-6  rounded-full disabled:bg-[#cbcbcb]"
                                                 disabled={!Boolean(address)}
                                               >
                                                 {functionCalled == method.name ? (
@@ -985,77 +992,79 @@ export const PersonalDashboard = (props: DashboardProps) => {
                               {deployStatus}
                             </button>
                           )}
-                          {openDeployContractModal && (
-                            <div className="absolute top-0 left-0 z-50 flex items-center justify-center h-screen w-screen">
-                              <div className="absolute left-1/4 w-1/2 p-5 pb-10 bg-secondary-gray border border-white rounded-lg">
-                                <button
-                                  key={"closeDeployContractModalButton"}
-                                  onClick={() => setOpenDeployContractModal(false)}
-                                  className="absolute top-4 right-4"
-                                >
-                                  <X />
-                                </button>
-                                <h1>
-                                  Input constructor args to {deployStatus.toLowerCase()} your
-                                  contract!
-                                </h1>
+                          <PopupModal
+                            display={openDeployContractModal}
+                            displaySetter={setOpenDeployContractModal}
+                          >
+                            <div className="pb-10 mt-5">
+                              <h1 className="text-lg">
+                                Input constructor args to {deployStatus.toLowerCase()} your
+                                contract!
+                              </h1>
 
-                                <input
-                                  className="focus:outline-none rounded-xl focus:border-none ring-0 focus:ring-0"
-                                  type="checkbox"
-                                  name="useCachedArgs"
-                                  id="useCachedArgs"
-                                />
-                                <label
-                                  className="ml-2 text-base align-middle"
-                                  htmlFor="useCachedArgs"
-                                >
-                                  Use cached constructor args?
-                                </label>
+                              <input
+                                className="focus:outline-none rounded-xl focus:border-none ring-0 focus:ring-0"
+                                type="checkbox"
+                                name="useCachedArgs"
+                                id="useCachedArgs"
+                              />
+                              <label
+                                className="ml-2 text-base align-middle"
+                                htmlFor="useCachedArgs"
+                              >
+                                Use cached constructor args?
+                              </label>
+                              <div className="grid grid-cols-2 gap-2 mt-6">
                                 {parsedAbi.map(
                                   (method, i) =>
                                     method.type == "constructor" &&
                                     method.inputs.length > 0 &&
                                     method.inputs.map((input, i) => (
-                                      <input
-                                        key={"constructorArg-" + i}
-                                        type="text"
-                                        name={"constructorArg-" + i}
-                                        placeholder={input.type + " " + input.name}
-                                        className="bg-transparent rounded-lg ml-12"
-                                      />
+                                      <div className="flex flex-col justify-center items-center text-center">
+                                        <p className="text-sm text-off-white/50">
+                                          {input.type + " " + input.name}
+                                        </p>
+                                        <input
+                                          key={"constructorArg-" + i}
+                                          type="text"
+                                          name={"constructorArg-" + i}
+                                          placeholder={
+                                            "Current: " +
+                                            JSON.parse(
+                                              userData?.Repository?.cachedConstructorArgs as string
+                                            )[i]
+                                          }
+                                          className="bg-transparent mt-1 text-center focus:border-off-white  focus:ring-0"
+                                        />
+                                      </div>
                                     ))
                                 )}
-                                <input
-                                  type="hidden"
-                                  name="numOfArgs"
-                                  value={
-                                    parsedAbi[0].type == "constructor" &&
-                                    parsedAbi[0].inputs.length > 0
-                                      ? parsedAbi[0].inputs.length
-                                      : 0
-                                  }
-                                />
+                              </div>
+                              <input
+                                type="hidden"
+                                name="numOfArgs"
+                                value={
+                                  parsedAbi[0].type == "constructor" &&
+                                  parsedAbi[0].inputs.length > 0
+                                    ? parsedAbi[0].inputs.length
+                                    : 0
+                                }
+                              />
+                              <div className="flex w-full justify-center mt-10">
                                 <button
-                                  key={"deployContractButtonWithinModal"}
-                                  className="text-base border border-off-white/50 text-[#f0f0f0] bg-almost-black py-2 px-4 rounded-full"
                                   type="submit"
+                                  className=" bg-secondary-orange text-xl py-3 px-20 rounded-full"
                                 >
                                   {navigation.state == "submitting" &&
                                   navigation.formData?.get("formType") == "deployContract" ? (
-                                    <div className="flex flex-row items-center">
-                                      <p>Deploying</p>
-                                      <div className="animate-spin ml-2">
-                                        <Loader size={20} />
-                                      </div>
-                                    </div>
+                                    <p>Deploying</p>
                                   ) : (
                                     <p>{deployStatus}</p>
                                   )}
                                 </button>
                               </div>
                             </div>
-                          )}
+                          </PopupModal>
                         </>
                       ) : (
                         <button
