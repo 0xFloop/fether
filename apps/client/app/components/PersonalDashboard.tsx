@@ -357,12 +357,7 @@ export const PersonalDashboard = (props: DashboardProps) => {
                                         key={"constructorArg-" + i}
                                         type="text"
                                         name={"constructorArg-" + i}
-                                        placeholder={
-                                          "Current: " +
-                                          JSON.parse(
-                                            userData?.Repository?.cachedConstructorArgs as string
-                                          )[i]
-                                        }
+                                        placeholder={"Current: " + parsedAbi[i]}
                                         className="bg-transparent mt-1 text-center focus:border-off-white  focus:ring-0"
                                       />
                                     </div>
@@ -972,7 +967,7 @@ export const PersonalDashboard = (props: DashboardProps) => {
               <div className="flex flex-col w-full xl:flex-1 gap-10 py-12 pl-12 pr-16">
                 <div className="min-h-[50%] bg-secondary-gray border border-off-white/25  shadow-md	p-5 rounded-lg ">
                   <div className="flex flex-row justify-between align-middle items-center">
-                    <p className=" ">Transactions</p>
+                    <p className="font-bold">Transactions</p>
                     <Form method="post" className="flex items-center">
                       <input
                         type="hidden"
@@ -1028,12 +1023,7 @@ export const PersonalDashboard = (props: DashboardProps) => {
                                           key={"constructorArg-" + i}
                                           type="text"
                                           name={"constructorArg-" + i}
-                                          placeholder={
-                                            "Current: " +
-                                            JSON.parse(
-                                              userData?.Repository?.cachedConstructorArgs as string
-                                            )[i]
-                                          }
+                                          placeholder={"Current: " + parsedAbi[i]}
                                           className="bg-transparent mt-1 text-center focus:border-off-white  focus:ring-0"
                                         />
                                       </div>
