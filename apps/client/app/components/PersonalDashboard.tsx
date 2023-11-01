@@ -29,6 +29,7 @@ import * as Accordion from "@radix-ui/react-accordion";
 import TxViewer from "./TxViewer";
 import { InviteFriendsModal } from "./InviteFriendsModal";
 import { DashboardSelector } from "./DashboardSelector";
+import { PopupModal } from "./PopupModal";
 
 export interface DashboardProps {
   userData: UserWithKeyRepoActivityTeam;
@@ -98,13 +99,13 @@ export const PersonalDashboard = (props: DashboardProps) => {
   };
 
   return (
-    <div className="max-w-screen font-primary h-auto min-h-screen display flex flex-col items-center justify-center">
+    <div className="flex flex-col font-primary min-h-screen">
       <div
         id="dashboard-top-bar"
         className="mt-20 px-20 border-b border-b-off-white/25 text-white w-full bg-[#27262B] h-32 flex flex-row items-center justify-between relative"
       >
         <div className="flex flex-col justify-between rounded-lg">
-          <p className="text-sm font-primary text-tertiary-gray">Current Dashboard :</p>
+          <p className="text-sm text-tertiary-gray">Current Dashboard :</p>
           <div className="flex flex-row align-middle gap-1">
             <p className="text-3xl">{userData?.username}</p>
 
@@ -121,7 +122,7 @@ export const PersonalDashboard = (props: DashboardProps) => {
           )}
         </div>
         <div className="flex flex-col ml-16">
-          <p className="text-sm font-primary text-tertiary-gray">Api Key :</p>
+          <p className="text-sm   text-tertiary-gray">Api Key :</p>
           <div className="flex flex-row items-center gap-2">
             <p className="text-3xl">
               {userData?.ApiKey?.key.slice(0, 5)}••••
@@ -151,7 +152,7 @@ export const PersonalDashboard = (props: DashboardProps) => {
             <button
               type="submit"
               disabled={true}
-              className="bg-almost-black/25 text-off-white/25 border border-off-white/25 ml-6  py-2 px-8 rounded-full mt-2 text-base float-right"
+              className="bg-almost-black/25 text-off-white/25 border border-off-white/25 ml-6 py-2 px-8 rounded-full mt-2 text-base float-right"
             >
               Add FEth
             </button>
@@ -194,16 +195,16 @@ export const PersonalDashboard = (props: DashboardProps) => {
         userData.Repository.filename &&
         userData.ApiKey &&
         userData.ApiKey.key && (
-          <div id="content" className="w-full text-white">
+          <div className="flex-1 flex flex-col text-white">
             {displayCodes.displayInviteCodes && (
               <InviteFriendsModal userData={userData} displayCodes={displayCodes} />
             )}
-            <div className="w-full text-4xl flex flex-col xl:flex-row">
-              <div className="w-full xl:w-[40.9%] pb-5 bg-dark-gray border-r border-r-off-white/25">
+            <div className="w-full text-4xl h-full flex-1 flex flex-col xl:flex-row">
+              <div className="w-full xl:w-[40.5%] min-h-full pb-5 bg-dark-gray border-r border-r-off-white/25">
                 <div className="text-xl gap-3 border-b border-b-off-white/25 shadow-md p-5 flex flex-col">
-                  <p className="pb-2 text-4xl font-bold font-primary">Contract</p>
+                  <p className="pb-2 text-4xl font-bold  ">Contract</p>
                   <div className="flex flex-row justify-between rounded-lg">
-                    <p className="text-2xl font-primary text-tertiary-gray">Address</p>
+                    <p className="text-2xl   text-tertiary-gray">Address</p>
                     <div className="flex flex-row items-center">
                       <p>
                         {userData?.Repository?.contractAddress?.slice(0, 8)}••••
@@ -224,7 +225,7 @@ export const PersonalDashboard = (props: DashboardProps) => {
                     </div>
                   </div>
                   <div className="flex flex-row justify-between rounded-lg">
-                    <p className="text-2xl font-primary text-tertiary-gray">ABI</p>
+                    <p className="text-2xl   text-tertiary-gray">ABI</p>
                     <div className="flex flex-row items-center">
                       <button
                         onClick={() =>
@@ -238,7 +239,7 @@ export const PersonalDashboard = (props: DashboardProps) => {
                     </div>
                   </div>
                   <div className="flex flex-row justify-between rounded-lg">
-                    <p className="text-2xl font-primary text-tertiary-gray">Deployer</p>
+                    <p className="text-2xl   text-tertiary-gray">Deployer</p>
                     <div className="flex flex-row items-center">
                       <p>
                         {userData?.Repository?.deployerAddress?.slice(0, 8)}••••
@@ -264,63 +265,53 @@ export const PersonalDashboard = (props: DashboardProps) => {
                           />
                         </button>
                       </Form>
-                      {deployerModal && actionArgs?.originCallForm != "setDeployerAddress" && (
-                        <div className="fixed top-0 left-0 z-50 flex items-center justify-center h-screen w-screen">
-                          <div className="absolute left-1/4 w-1/2 p-5 pb-10 bg-secondary-gray border border-white rounded-lg">
-                            <div className="w-full justify-between flex flex-row">
-                              <p className="text-2xl">Update Deployer Address:</p>
-                              <button
-                                onClick={() => setDeployerModal(false)}
-                                className="float-right"
-                              >
-                                <X />
-                              </button>
-                            </div>
+                      <PopupModal
+                        display={
+                          deployerModal && actionArgs?.originCallForm != "setDeployerAddress"
+                        }
+                        displaySetter={setDeployerModal}
+                      >
+                        <p className="text-2xl">Update Deployer Address:</p>
+                        <Form method="post" className="w-11/12 mt-5 h-full">
+                          <input
+                            type="hidden"
+                            name="githubInstallationId"
+                            value={userData?.githubInstallationId?.toString()}
+                          />
+                          <input type="hidden" name="formType" value="setDeployerAddress" />
 
-                            <Form method="post" className="w-11/12 mt-5 h-full">
-                              <input
-                                type="hidden"
-                                name="githubInstallationId"
-                                value={userData?.githubInstallationId?.toString()}
-                              />
-                              <input type="hidden" name="formType" value="setDeployerAddress" />
-
-                              <div className="flex  overflow-hidden bg-white rounded-lg flex-row items-center justify-between w-full h-full">
-                                <input
-                                  className="text-lg outline-none border-none text-black px-2 w-5/6  bg-[#D9D9D9]"
-                                  name="deployerAddress"
-                                  placeholder="Input desired contract deployer address"
-                                  onChange={handleAddressChange}
-                                />
-                                <button
-                                  className="text-white h-full flex-1 text-xl disabled:bg-tertiary-gray bg-secondary-orange py-2 px-4"
-                                  type="submit"
-                                  disabled={!addressValid}
-                                >
-                                  {navigation.state == "submitting" &&
-                                  navigation.formData &&
-                                  navigation.formData.get("formType") == "setDeployerAddress" ? (
-                                    <div className="inline-block animate-spin">
-                                      <Loader size={20} />
-                                    </div>
-                                  ) : (
-                                    <p>Confirm</p>
-                                  )}
-                                </button>
-                              </div>
-                            </Form>
+                          <div className="flex  overflow-hidden bg-white rounded-lg flex-row items-center justify-between w-full h-full">
+                            <input
+                              className="text-lg outline-none border-none text-black px-2 w-5/6  bg-[#D9D9D9]"
+                              name="deployerAddress"
+                              placeholder="Input desired contract deployer address"
+                              onChange={handleAddressChange}
+                            />
+                            <button
+                              className="text-white h-full flex-1 text-xl disabled:bg-tertiary-gray bg-secondary-orange py-2 px-4"
+                              type="submit"
+                              disabled={!addressValid}
+                            >
+                              {navigation.state == "submitting" &&
+                              navigation.formData &&
+                              navigation.formData.get("formType") == "setDeployerAddress" ? (
+                                <div className="inline-block animate-spin">
+                                  <Loader size={20} />
+                                </div>
+                              ) : (
+                                <p>Confirm</p>
+                              )}
+                            </button>
                           </div>
-                        </div>
-                      )}
+                        </Form>
+                      </PopupModal>
                     </div>
                   </div>
                   {userData?.Repository?.cachedConstructorArgs &&
                     JSON.parse(userData?.Repository?.cachedConstructorArgs).length > 0 && (
                       <>
                         <div className="flex flex-row justify-between rounded-lg">
-                          <p className="text-2xl font-primary text-tertiary-gray">
-                            Constructor Args
-                          </p>
+                          <p className="text-2xl   text-tertiary-gray">Constructor Args</p>
                           <button
                             className="text-base rounded-full px-4 py-1 text-secondary-orange border border-off-white/50 transform ml-4 active:scale-75 transition-transform"
                             key="openUpdateConstructorArgModalButton"
@@ -331,84 +322,75 @@ export const PersonalDashboard = (props: DashboardProps) => {
                             Edit Args
                           </button>
                         </div>
-                        {constructorArgModal && (
-                          <div className="fixed top-0 left-0 z-50 flex items-center justify-center h-screen w-screen">
-                            <div className="absolute left-1/4 w-1/2 p-5 pb-10 bg-secondary-gray border border-white rounded-lg">
-                              <Form method="post" key="updateConstructorArgsForm">
-                                <input
-                                  type="hidden"
-                                  name="githubInstallationId"
-                                  value={userData?.githubInstallationId?.toString()}
-                                />
-                                <input
-                                  key="updateConstructorArgsFormType"
-                                  type="hidden"
-                                  name="formType"
-                                  value="updateConstructorArgs"
-                                />
-                                <button
-                                  key="closeUpdateConstructorArgModalButton"
-                                  onClick={() => setConstructorArgModal(false)}
-                                  className="absolute top-4 right-4"
-                                >
-                                  <X />
-                                </button>
-                                <h1>
-                                  Current cached constructor args:{" "}
-                                  {userData.Repository.cachedConstructorArgs}
-                                </h1>
-                                <h1>Input new constructor args below.</h1>
-                                {parsedAbi.map(
-                                  (method, i) =>
-                                    method.type == "constructor" &&
-                                    method.inputs.length > 0 &&
-                                    method.inputs.map((input, i) => (
-                                      <input
-                                        key={"constructorArg-" + i}
-                                        type="text"
-                                        name={"constructorArg-" + i}
-                                        placeholder={input.type + " " + input.name}
-                                        className="bg-transparent rounded-lg ml-12"
-                                      />
-                                    ))
-                                )}
-                                <input
-                                  key="numOfArgsFromInputNewConstructorArgs"
-                                  type="hidden"
-                                  name="numOfArgs"
-                                  value={
-                                    parsedAbi[0].type == "constructor" &&
-                                    parsedAbi[0].inputs.length > 0
-                                      ? parsedAbi[0].inputs.length
-                                      : 0
-                                  }
-                                />
-                                <button
-                                  key="updateConstructorArgsButton"
-                                  className="text-xl text-[#f0f0f0] bg-almost-black py-2 px-4 rounded-lg"
-                                  type="submit"
-                                >
-                                  {navigation.state == "submitting" &&
-                                  navigation.formData?.get("formType") ==
-                                    "updateConstructorArgs" ? (
-                                    <div className="flex flex-row items-center">
-                                      <p>Updating</p>
-                                      <div className="animate-spin ml-2">
-                                        <Loader size={20} />
-                                      </div>
-                                    </div>
-                                  ) : (
-                                    <p>Update</p>
-                                  )}
-                                </button>
-                              </Form>
-                            </div>
-                          </div>
-                        )}
+                        <PopupModal
+                          display={constructorArgModal}
+                          displaySetter={setConstructorArgModal}
+                        >
+                          <Form method="post" key="updateConstructorArgsForm">
+                            <input
+                              type="hidden"
+                              name="githubInstallationId"
+                              value={userData?.githubInstallationId?.toString()}
+                            />
+                            <input
+                              key="updateConstructorArgsFormType"
+                              type="hidden"
+                              name="formType"
+                              value="updateConstructorArgs"
+                            />
+
+                            <h1>
+                              Current cached constructor args:{" "}
+                              {userData.Repository.cachedConstructorArgs}
+                            </h1>
+                            <h1>Input new constructor args below.</h1>
+                            {parsedAbi.map(
+                              (method, i) =>
+                                method.type == "constructor" &&
+                                method.inputs.length > 0 &&
+                                method.inputs.map((input, i) => (
+                                  <input
+                                    key={"constructorArg-" + i}
+                                    type="text"
+                                    name={"constructorArg-" + i}
+                                    placeholder={input.type + " " + input.name}
+                                    className="bg-transparent rounded-lg ml-12"
+                                  />
+                                ))
+                            )}
+                            <input
+                              key="numOfArgsFromInputNewConstructorArgs"
+                              type="hidden"
+                              name="numOfArgs"
+                              value={
+                                parsedAbi[0].type == "constructor" && parsedAbi[0].inputs.length > 0
+                                  ? parsedAbi[0].inputs.length
+                                  : 0
+                              }
+                            />
+                            <button
+                              key="updateConstructorArgsButton"
+                              className="text-xl text-[#f0f0f0] bg-almost-black py-2 px-4 rounded-lg"
+                              type="submit"
+                            >
+                              {navigation.state == "submitting" &&
+                              navigation.formData?.get("formType") == "updateConstructorArgs" ? (
+                                <div className="flex flex-row items-center">
+                                  <p>Updating</p>
+                                  <div className="animate-spin ml-2">
+                                    <Loader size={20} />
+                                  </div>
+                                </div>
+                              ) : (
+                                <p>Update</p>
+                              )}
+                            </button>
+                          </Form>
+                        </PopupModal>
                       </>
                     )}
                   <div className="flex flex-row justify-between rounded-lg">
-                    <p className="text-2xl font-primary text-tertiary-gray">Last Deployment</p>
+                    <p className="text-2xl   text-tertiary-gray">Last Deployment</p>
                     <p>
                       {userData?.Repository?.lastDeployed
                         ? `${timeSince(userData?.Repository?.lastDeployed)} ago`
@@ -417,9 +399,9 @@ export const PersonalDashboard = (props: DashboardProps) => {
                   </div>
                 </div>
                 <div className="text-xl gap-3 border-b border-b-off-white/25 shadow-md p-5 flex flex-col">
-                  <p className="pb-2 text-4xl font-bold font-primary">Repository</p>
+                  <p className="pb-2 text-4xl font-bold  ">Repository</p>
                   <div className="flex flex-row justify-between rounded-lg">
-                    <p className="text-2xl font-primary text-tertiary-gray">Name</p>
+                    <p className="text-2xl   text-tertiary-gray">Name</p>
                     <div className="flex flex-row items-center">
                       <p>{userData.Repository.repoName} &nbsp;</p>{" "}
                       <Form method="post">
@@ -444,62 +426,53 @@ export const PersonalDashboard = (props: DashboardProps) => {
                         </button>
                       </Form>
                     </div>
-                    {actionArgs?.originCallForm == "getRepos" && (
-                      <div className="fixed top-0 left-0 z-50 flex items-center justify-center h-screen w-screen">
-                        <div className="absolute w-1/2 p-5 bg-secondary-gray border border-white rounded-lg">
-                          <div className="w-full justify-between flex flex-row">
-                            <p className="text-2xl">Choose Repository :</p>
-                            <Form method="post">
+                    <PopupModal
+                      display={actionArgs?.originCallForm == "getRepos"}
+                      displaySetter={() =>
+                        submit(null, { method: "post", action: "/alpha/dashboard" })
+                      }
+                    >
+                      <p className="text-2xl mt-3">Choose Repository :</p>
+                      <Form method="post" className="mt-5 pb-4">
+                        <input
+                          type="hidden"
+                          name="githubInstallationId"
+                          value={userData.githubInstallationId as string}
+                        />
+                        <input type="hidden" name="formType" value="getChosenRepo" />
+
+                        <fieldset className="grid grid-cols-2 gap-2">
+                          {actionArgs?.repositories?.map((repo) => (
+                            <label key={repo.repoName} className="text-base">
                               <input
-                                type="hidden"
-                                name="githubInstallationId"
-                                value={userData.githubInstallationId as string}
-                              />
-                              <button type="submit">
-                                <X />
-                              </button>
-                            </Form>
-                          </div>
-                          <Form method="post" className="mt-5">
-                            <input
-                              type="hidden"
-                              name="githubInstallationId"
-                              value={userData.githubInstallationId as string}
-                            />
-                            <input type="hidden" name="formType" value="getChosenRepo" />
-
-                            <fieldset className="grid grid-cols-2">
-                              {actionArgs.repositories?.map((repo) => (
-                                <label key={repo.repoName} className="text-xl">
-                                  <input
-                                    type="radio"
-                                    name="chosenRepoData"
-                                    value={[repo.repoName, repo.repoId]}
-                                  />{" "}
-                                  {repo.repoName}
-                                </label>
-                              ))}
-                            </fieldset>
-                            <br />
-
-                            <button
-                              type="submit"
-                              className=" bg-secondary-orange py-2 px-4  rounded-lg"
-                            >
-                              {navigation.state == "submitting" &&
-                              navigation.formData?.get("formType") == "getChosenRepo" ? (
-                                <p>Submitting....</p>
-                              ) : (
-                                <p>Submit</p>
-                              )}
-                            </button>
-                          </Form>
+                                type="radio"
+                                name="chosenRepoData"
+                                value={[repo.repoName, repo.repoId]}
+                                className="text-secondary-orange checked:outline-secondary-orange"
+                              />{" "}
+                              {repo.repoName}
+                            </label>
+                          ))}
+                        </fieldset>
+                        <br />
+                        <div className="flex w-full justify-center mt-4">
+                          <button
+                            type="submit"
+                            className=" bg-secondary-orange py-3 px-20 rounded-full"
+                          >
+                            {navigation.state == "submitting" &&
+                            navigation.formData?.get("formType") == "getChosenRepo" ? (
+                              <p>Updating</p>
+                            ) : (
+                              <p>Update</p>
+                            )}
+                          </button>
                         </div>
-                      </div>
-                    )}
+                      </Form>
+                    </PopupModal>
                   </div>
                   <div className="flex flex-row justify-between rounded-lg">
-                    <p className="text-2xl font-primary text-tertiary-gray">Branch</p>
+                    <p className="text-2xl   text-tertiary-gray">Branch</p>
                     <div className="flex flex-row items-center">
                       <p>{userData.Repository.branchName} &nbsp;</p>{" "}
                       <div>
@@ -524,58 +497,54 @@ export const PersonalDashboard = (props: DashboardProps) => {
                             )}
                           </button>
                         </Form>
-                        {actionArgs?.originCallForm == "getBranchesOfChosenRepo" && (
-                          <div className="fixed top-0 left-0 z-50 flex items-center justify-center h-screen w-screen">
-                            <div className="p-5 bg-secondary-gray border border-white rounded-lg">
-                              <div className="justify-between flex flex-row">
-                                <p className="text-2xl">Choose Branch To Track:</p>
-                                <Form method="post">
+                        <PopupModal
+                          display={actionArgs?.originCallForm == "getBranchesOfChosenRepo"}
+                          displaySetter={() =>
+                            submit(null, { method: "post", action: "/alpha/dashboard" })
+                          }
+                        >
+                          <Form method="post" className="mt-5 pb-5">
+                            <input
+                              type="hidden"
+                              name="githubInstallationId"
+                              value={userData.githubInstallationId as string}
+                            />
+                            <input type="hidden" name="formType" value="chooseBranch" />
+                            <fieldset className="grid grid-cols-2 gap-[2px] bg-white">
+                              {actionArgs?.branches?.map((branchName, i) => (
+                                <div key={i} className="p-4 text-base bg-dark-gray">
                                   <input
-                                    type="hidden"
-                                    name="githubInstallationId"
-                                    value={userData.githubInstallationId as string}
-                                  />
-                                  <button type="submit">
-                                    <X />
-                                  </button>
-                                </Form>
-                              </div>
-                              <Form method="post" className="mt-10">
-                                <input
-                                  type="hidden"
-                                  name="githubInstallationId"
-                                  value={userData.githubInstallationId as string}
-                                />
-                                <input type="hidden" name="formType" value="chooseBranch" />
-                                <fieldset className="grid grid-cols-2">
-                                  {actionArgs.branches?.map((branchName, i) => (
-                                    <label key={i} className="text-xl">
-                                      <input type="radio" name="choosenBranch" value={branchName} />{" "}
-                                      {branchName}
-                                    </label>
-                                  ))}
-                                </fieldset>
-                                <br />
-                                <button
-                                  type="submit"
-                                  className=" bg-secondary-orange py-2 px-4  rounded-lg"
-                                >
-                                  {navigation.state == "submitting" &&
-                                  navigation.formData?.get("formType") == "chooseBranch" ? (
-                                    <p>Submitting....</p>
-                                  ) : (
-                                    <p>Submit</p>
-                                  )}
-                                </button>
-                              </Form>
+                                    key={i}
+                                    className="text-secondary-orange checked:outline-secondary-orange"
+                                    type="radio"
+                                    name="choosenBranch"
+                                    value={branchName}
+                                  />{" "}
+                                  {branchName}
+                                </div>
+                              ))}
+                            </fieldset>
+                            <br />
+                            <div className="flex w-full justify-center mt-4">
+                              <button
+                                type="submit"
+                                className=" bg-secondary-orange py-3 px-20 rounded-full"
+                              >
+                                {navigation.state == "submitting" &&
+                                navigation.formData?.get("formType") == "chooseBranch" ? (
+                                  <p>Updating</p>
+                                ) : (
+                                  <p>Track Branch</p>
+                                )}
+                              </button>
                             </div>
-                          </div>
-                        )}
+                          </Form>
+                        </PopupModal>
                       </div>
                     </div>
                   </div>
                   <div className="flex flex-row justify-between rounded-lg">
-                    <p className="text-2xl font-primary text-tertiary-gray">Contract</p>
+                    <p className="text-2xl   text-tertiary-gray">Contract</p>
                     <div className="flex flex-row items-center">
                       <p>{userData.Repository.filename} &nbsp;</p>{" "}
                       <div>
@@ -600,63 +569,59 @@ export const PersonalDashboard = (props: DashboardProps) => {
                             )}
                           </button>
                         </Form>
-                        {actionArgs?.originCallForm == "getFilesOfChosenRepo" && (
-                          <div className="fixed top-0 left-0 z-50 flex items-center justify-center h-screen w-screen">
-                            <div className="p-5 bg-secondary-gray border border-white rounded-lg">
-                              <div className="justify-between flex flex-row">
-                                <p className="text-2xl">Choose File To Track:</p>
-                                <Form method="post">
+                        <PopupModal
+                          display={actionArgs?.originCallForm == "getFilesOfChosenRepo"}
+                          displaySetter={() =>
+                            submit(null, { method: "post", action: "/alpha/dashboard" })
+                          }
+                        >
+                          <div className="justify-between flex flex-row"></div>
+                          <Form method="post" className="mt-5 pb-5">
+                            <input
+                              type="hidden"
+                              name="githubInstallationId"
+                              value={userData.githubInstallationId as string}
+                            />
+                            <input type="hidden" name="formType" value="chooseFileToTrack" />
+                            <fieldset className="grid grid-cols-2 gap-[2px] bg-white">
+                              {actionArgs?.solFilesFromChosenRepo?.map((fileName, i) => (
+                                <div key={i} className="p-4 text-base bg-dark-gray">
                                   <input
-                                    type="hidden"
-                                    name="githubInstallationId"
-                                    value={userData.githubInstallationId as string}
-                                  />
-                                  <button type="submit">
-                                    <X />
-                                  </button>
-                                </Form>
-                              </div>
-                              <Form method="post" className="mt-10">
-                                <input
-                                  type="hidden"
-                                  name="githubInstallationId"
-                                  value={userData.githubInstallationId as string}
-                                />
-                                <input type="hidden" name="formType" value="chooseFileToTrack" />
-                                <fieldset className="grid grid-cols-2">
-                                  {actionArgs.solFilesFromChosenRepo?.map((fileName, i) => (
-                                    <label key={i} className="text-xl">
-                                      <input type="radio" name="chosenFileName" value={fileName} />
-                                      {fileName}
-                                    </label>
-                                  ))}
-                                </fieldset>
-                                <br />
-                                <button
-                                  type="submit"
-                                  className=" bg-secondary-orange py-2 px-4  rounded-lg"
-                                >
-                                  {navigation.state == "submitting" &&
-                                  navigation.formData?.get("formType") == "chooseFileToTrack" ? (
-                                    <p>Submitting....</p>
-                                  ) : (
-                                    <p>Submit</p>
-                                  )}
-                                </button>
-                              </Form>
+                                    type="radio"
+                                    name="chosenFileName"
+                                    className="text-secondary-orange checked:outline-secondary-orange"
+                                    value={fileName}
+                                  />{" "}
+                                  {fileName}
+                                </div>
+                              ))}
+                            </fieldset>
+                            <br />
+                            <div className="flex w-full justify-center mt-4">
+                              <button
+                                type="submit"
+                                className=" bg-secondary-orange py-3 px-20 rounded-full"
+                              >
+                                {navigation.state == "submitting" &&
+                                navigation.formData?.get("formType") == "chooseBranch" ? (
+                                  <p>Updating</p>
+                                ) : (
+                                  <p>Track File</p>
+                                )}
+                              </button>
                             </div>
-                          </div>
-                        )}
+                          </Form>
+                        </PopupModal>
                       </div>
                     </div>
                   </div>
                 </div>
                 <div className="flex p-5 flex-col">
                   <div className="flex flex-row justify-between">
-                    <p className="font-primary font-bold">Functions</p>
+                    <p className="  font-bold">Functions</p>
                   </div>
                   <ul className="flex flex-col gap-2">
-                    <p className="text-xl font-primary mt-4 text-tertiary-gray">Read</p>
+                    <p className="text-xl   mt-4 text-tertiary-gray">Read</p>
                     <div className="ml-4">
                       {parsedAbi.map((method, i: number) => (
                         <div key={i}>
@@ -820,7 +785,7 @@ export const PersonalDashboard = (props: DashboardProps) => {
                         </div>
                       ))}
                     </div>
-                    <p className="text-xl font-primary mt-4 text-tertiary-gray">Write</p>
+                    <p className="text-xl   mt-4 text-tertiary-gray">Write</p>
                     <div className="ml-4 flex flex-col gap-2">
                       {JSON.parse(userData?.Repository?.contractAbi).map(
                         (method: AbiFunctionType, i: number) => (
@@ -1000,7 +965,7 @@ export const PersonalDashboard = (props: DashboardProps) => {
               <div className="flex flex-col w-full xl:flex-1 gap-10 py-12 pl-12 pr-16">
                 <div className="min-h-[50%] bg-secondary-gray border border-off-white/25  shadow-md	p-5 rounded-lg ">
                   <div className="flex flex-row justify-between align-middle items-center">
-                    <p className="font-primary">Transactions</p>
+                    <p className=" ">Transactions</p>
                     <Form method="post" className="flex items-center">
                       <input
                         type="hidden"
@@ -1115,7 +1080,7 @@ export const PersonalDashboard = (props: DashboardProps) => {
                   </div>
                   <table className="table-fixed w-full mt-5">
                     <thead>
-                      <tr className="text-left text-tertiary-gray font-primary">
+                      <tr className="text-left text-tertiary-gray  ">
                         <th className="text-lg">Tx Hash</th>
                         <th className="text-lg">Function Name</th>
                         <th className="text-lg">Timestamp</th>

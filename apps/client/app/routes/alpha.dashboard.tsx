@@ -29,6 +29,7 @@ import SetupWizard from "~/components/SetupWizard";
 import { PersonalDashboard } from "~/components/PersonalDashboard";
 import { BackgroundLines } from "~/components/BackgroundLines";
 
+//TODO: finish construcot args modal update
 //TODO: fix/improve fether blockchain setup
 //TODO: update team dash to new dashboard
 
