@@ -519,7 +519,7 @@ export const PersonalDashboard = (props: DashboardProps) => {
                             <input type="hidden" name="formType" value="chooseBranch" />
                             <fieldset className="grid grid-cols-2 gap-[2px] bg-white">
                               {actionArgs?.branches?.map((branchName, i) => (
-                                <div key={i} className="p-4 text-base bg-dark-gray">
+                                <label key={i} className="p-4 text-base bg-dark-gray">
                                   <input
                                     key={i}
                                     className="text-secondary-orange checked:outline-secondary-orange"
@@ -528,7 +528,7 @@ export const PersonalDashboard = (props: DashboardProps) => {
                                     value={branchName}
                                   />{" "}
                                   {branchName}
-                                </div>
+                                </label>
                               ))}
                             </fieldset>
                             <br />
@@ -839,7 +839,6 @@ export const PersonalDashboard = (props: DashboardProps) => {
                                                     setFunctionReturn(returnedData);
                                                   } catch (error) {
                                                     setFunctionCalled(null);
-                                                    console.log(error.message);
                                                     throw error;
                                                   }
                                                 }
