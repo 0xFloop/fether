@@ -157,17 +157,19 @@ export const callContractFunction = async (
         returnItems.push(newReturnItem);
       }
     } else {
-      let newReturnItem: ContractReturnItem = {
-        type: method.outputs[0].type,
-        name: method.outputs[0].name ? (method.outputs[0].name as string) : method.outputs[0].type,
-        value: result?.toString(),
-      };
-      returnItems.push(newReturnItem);
+      if (method.outputs.length != 0) {
+        let newReturnItem: ContractReturnItem = {
+          type: method.outputs[0].type,
+          name: method.outputs[0].name
+            ? (method.outputs[0].name as string)
+            : method.outputs[0].type,
+          value: result?.toString(),
+        };
+        returnItems.push(newReturnItem);
+      }
     }
 
     let tx = await walletClient.writeContract(request);
-
-    //TODO idk wtf is going on here lol
     return {
       returnItems: returnItems,
       methodName: method.name,

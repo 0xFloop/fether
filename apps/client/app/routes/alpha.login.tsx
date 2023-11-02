@@ -1,5 +1,5 @@
 import { ActionArgs, LoaderArgs, json, redirect } from "@vercel/remix";
-import { Form, Link, useActionData, useLoaderData } from "@remix-run/react";
+import { Form, Link, useActionData, useLoaderData, useNavigation } from "@remix-run/react";
 import { db } from "../utils/db.server";
 import { getSession, commitSession } from "../utils/alphaAccessKeySession.server";
 import {
@@ -7,6 +7,7 @@ import {
   commitSession as userCommitSession,
 } from "../utils/alphaSession.server";
 import { BackgroundLines } from "~/components/BackgroundLines";
+import { Loader } from "lucide-react";
 
 export const loader = async ({ request }: LoaderArgs) => {
   let redirectUri = process.env.fetherGithubRedirectUri as string;
@@ -24,26 +25,40 @@ export const action = async ({ request }: ActionArgs) => {
   return redirect(url);
 };
 export default function Index() {
+  const navigation = useNavigation();
+
   return (
-    <div className="relative w-screen flex justify-center items-center min-h-screen h-full overflow-x-hidden bg-[url('/images/staticGrainSmallerest.png')] font-primary">
+    <div className="relative text-white w-screen flex justify-center items-center min-h-screen h-full overflow-x-hidden bg-[url('/images/staticGrainSmallerest.png')] font-primary">
       <BackgroundLines />
-      <div className="w-[500px] relative flex flex-col items-center px-10 py-20 border-x-2 border-white">
-        <img
-          className="w-16 absolute top-4 left-10"
-          src="/images/fetherLogoWhite.svg"
-          alt="fether logo"
-        />
+      <div className="border z-60 relative border-off-white flex flex-col px-16 pb-12 rounded-xl bg-dark-gray">
+        <span className="absolute w-full top-0 left-0 h-16 border-b border-b-off-white"></span>
+        <div className="h-16 w-full flex items-center py-4 justify-center">
+          <img src="/images/fetherLogoWhite.svg" className="h-9" />
+          <h2 className="text-xs ml-2">
+            BETA VERSION <span className="text-secondary-orange">0.0.03</span>
+          </h2>
+        </div>
+
         <h1 className="text-xl mt-10 text-white">
-          Fether utilizes Log In With GitHub to streamline the GitHub integration necessary for
-          continuous contract tracking.
+          Fether utilizes Log In With GitHub to streamline the GitHub
+          <br />
+          integration necessary for continuous contract tracking.
         </h1>
         <Form method="post">
-          <button
-            type="submit"
-            className="border select-none bg-secondary-orange border-off-white/25 text-white py-4 px-14 text-xl text-center rounded-full mt-10"
-          >
-            Log in with GitHub
-          </button>
+          <div className="flex w-full justify-center mt-10">
+            <button type="submit" className=" bg-secondary-orange py-3 px-20 rounded-full">
+              {navigation.state == "submitting" ? (
+                <div className="flex flex-row items-center">
+                  <p>Logging In </p>
+                  <div className="ml-2 animate-spin">
+                    <Loader size={20} />
+                  </div>
+                </div>
+              ) : (
+                <p>Log in with GitHub</p>
+              )}
+            </button>
+          </div>
         </Form>
       </div>
     </div>
