@@ -357,7 +357,12 @@ export const PersonalDashboard = (props: DashboardProps) => {
                                         key={"constructorArg-" + i}
                                         type="text"
                                         name={"constructorArg-" + i}
-                                        placeholder={"Current: " + parsedAbi[i]}
+                                        placeholder={
+                                          "Current: " +
+                                          JSON.parse(
+                                            userData?.Repository?.cachedConstructorArgs as string
+                                          )[i]
+                                        }
                                         className="bg-transparent mt-1 text-center focus:border-off-white  focus:ring-0"
                                       />
                                     </div>
@@ -676,14 +681,11 @@ export const PersonalDashboard = (props: DashboardProps) => {
                                             className="border border-off-white/25  bg-almost-black py-2 px-6 rounded-full disabled:bg-[#cbcbcb]"
                                           >
                                             {functionCalled == method.name ? (
-                                              <div className="flex flex-row items-center">
-                                                <p>Calling </p>
-                                                <div className="ml-2 animate-spin">
-                                                  <Loader size={20} />
-                                                </div>
+                                              <div className="flex flex-row px-[6px] py-1 justify-center animate-spin items-center">
+                                                <Loader size={20} />
                                               </div>
                                             ) : (
-                                              <>Call</>
+                                              <p>Call</p>
                                             )}
                                           </button>
                                         </div>
@@ -742,17 +744,14 @@ export const PersonalDashboard = (props: DashboardProps) => {
                                                   setFunctionCalled(null);
                                                 }
                                               }}
-                                              className="border border-off-white/25 bg-almost-black py-2 px-6  rounded-full disabled:bg-[#cbcbcb]"
+                                              className="border border-off-white/25 bg-almost-black px-6  rounded-full disabled:bg-[#cbcbcb] h-12 flex items-center"
                                             >
                                               {functionCalled == method.name ? (
-                                                <div className="flex flex-row items-center">
-                                                  <p>Calling </p>
-                                                  <div className="ml-2 animate-spin">
-                                                    <Loader size={20} />
-                                                  </div>
+                                                <div className="flex flex-row px-[6px] py-1 justify-center animate-spin items-center">
+                                                  <Loader size={20} />
                                                 </div>
                                               ) : (
-                                                <>Call</>
+                                                <p>Call</p>
                                               )}
                                             </button>
                                           </div>
@@ -840,6 +839,8 @@ export const PersonalDashboard = (props: DashboardProps) => {
                                                     setFunctionReturn(returnedData);
                                                   } catch (error) {
                                                     setFunctionCalled(null);
+                                                    console.log(error.message);
+                                                    throw error;
                                                   }
                                                 }
                                               }}
@@ -847,14 +848,11 @@ export const PersonalDashboard = (props: DashboardProps) => {
                                               disabled={!Boolean(address)}
                                             >
                                               {functionCalled == method.name ? (
-                                                <div className="flex flex-row items-center">
-                                                  <p>Calling </p>
-                                                  <div className="ml-2 animate-spin">
-                                                    <Loader size={20} />
-                                                  </div>
+                                                <div className="flex flex-row px-[6px] py-1 justify-center animate-spin items-center">
+                                                  <Loader size={20} />
                                                 </div>
                                               ) : (
-                                                <>Call</>
+                                                <p>Call</p>
                                               )}
                                             </button>
                                           </div>
@@ -914,18 +912,15 @@ export const PersonalDashboard = (props: DashboardProps) => {
                                                     }
                                                   }
                                                 }}
-                                                className="border border-off-white/25  bg-almost-black py-2 px-6  rounded-full disabled:bg-[#cbcbcb]"
+                                                className="border border-off-white/25 bg-almost-black px-6  rounded-full disabled:bg-[#cbcbcb] h-12 flex items-center"
                                                 disabled={!Boolean(address)}
                                               >
                                                 {functionCalled == method.name ? (
-                                                  <div className="flex flex-row items-center">
-                                                    <p>Calling </p>
-                                                    <div className="ml-2 animate-spin">
-                                                      <Loader size={20} />
-                                                    </div>
+                                                  <div className="flex flex-row px-[6px] py-1 justify-center animate-spin items-center">
+                                                    <Loader size={20} />
                                                   </div>
                                                 ) : (
-                                                  <>Call</>
+                                                  <p>Call</p>
                                                 )}
                                               </button>
                                             </div>
@@ -1023,7 +1018,12 @@ export const PersonalDashboard = (props: DashboardProps) => {
                                           key={"constructorArg-" + i}
                                           type="text"
                                           name={"constructorArg-" + i}
-                                          placeholder={"Current: " + parsedAbi[i]}
+                                          placeholder={
+                                            "Current: " +
+                                            JSON.parse(
+                                              userData?.Repository?.cachedConstructorArgs as string
+                                            )[i]
+                                          }
                                           className="bg-transparent mt-1 text-center focus:border-off-white  focus:ring-0"
                                         />
                                       </div>
