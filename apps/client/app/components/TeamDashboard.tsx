@@ -1122,56 +1122,98 @@ export const TeamDashboard = (props: DashboardProps) => {
                     >
                       Invite
                     </button>
-                    {teamInviteModal && (
-                      <div className="fixed top-0 left-0 z-50 font-primary flex items-center justify-center h-screen w-screen">
-                        <span className="bg-secondary-gray opacity-70 absolute top-0 left-0 h-screen w-screen"></span>
-                        <div className="p-10 bg-secondary-border relative rounded-lg">
-                          <button
-                            onClick={() => setTeamInviteModal(false)}
-                            className="absolute top-4 right-4"
-                          >
-                            <X />
-                          </button>
-                          <h1 className="font-black text-4xl">
-                            Invite members to{" "}
-                            <span className="text-secondary-orange">{teamData.name}</span>!
-                          </h1>
-                          <p className="mt-4 text-xl">Send them one of your invite links below!</p>
-                          <div className="flex flex-row justify-evenly mt-4">
-                            {teamData.InviteCodes?.map((code) => (
-                              <div className="flex flex-col items-center">
-                                <p
-                                  className={
-                                    code.keyStatus == "UNUSED"
-                                      ? "text-green-400" + " text-base"
-                                      : "text-red-400" + " text-base"
-                                  }
-                                >
-                                  {code.keyStatus.slice(0, 1) +
-                                    code.keyStatus.toLowerCase().slice(1)}
-                                </p>
-                                <div className="flex flex-row text-base items-center">
-                                  <p>{code.inviteCode}</p>
-                                  {code.keyStatus == "UNUSED" && (
-                                    <button>
-                                      <Copy
-                                        className="transform ml-4 active:scale-75 transition-transform"
-                                        size={16}
-                                        onClick={() =>
-                                          navigator.clipboard.writeText(
-                                            `https://fether.xyz/alpha/team/${teamData.id}/join/${code.inviteCode}`
-                                          )
-                                        }
-                                      />
-                                    </button>
-                                  )}
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
+                    <PopupModal display={false} displaySetter={() => true}>
+                      <div className="text-center">
+                        <h1 className="text-xl font-black">Know someone who needs Fether?</h1>
+                        <p className="mt-4 text-base">
+                          Send 'em one of your invite codes below and they <br /> can experience the
+                          magic themselves.
+                        </p>
                       </div>
-                    )}
+                      <div className="flex flex-row justify-evenly mt-9">
+                        {props.userData?.IssuedInviteCodes?.map((code) => (
+                          <>
+                            {code.keyStatus == "UNUSED" ? (
+                              <button
+                                className="flex flex-col items-center"
+                                onClick={() => navigator.clipboard.writeText(code.inviteCode)}
+                              >
+                                <div className="border border-off-white rounded-lg py-2 px-4">
+                                  <p className="text-off-white/50 text-xs">
+                                    {code.keyStatus.slice(0, 1) +
+                                      code.keyStatus.toLowerCase().slice(1)}
+                                  </p>
+                                  <p className="font-bold text-base">{code.inviteCode}</p>
+                                </div>
+                                <p className="font-bold text-base text-secondary-orange mt-2">
+                                  Copy Code
+                                </p>
+                              </button>
+                            ) : (
+                              <button className="flex flex-col items-center">
+                                <div className="border border-off-white/25 rounded-lg py-2 px-4">
+                                  <p className="text-off-white/50 text-xs">
+                                    {code.keyStatus.slice(0, 1) +
+                                      code.keyStatus.toLowerCase().slice(1)}
+                                  </p>
+                                  <p className="font-bold text-base text-off-white/25">
+                                    {code.inviteCode}
+                                  </p>
+                                </div>
+                              </button>
+                            )}
+                          </>
+                        ))}
+                      </div>
+                    </PopupModal>
+                    <PopupModal display={teamInviteModal} displaySetter={setTeamInviteModal}>
+                      <h1 className="font-black text-xl text-center">
+                        Invite members to{" "}
+                        <span className="text-secondary-orange">{teamData.name}</span>!
+                      </h1>
+                      <p className="mt-4 text-base text-center">
+                        Send 'em one of your invite links below <br /> to get them started.
+                      </p>
+                      <div className="flex flex-row justify-evenly mt-9 gap-4">
+                        {teamData.InviteCodes?.map((code) => (
+                          <>
+                            {code.keyStatus == "UNUSED" ? (
+                              <button
+                                className="flex flex-col items-center"
+                                onClick={() =>
+                                  navigator.clipboard.writeText(
+                                    `https://fether.xyz/alpha/team/${teamData.id}/join/${code.inviteCode}`
+                                  )
+                                }
+                              >
+                                <div className="border border-off-white rounded-lg py-2 px-4">
+                                  <p className="text-off-white/50 text-xs">
+                                    {code.keyStatus.slice(0, 1) +
+                                      code.keyStatus.toLowerCase().slice(1)}
+                                  </p>
+                                  <p className="font-bold text-base">{code.inviteCode}</p>
+                                </div>
+                                <p className="font-bold text-base text-secondary-orange mt-2">
+                                  Copy Code
+                                </p>
+                              </button>
+                            ) : (
+                              <button className="flex flex-col items-center">
+                                <div className="border border-off-white/25 rounded-lg py-2 px-4">
+                                  <p className="text-off-white/50 text-xs">
+                                    {code.keyStatus.slice(0, 1) +
+                                      code.keyStatus.toLowerCase().slice(1)}
+                                  </p>
+                                  <p className="font-bold text-base text-off-white/25">
+                                    {code.inviteCode}
+                                  </p>
+                                </div>
+                              </button>
+                            )}
+                          </>
+                        ))}
+                      </div>
+                    </PopupModal>
                   </div>
                   <table className="table-fixed w-full mt-5">
                     <thead>
@@ -1198,7 +1240,7 @@ export const TeamDashboard = (props: DashboardProps) => {
                                   <>
                                     <button
                                       onClick={() => setDeleteTeamModal(true)}
-                                      className="border border-red-500 px-2 text-base text-red-500"
+                                      className=" bg-[#FF1F00] py-1 px-2 text-base rounded-full"
                                     >
                                       Delete Team
                                     </button>
@@ -1206,49 +1248,51 @@ export const TeamDashboard = (props: DashboardProps) => {
                                       display={deleteTeamModal}
                                       displaySetter={setDeleteTeamModal}
                                     >
-                                      <h1 className="w-full text-5xl text-center text-red-500">
-                                        !!!CAUTION!!!
-                                      </h1>
-                                      <p className="mt-4">Deleting this team will:</p>
-                                      <ul className="mt-2">
-                                        <li>- Remove access for all team members.</li>
-                                        <li>- Delete all underlying team data.</li>
-                                      </ul>
-                                      <p className="mt-4">This can not be undone.</p>
-
-                                      <Form
-                                        method="post"
-                                        className="flex items-center justify-center"
-                                      >
-                                        <input
-                                          type="hidden"
-                                          name="githubInstallationId"
-                                          value={userData?.githubInstallationId?.toString()}
-                                        />
-                                        <input type="hidden" name="formType" value="deleteTeam" />
-                                        <button
-                                          type="submit"
-                                          className="border mt-8 border-red-500 px-2 text-red-500"
+                                      <div className="flex flex-col items-center justify-center pb-8">
+                                        <h1 className="text-xl">You sure?</h1>
+                                        <p className="mt-4 text-center text-sm">
+                                          Deleting this will remove access for all team members,
+                                          <br />
+                                          and permanently delete all corresponding team — <br />
+                                          this cannot be undone.
+                                        </p>
+                                        <Form
+                                          method="post"
+                                          className="flex items-center justify-center"
                                         >
-                                          {navigation.state == "submitting" &&
-                                          navigation.formData?.get("formType") == "deleteTeam" ? (
-                                            <div className="flex flex-row items-center">
-                                              <p>Deleting Team</p>
-                                              <div className="animate-spin ml-2">
-                                                <Loader size={20} />
-                                              </div>
-                                            </div>
-                                          ) : (
-                                            <p>Delete Team</p>
-                                          )}
-                                        </button>
-                                      </Form>
+                                          <input
+                                            type="hidden"
+                                            name="githubInstallationId"
+                                            value={userData?.githubInstallationId?.toString()}
+                                          />
+                                          <input type="hidden" name="formType" value="deleteTeam" />
+                                          <div className="flex w-full justify-center mt-10">
+                                            <button
+                                              type="submit"
+                                              className=" bg-[#FF1F00] py-3 px-20 text-base rounded-full"
+                                            >
+                                              {navigation.state == "submitting" &&
+                                              navigation.formData?.get("formType") ==
+                                                "deleteTeam" ? (
+                                                <div className="flex flex-row items-center">
+                                                  <p>Deleting </p>
+                                                  <div className="ml-2 animate-spin">
+                                                    <Loader size={20} />
+                                                  </div>
+                                                </div>
+                                              ) : (
+                                                <p>Delete Team</p>
+                                              )}
+                                            </button>
+                                          </div>
+                                        </Form>
+                                      </div>
                                     </PopupModal>
                                   </>
                                 ) : (
                                   <Link
                                     to={`/alpha/team/${teamData.id}/leave`}
-                                    className="bg-red-500 text-base px-2 rounded-lg"
+                                    className="bg-[#FF1F00] py-1 px-2 text-base rounded-full"
                                   >
                                     Leave Team
                                   </Link>
