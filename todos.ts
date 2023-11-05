@@ -1,6 +1,7 @@
 //Pre-beta TODOs
 
 //TODO: redo setup wizard design
+//TODO: fix tx view gas price
 //TODO: add tx trace view via ethtx.info code
 //TODO: add some sort of graphs to dashboard
 //TODO: fix/improve fether blockchain setup

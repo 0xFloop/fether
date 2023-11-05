@@ -992,7 +992,7 @@ export const PersonalDashboard = (props: DashboardProps) => {
                               </h1>
 
                               <input
-                                className="focus:outline-none rounded-xl focus:border-none ring-0 focus:ring-0"
+                                className="focus:outline-none rounded-xl focus:border-none ring-0 focus:ring-0 text-secondary-orange"
                                 type="checkbox"
                                 name="useCachedArgs"
                                 id="useCachedArgs"
@@ -1046,7 +1046,12 @@ export const PersonalDashboard = (props: DashboardProps) => {
                                 >
                                   {navigation.state == "submitting" &&
                                   navigation.formData?.get("formType") == "deployContract" ? (
-                                    <p>Deploying</p>
+                                    <div className="flex flex-row items-center">
+                                      <p>Deploying</p>
+                                      <div className="animate-spin ml-2">
+                                        <Loader size={20} />
+                                      </div>
+                                    </div>
                                   ) : (
                                     <p>{deployStatus}</p>
                                   )}
