@@ -23,7 +23,6 @@ export const action = async ({ request, params }: ActionArgs) => {
           headers: { "Access-Control-Allow-Origin": "*" },
         });
       } else {
-        console.log(isArrayRequest.data.length);
         reqbodyArray = isArrayRequest.data;
       }
     }
@@ -61,7 +60,6 @@ export const action = async ({ request, params }: ActionArgs) => {
         }
       } else if (reqbodySingle) {
         if (reqbodySingle.method == "eth_sendRawTransaction") {
-          console.log(reqbodySingle);
           if (reqbodySingle?.params) {
             let abi = JSON.parse(
               validated.apiKeyData?.associatedUser.Repository?.contractAbi as string
