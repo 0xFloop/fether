@@ -95,9 +95,9 @@ model Repository {
 }
 
 model Transaction {
-  txHash               String     @id @unique
+  txHash               String      @id @unique
   repositoryId         String
-  associatedRepository Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  associatedRepository Repository? @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
   functionName         String
   callerUsername       String?
 
