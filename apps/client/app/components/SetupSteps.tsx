@@ -9,7 +9,7 @@ import { Abi } from "abitype/zod";
 type setupStep = {
   stepNumber: string;
   name: string;
-  description: string;
+  description: JSX.Element;
   iconUrl: string;
   actionComponent: (props: setupProps) => JSX.Element;
 };
@@ -497,8 +497,19 @@ export const setupSteps: setupStep[] = [
   {
     stepNumber: "01",
     name: "Generate API Key",
-    description:
-      "Your Fether API Key will be used for external FetherKit use including both the FetherKit React Typescript package as well as your personal Fether RPC Url.",
+    description: (
+      <p>
+        What will this be used for?
+        <br />
+        <br />
+        Your Fether API Key will be used for all Fether tools including both the{" "}
+        <span className="text-secondary-orange underline">
+          FetherKit React Typescript module
+        </span>{" "}
+        as well as your personal{" "}
+        <span className="text-secondary-orange underline">Fether RPC Url</span>.
+      </p>
+    ),
     iconUrl: "/images/key.svg",
     actionComponent: (props: setupProps) => (
       <GenerateKeyComponent
@@ -513,9 +524,17 @@ export const setupSteps: setupStep[] = [
   },
   {
     stepNumber: "02",
-    name: "Install FetherKit Github App",
-    description:
-      "The FetherKit github app allows Fether to track new code changes to your smart contracts. This allows Fether to provide you with an always up to date deployment of your smart contract.",
+    name: "Install FetherKit App",
+    description: (
+      <p>
+        What is this?
+        <br />
+        <br />
+        The <span className="text-secondary-orange underline">FetherKit github app</span> allows
+        Fether to track new code changes to your smart contracts. This enables Fether to provide you
+        with an always up to date test deployment of your smart contract.
+      </p>
+    ),
     iconUrl: "/images/github.svg",
     actionComponent: (props: setupProps) => (
       <InstallGithubAppComponent
@@ -530,9 +549,13 @@ export const setupSteps: setupStep[] = [
   },
   {
     stepNumber: "03",
-    name: "Select Repository",
-    description:
-      "Select which GitHub repository contains the smart contract that you would like Fether to be tracking. Only repositories you allowed when installing the FetherKit app will appear below.",
+    name: "Select a Repository",
+    description: (
+      <p>
+        Select which GitHub repository contains the smart contract that you would like Fether to be
+        tracking. Only repositories you allowed when installing the FetherKit app will appear below.
+      </p>
+    ),
     iconUrl: "/images/folder.svg",
     actionComponent: (props: setupProps) => (
       <SelectRepoComponent
@@ -547,9 +570,8 @@ export const setupSteps: setupStep[] = [
   },
   {
     stepNumber: "04",
-    name: "Select Branch",
-    description:
-      "Select which branch from your chosen repository that you would like Fether to be tracking.",
+    name: "Select a Branch",
+    description: <p>Select which branch you would like to track.</p>,
     iconUrl: "/images/folder.svg",
     actionComponent: (props: setupProps) => (
       <SelectBranchComponent
@@ -564,9 +586,13 @@ export const setupSteps: setupStep[] = [
   },
   {
     stepNumber: "05",
-    name: "Select Smart Contract",
-    description:
-      "Select which solidity file from your chosen repository that you would like Fether to be tracking for you.",
+    name: "Select a Smart Contract",
+    description: (
+      <p>
+        Select which solidity file from your chosen repository that you would like Fether to be
+        tracking for you.
+      </p>
+    ),
     iconUrl: "/images/file.svg",
     actionComponent: (props: setupProps) => (
       <SelectSmartContract
@@ -581,9 +607,13 @@ export const setupSteps: setupStep[] = [
   },
   {
     stepNumber: "06",
-    name: "Set Deployer Address",
-    description:
-      "Set which Ethereum address you would like to be the deployer of your smart contract. This is the address that will have will have any deployer based ownership.",
+    name: "Set Your Deployer Address",
+    description: (
+      <p>
+        Set which Ethereum address you would like to be the deployer of your smart contract. This is
+        the address that will have will have any deployer based ownership.
+      </p>
+    ),
     iconUrl: "/images/paperAirplane.svg",
     actionComponent: (props: setupProps) => (
       <SetDeployerComponent
@@ -599,8 +629,11 @@ export const setupSteps: setupStep[] = [
   {
     stepNumber: "07",
     name: "Deploy Contract",
-    description:
-      "You are all set up! Click below to deploy your first instance of a Fethered smart contract!",
+    description: (
+      <p>
+        You are all set up! Click below to deploy your first instance of a Fethered smart contract!
+      </p>
+    ),
     iconUrl: "/images/celebrate.svg",
     actionComponent: (props: setupProps) => (
       <DeployContractComponent
