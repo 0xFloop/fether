@@ -109,7 +109,7 @@ const SelectRepoComponent: React.FC<setupProps> = (props: setupProps) => {
           {data?.Repository?.repoName && (
             <button
               onClick={() => props.updateStep(3)}
-              className="py-3 px-5 bg-secondary-orange border rounded-lg border-off-white/50 absolute bottom-7 right-10"
+              className="py-2 text-lg px-6 bg-secondary-orange border rounded-full border-off-white/50 absolute bottom-6 right-6"
             >
               <p>Next</p>
             </button>
@@ -140,16 +140,13 @@ const SelectRepoComponent: React.FC<setupProps> = (props: setupProps) => {
             {repoChosen && (
               <button
                 type="submit"
-                className="py-3 px-5 bg-secondary-orange border rounded-lg border-off-white/50  absolute bottom-7 right-10"
+                className="py-2 text-lg px-6 bg-secondary-orange border rounded-full border-off-white/50 absolute bottom-6 right-6"
               >
                 {props.navigation.state == "submitting" &&
                 props.navigation.formData &&
                 props.navigation.formData.get("formType") == "getChosenRepo" ? (
-                  <div className="flex flex-row items-center">
-                    Submitting
-                    <div className="ml-1 animate-spin">
-                      <Loader size={20} />
-                    </div>
+                  <div className="ml-1 px-4 animate-spin">
+                    <Loader size={28} />
                   </div>
                 ) : (
                   <p>Submit</p>
@@ -199,7 +196,7 @@ const SelectBranchComponent: React.FC<setupProps> = (props: setupProps) => {
           {data?.Repository?.branchName && (
             <button
               onClick={() => props.updateStep(3)}
-              className="py-3 px-5 bg-secondary-orange border rounded-lg border-off-white/50 absolute bottom-7 right-10"
+              className="py-2 text-lg px-6 bg-secondary-orange border rounded-full border-off-white/50 absolute bottom-6 right-6"
             >
               <p>Next</p>
             </button>
@@ -230,16 +227,13 @@ const SelectBranchComponent: React.FC<setupProps> = (props: setupProps) => {
             {branchChosen && (
               <button
                 type="submit"
-                className="py-3 px-5 bg-secondary-orange border rounded-lg border-off-white/50  absolute bottom-7 right-10"
+                className="py-2 text-lg px-6 bg-secondary-orange border rounded-full border-off-white/50 absolute bottom-6 right-6"
               >
                 {props.navigation.state == "submitting" &&
                 props.navigation.formData &&
                 props.navigation.formData.get("formType") == "chooseBranch" ? (
-                  <div className="flex flex-row items-center">
-                    Submitting
-                    <div className="ml-1 animate-spin">
-                      <Loader size={20} />
-                    </div>
+                  <div className="ml-1 px-4 animate-spin">
+                    <Loader size={28} />
                   </div>
                 ) : (
                   <p>Submit</p>
@@ -307,7 +301,7 @@ const SelectSmartContract: React.FC<setupProps> = (props: setupProps) => {
           {data?.Repository?.filename && (
             <button
               onClick={() => props.updateStep(4)}
-              className="py-3 px-5 bg-secondary-orange border rounded-lg border-off-white/50 absolute bottom-7 right-10"
+              className="py-2 text-lg px-6 bg-secondary-orange border rounded-full border-off-white/50 absolute bottom-6 right-6"
             >
               <p>Next</p>
             </button>
@@ -338,16 +332,13 @@ const SelectSmartContract: React.FC<setupProps> = (props: setupProps) => {
             {fileChosen && (
               <button
                 type="submit"
-                className="flex flex-row items-center py-3 px-5 bg-secondary-orange border rounded-lg border-off-white/50 absolute bottom-7 right-10"
+                className="flex flex-row py-2 text-lg px-6 bg-secondary-orange border rounded-full border-off-white/50 absolute bottom-6 right-6                "
               >
                 {props.navigation.state == "submitting" &&
                 props.navigation.formData &&
                 props.navigation.formData.get("formType") == "chooseFileToTrack" ? (
-                  <div className=" flex flex-row items-center">
-                    <p>Submitting</p>
-                    <div className="ml-1 animate-spin">
-                      <Loader size={20} />
-                    </div>
+                  <div className="ml-1 px-4 animate-spin">
+                    <Loader size={28} />
                   </div>
                 ) : (
                   <p>Submit</p>
@@ -422,7 +413,7 @@ const SetDeployerComponent: React.FC<setupProps> = (props: setupProps) => {
       {data?.Repository?.deployerAddress && (
         <button
           onClick={() => props.updateStep(5)}
-          className="py-3 px-5 bg-secondary-orange border rounded-lg border-off-white/50 absolute bottom-7 right-10"
+          className="py-2 text-lg px-6 bg-secondary-orange border rounded-full border-off-white/50 absolute bottom-6 right-6"
         >
           <p>Next</p>
         </button>
@@ -474,11 +465,8 @@ const DeployContractComponent: React.FC<setupProps> = (props: setupProps) => {
         {props.navigation.state == "submitting" &&
         props.navigation.formData &&
         props.navigation.formData.get("formType") == "deployContract" ? (
-          <div className="flex flex-row items-center py-4 px-6 bg-secondary-orange border rounded-lg border-off-white/50">
-            Deploying
-            <div className="ml-1 animate-spin">
-              <Loader size={20} />
-            </div>
+          <div className="ml-1 px-4 animate-spin">
+            <Loader size={28} />
           </div>
         ) : (
           <button

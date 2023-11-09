@@ -109,12 +109,10 @@ const SetupWizard: React.FC<SetupWizardProps> = (props: SetupWizardProps) => {
           {props.actionArgs?.error && (
             <div className="text-red-500 px-10">Error: {props.actionArgs?.error}</div>
           )}
-          <div className="h-28 border-t-2 border-[#6D6D6D] px-10 flex items-center justify-between">
-            <div>
-              <p className="text-lg">For more information, visit the documentation!</p>
-              <div className="flex flex-row items-center gap-2 text-sm">
-                <Info size={16} strokeWidth={3} /> <p> all selections can be updated after setup</p>
-              </div>
+          <div className="h-24 border-t-2 border-[#6D6D6D] px-10 flex items-center justify-between">
+            <div className="text-sm text-off-white/50">
+              <p>All selections can be updated after setup</p>
+              <p>For more information, visit the documentation!</p>
             </div>
           </div>
         </div>
