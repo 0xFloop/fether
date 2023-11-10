@@ -226,13 +226,13 @@ export const action = async ({ request }: ActionArgs) => {
             error: null,
           };
         case "chooseBranch":
-          let choosenBranch = body.get("choosenBranch");
-          if (!choosenBranch) throw new Error("No branch chosen");
+          let chosenBranch = body.get("chosenBranch");
+          if (!chosenBranch) throw new Error("No branch chosen");
 
           await db.repository.update({
             where: { id: team.Repository?.id as string },
             data: {
-              branchName: choosenBranch as string,
+              branchName: chosenBranch as string,
               contractAbi: null,
               contractAddress: null,
               filename: null,

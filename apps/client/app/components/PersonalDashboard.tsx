@@ -524,7 +524,7 @@ export const PersonalDashboard = (props: DashboardProps) => {
                                     key={i}
                                     className="text-secondary-orange checked:outline-secondary-orange"
                                     type="radio"
-                                    name="choosenBranch"
+                                    name="chosenBranch"
                                     value={branchName}
                                   />{" "}
                                   {branchName}
