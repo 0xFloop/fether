@@ -26,30 +26,29 @@ type setupProps = {
 const GenerateKeyComponent: React.FC<setupProps> = (props: setupProps) => {
   const data = props.dashboardType == "personal" ? props.userData : props.teamData;
   return (
-    <div className="h-full w-full flex items-center align-middle justify-center">
-      <Form method="post" action="/api/keygen">
-        <input type="hidden" name="id" value={data?.id} />
-        <input type="hidden" name="formType" value="generateApiKey" />
-        <input type="hidden" name="dashboardType" value={props.dashboardType} />
+    <Form method="post" action="/api/keygen">
+      <input type="hidden" name="id" value={data?.id} />
+      <input type="hidden" name="formType" value="generateApiKey" />
+      <input type="hidden" name="dashboardType" value={props.dashboardType} />
 
-        <button
-          disabled={props.navigation.state === "submitting"}
-          type="submit"
-          className="py-4 px-6 bg-secondary-orange border rounded-lg flex flex-row border-off-white/50"
-        >
-          {props.navigation.state == "submitting" ? (
-            <div className="flex flex-row items-center">
-              <p>Generating</p>
-              <div className="ml-1 animate-spin">
-                <Loader size={20} />
-              </div>
+      <button
+        disabled={props.navigation.state === "submitting"}
+        type="submit"
+        className="py-2 pl-4 pr-2 bg-secondary-orange rounded-full flex flex-row items-center gap-10 border-off-white/50"
+      >
+        {props.navigation.state == "submitting" ? (
+          <div className="flex flex-row items-center">
+            <p>Generating</p>
+            <div className="ml-1 animate-spin">
+              <Loader size={20} />
             </div>
-          ) : (
-            "Generate Key"
-          )}
-        </button>
-      </Form>
-    </div>
+          </div>
+        ) : (
+          "Generate Key"
+        )}
+        <img src="/images/fetherLogoWhite.svg" alt="" />
+      </button>
+    </Form>
   );
 };
 
@@ -57,17 +56,17 @@ const InstallGithubAppComponent: React.FC<setupProps> = (props: setupProps) => {
   if (props.teamData) return;
   else {
     return (
-      <div className="h-full w-full flex items-center align-middle justify-center">
-        <Form method="post" action="/api/gh-app-install">
-          <input type="hidden" name="username" value={props.userData?.username} />
-          <button
-            type="submit"
-            className="py-4 px-6 bg-secondary-orange border rounded-lg border-off-white/50"
-          >
-            Click to add github FetherKit app
-          </button>
-        </Form>
-      </div>
+      <Form method="post" action="/api/gh-app-install">
+        <input type="hidden" name="username" value={props.userData?.username} />
+        <button
+          disabled={props.navigation.state === "submitting"}
+          type="submit"
+          className="py-2 pl-4 pr-2 bg-secondary-orange rounded-full flex flex-row items-center gap-10 border-off-white/50"
+        >
+          <p>Install Github App</p>
+          <img src="/images/fetherLogoWhite.svg" alt="" />
+        </button>
+      </Form>
     );
   }
 };
@@ -89,9 +88,9 @@ const SelectRepoComponent: React.FC<setupProps> = (props: setupProps) => {
     );
   }, []);
   return (
-    <div className="h-full w-full flex flex-col gap-4 items-center">
+    <div className="h-full w-full flex flex-col gap-4">
       {props.actionArgs?.originCallForm != "getRepos" ? (
-        <div className="h-full w-full flex justify-center">
+        <div className="">
           {props.navigation.state == "submitting" &&
             props.navigation.formData &&
             props.navigation.formData.get("formType") == "getAllRepos" && (
@@ -105,16 +104,18 @@ const SelectRepoComponent: React.FC<setupProps> = (props: setupProps) => {
         </div>
       ) : (
         <>
-          {data?.Repository?.repoName && <p>Current Repo: {data?.Repository?.repoName}</p>}
           {data?.Repository?.repoName && (
-            <button
-              onClick={() => props.updateStep(3)}
-              className="py-2 text-lg px-6 bg-secondary-orange border rounded-full border-off-white/50 absolute bottom-6 right-6"
-            >
-              <p>Next</p>
-            </button>
+            <>
+              <p>Current Repo: {data?.Repository?.repoName}</p>
+              <button
+                onClick={() => props.updateStep(3)}
+                className="py-2 text-lg px-6 bg-secondary-orange border rounded-full border-off-white/50 absolute bottom-6 right-6"
+              >
+                <p>Next</p>
+              </button>
+            </>
           )}
-          <Form className="overflow-y-auto" method="post">
+          <Form className="overflow-y-auto mb-4 border border-off-white/50" method="post">
             <input
               type="hidden"
               name="githubInstallationId"
@@ -122,21 +123,28 @@ const SelectRepoComponent: React.FC<setupProps> = (props: setupProps) => {
             />
             <input type="hidden" name="formType" value="getChosenRepo" />
 
-            <fieldset id="repoSelector" className="grid grid-cols-2">
+            <fieldset
+              id="repoSelector"
+              className="grid grid-cols-2 [&>*:nth-child(odd)]:border-r  "
+            >
               {props.actionArgs.repositories?.map((repo: any) => (
-                <label key={repo.repoName} className="text-xl">
+                <label
+                  key={repo.repoName}
+                  className="flex items-center text-xs  border-b border-b-off-white/50 border-r-off-white/50 py-2 px-3"
+                >
                   <input
+                    className="text-secondary-orange focus:ring-0 focus:outline-none focus:border-none focus:bg-transparent outline-transparent"
                     type="radio"
                     id="chosenRepoData"
                     name="chosenRepoData"
                     value={[repo.repoName, repo.repoId]}
                     onClick={() => setRepoChosen(true)}
                   />
+                  &nbsp;
                   {repo.repoName}
                 </label>
               ))}
             </fieldset>
-            <br />
             {repoChosen && (
               <button
                 type="submit"
@@ -176,9 +184,9 @@ const SelectBranchComponent: React.FC<setupProps> = (props: setupProps) => {
     );
   }, []);
   return (
-    <div className="h-full w-full flex flex-col gap-4 items-center">
+    <div className="h-full w-full">
       {props.actionArgs?.originCallForm != "getBranchesOfChosenRepo" ? (
-        <div className="h-full w-full flex justify-center">
+        <div className="">
           {props.navigation.state == "submitting" &&
             props.navigation.formData &&
             props.navigation.formData.get("formType") == "getBranchesOfChosenRepo" && (
@@ -195,30 +203,37 @@ const SelectBranchComponent: React.FC<setupProps> = (props: setupProps) => {
           {data?.Repository?.branchName && <p>Current Branch: {data.Repository.branchName}</p>}
           {data?.Repository?.branchName && (
             <button
-              onClick={() => props.updateStep(3)}
+              onClick={() => props.updateStep(4)}
               className="py-2 text-lg px-6 bg-secondary-orange border rounded-full border-off-white/50 absolute bottom-6 right-6"
             >
               <p>Next</p>
             </button>
           )}
-          <Form className="overflow-y-auto" method="post">
+          <Form className="overflow-y-auto mt-4" method="post">
             <input
               type="hidden"
               name="githubInstallationId"
               value={props.userData?.githubInstallationId?.toString()}
             />
             <input type="hidden" name="formType" value="chooseBranch" />
-
-            <fieldset id="repoSelector" className="grid grid-cols-2">
+            <fieldset
+              id="repoSelector"
+              className="grid grid-cols-2 [&>*:nth-child(odd)]:border-r border border-off-white/50"
+            >
               {props.actionArgs.branches?.map((branchName: string) => (
-                <label key={branchName} className="text-xl">
+                <label
+                  key={branchName}
+                  className="flex items-center text-xs  border-b border-b-off-white/50 border-r-off-white/50 py-2 px-3"
+                >
                   <input
+                    className="text-secondary-orange focus:ring-0 focus:outline-none focus:border-none focus:bg-transparent outline-transparent"
                     type="radio"
-                    id="choosenBranch"
-                    name="choosenBranch"
+                    id="chosenBranch"
+                    name="chosenBranch"
                     value={branchName}
                     onClick={() => setBranchChosen(true)}
                   />
+                  &nbsp;
                   {branchName}
                 </label>
               ))}
@@ -264,7 +279,7 @@ const SelectSmartContract: React.FC<setupProps> = (props: setupProps) => {
     );
   }, []);
   return (
-    <div className="h-full w-full flex flex-col gap-4 items-center align-middle justify-center">
+    <div className="h-full w-full flex flex-col gap-4">
       {props.actionArgs?.originCallForm != "getFilesOfChosenRepo" && (
         <>
           <Form method="post">
@@ -300,7 +315,7 @@ const SelectSmartContract: React.FC<setupProps> = (props: setupProps) => {
           {data?.Repository?.filename && <div>Current File: {data?.Repository?.filename}</div>}
           {data?.Repository?.filename && (
             <button
-              onClick={() => props.updateStep(4)}
+              onClick={() => props.updateStep(5)}
               className="py-2 text-lg px-6 bg-secondary-orange border rounded-full border-off-white/50 absolute bottom-6 right-6"
             >
               <p>Next</p>
@@ -313,19 +328,29 @@ const SelectSmartContract: React.FC<setupProps> = (props: setupProps) => {
               value={props.userData?.githubInstallationId as string}
             />
             <input type="hidden" name="formType" value="chooseFileToTrack" />
-            <fieldset className="grid grid-cols-2">
+
+            <fieldset
+              id="repoSelector"
+              className="grid grid-cols-2 [&>*:nth-child(odd)]:border-r border border-off-white/50"
+            >
               {props.actionArgs.solFilesFromChosenRepo?.map((fileName: any, i: number) => (
-                <label key={i} className="text-xl text-center flex justify-center items-center">
+                <label
+                  key={fileName}
+                  className="flex items-center text-xs  border-b border-b-off-white/50 border-r-off-white/50 py-2 px-3"
+                >
                   <input
-                    onClick={() => setFileChosen(true)}
+                    className="text-secondary-orange focus:ring-0 focus:outline-none focus:border-none focus:bg-transparent outline-transparent"
                     type="radio"
+                    id="chosenFileName"
                     name="chosenFileName"
                     value={fileName}
+                    onClick={() => setFileChosen(true)}
                   />
                   &nbsp;{fileName}
                 </label>
               ))}
             </fieldset>
+
             {props.actionArgs.solFilesFromChosenRepo?.length == 0 && (
               <>No Solidity files found in selected repository.</>
             )}
@@ -374,7 +399,7 @@ const SetDeployerComponent: React.FC<setupProps> = (props: setupProps) => {
   };
 
   return (
-    <div className="h-full w-full flex flex-col items-center align-middle justify-center ">
+    <div className="h-full w-full flex flex-col ">
       <Form method="post" className="w-full">
         <input
           type="hidden"
@@ -382,29 +407,20 @@ const SetDeployerComponent: React.FC<setupProps> = (props: setupProps) => {
           value={props.userData?.githubInstallationId as string}
         />
         <input type="hidden" name="formType" value="setDeployerAddress" />
-        <div className="flex flex-row items-center justify-between w-full h-14">
-          <input
-            className="text-lg h-full outline-none border-none focus:ring-0 text-black rounded-l-lg px-2 flex-1 bg-[#D9D9D9]"
-            name="deployerAddress"
-            placeholder="Input desired contract deployer address"
-            onChange={handleAddressChange}
-          />
-          <button
-            className="text-white w-1/5 h-full text-xl disabled:bg-tertiary-gray bg-secondary-orange py-2 px-4 border rounded-r-lg flex items-center align-middle justify-center"
-            type="submit"
-            disabled={!addressValid}
-          >
-            {props.navigation.state == "submitting" &&
-            props.navigation.formData &&
-            props.navigation.formData.get("formType") == "setDeployerAddress" ? (
-              <div className="animate-spin">
-                <Loader size={20} />
-              </div>
-            ) : (
-              <p>Confirm</p>
-            )}
-          </button>
-        </div>
+        <label className="text-off-white/75 text-xs">Ethereum Address</label>
+        <input
+          className="text-base text-center w-full h-16 outline-none border border-off-white/50 focus:ring-0 text-black  px-2 flex-1 bg-transparent"
+          name="deployerAddress"
+          placeholder="Input deployer address"
+          onChange={handleAddressChange}
+        />
+        <button
+          className="mt-6 text-xl disabled:bg-tertiary-gray bg-secondary-orange py-2 px-6 rounded-full flex items-center align-middle justify-center"
+          type="submit"
+          disabled={!addressValid}
+        >
+          <p>Confirm Address</p>
+        </button>
       </Form>
       <p className="text-red-500 mt-10">{addressError}</p>
       {data?.Repository?.deployerAddress && (
@@ -412,7 +428,7 @@ const SetDeployerComponent: React.FC<setupProps> = (props: setupProps) => {
       )}
       {data?.Repository?.deployerAddress && (
         <button
-          onClick={() => props.updateStep(5)}
+          onClick={() => props.updateStep(6)}
           className="py-2 text-lg px-6 bg-secondary-orange border rounded-full border-off-white/50 absolute bottom-6 right-6"
         >
           <p>Next</p>
@@ -430,7 +446,7 @@ const DeployContractComponent: React.FC<setupProps> = (props: setupProps) => {
   const parsedAbi = Abi.parse(JSON.parse(data.Repository.contractAbi));
 
   return (
-    <div className="h-full w-full flex items-center align-middle justify-center">
+    <div className="h-full w-full flex ">
       <Form method="post">
         {parsedAbi[0].type == "constructor" &&
           parsedAbi[0].inputs.length > 0 &&
@@ -465,15 +481,15 @@ const DeployContractComponent: React.FC<setupProps> = (props: setupProps) => {
         {props.navigation.state == "submitting" &&
         props.navigation.formData &&
         props.navigation.formData.get("formType") == "deployContract" ? (
-          <div className="ml-1 px-4 animate-spin">
+          <div className="mt-8 ml-1 px-4 animate-spin">
             <Loader size={28} />
           </div>
         ) : (
           <button
             type="submit"
-            className="py-4 px-6 bg-secondary-orange border rounded-lg border-off-white/50"
+            className="mt-8 py-3 px-6 text-xl bg-secondary-orange rounded-full border-off-white/50"
           >
-            Click here to deploy your contract
+            Deploy Contract
           </button>
         )}
       </Form>

@@ -17,12 +17,12 @@ const SetupWizard: React.FC<SetupWizardProps> = (props: SetupWizardProps) => {
   //the dumbest solution to a 3 hour bug hunt
   if (props.step == 7) return <></>;
   return (
-    <div className="selection:bg-accent selection:text-primary-gray max-w-screen h-auto min-h-screen display flex flex-col items-center justify-center text-[#a38282]  ">
+    <div className="selection:bg-secondary-orange text-off-white selection:text-primary-gray max-w-screen h-auto min-h-screen display flex flex-col items-center justify-center ">
       <div className="w-11/12 min-w-[800px] max-w-[836px] h-[650px] flex flex-row justify-between items-center rounded-lg overflow-hidden border border-off-white bg-dark-gray">
-        <div className="text-white border-r border-r-off-white/50  h-full w-[280px] flex flex-col">
+        <div className=" border-r border-r-off-white/50  h-full w-[280px] flex flex-col">
           <div className="flex flex-row justify-between items-end p-4 border-b border-b-off-white/50">
             <img className="w-1/2" src="/images/fetherWideLogoNoBorder.svg" alt="" />
-            <p>
+            <p className="text-xs">
               BETA <span className="text-secondary-orange">0.0.03</span>
             </p>
           </div>
@@ -90,12 +90,14 @@ const SetupWizard: React.FC<SetupWizardProps> = (props: SetupWizardProps) => {
             ))}
           </div>
         </div>
-        <div className="text-white relative h-full gap-4 flex flex-col flex-1">
-          <div className="flex flex-col justify-center gap-0 items-start px-12 py-8 leading-[50px] text-[44px]">
+        <div className=" relative h-full flex flex-col flex-1">
+          <div className="flex flex-col justify-center gap-0 items-start px-12 py-6 leading-[50px] text-[44px]">
             <h1>Step {props.step + 1} :</h1>
             <h1>{setupSteps[props.step].name}</h1>
           </div>
-          <div className="text-sm flex pb-10 px-12">{setupSteps[props.step].description}</div>
+          <div className="text-sm text-off-white/75 flex pb-6 px-12">
+            {setupSteps[props.step].description}
+          </div>
           <div className="flex-1 px-12 overflow-hidden">
             {setupSteps[props.step].actionComponent({
               dashboardType: props.dashboardType,
