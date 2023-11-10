@@ -17,7 +17,7 @@ const SetupWizard: React.FC<SetupWizardProps> = (props: SetupWizardProps) => {
   //the dumbest solution to a 3 hour bug hunt
   if (props.step == 7) return <></>;
   return (
-    <div className="selection:bg-secondary-orange text-off-white selection:text-primary-gray max-w-screen h-auto min-h-screen display flex flex-col items-center justify-center ">
+    <div className="selection:bg-secondary-orange text-off-white selection:text-primary-gray max-w-screen h-auto min-h-screen display flex flex-col items-center justify-centerp">
       <div className="w-11/12 min-w-[800px] max-w-[836px] h-[650px] flex flex-row justify-between items-center rounded-lg overflow-hidden border border-off-white bg-dark-gray">
         <div className=" border-r border-r-off-white/50  h-full w-[280px] flex flex-col">
           <div className="flex flex-row justify-between items-end p-4 border-b border-b-off-white/50">
