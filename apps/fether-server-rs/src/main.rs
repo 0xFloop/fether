@@ -1,47 +1,21 @@
 use axum::{
-    body::Body,
     extract::{Path, State},
-    http::{HeaderMap, HeaderName, HeaderValue, StatusCode},
+    http::StatusCode,
     response::{IntoResponse, Response},
     routing::{get, post},
     Json, Router,
 };
 use axum_macros::{self, debug_handler};
 use dotenv::dotenv;
-use either::Either;
-use reqwest::*;
+use reqwest;
 use serde::{Deserialize, Serialize};
 use sqlx::{mysql::MySqlPool, MySql, Pool};
-use std::{env, result::Result, str::FromStr, string::ParseError};
+use std::{env, result::Result};
 
 #[derive(Clone)]
 pub struct AppState {
     db_pool: Pool<MySql>,
 }
-
-struct AppError(anyhow::Error);
-impl IntoResponse for AppError {
-    fn into_response(self) -> axum::response::Response {
-        (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            format!("Something went wrong: {}", self.0),
-        )
-            .into_response()
-    }
-}
-impl<E> From<E> for AppError
-where
-    E: Into<anyhow::Error>,
-{
-    fn from(value: E) -> Self {
-        Self(value.into())
-    }
-}
-// impl Into<anyhow::Error> for String {
-//     fn into(self) -> anyhow::Error {
-//         anyhow::anyhow!(self)
-//     }
-// }
 
 #[tokio::main]
 async fn main() {
