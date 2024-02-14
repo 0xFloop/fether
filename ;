@@ -1,0 +1,147 @@
+use axum::{
+    extract::{Path, State},
+    http::StatusCode,
+    response::IntoResponse,
+    routing::{get, post},
+    Json, Router,
+};
+use axum_macros::{self, debug_handler};
+use dotenv::dotenv;
+use either::*;
+use reqwest::{self};
+use serde::{Deserialize, Serialize};
+use sqlx::{mysql::MySqlPool, types::Json as SQLX_JSON, MySql, Pool};
+use std::env;
+
+#[derive(Clone)]
+pub struct AppState {
+    db_pool: Pool<MySql>,
+}
+
+struct AppError(anyhow::Error);
+impl IntoResponse for AppError {
+    fn into_response(self) -> axum::response::Response {
+        (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            format!("Something went wrong: {}", self.0),
+        )
+            .into_response()
+    }
+}
+impl<E> From<E> for AppError
+where
+    E: Into<anyhow::Error>,
+{
+    fn from(value: E) -> Self {
+        Self(value.into())
+    }
+}
+// impl Into<anyhow::Error> for String {
+//     fn into(self) -> anyhow::Error {
+//         anyhow::anyhow!(self)
+//     }
+// }
+
+#[tokio::main]
+async fn main() -> anyhow::Result<()> {
+    dotenv().ok();
+
+    let db_pool =
+        MySqlPool::connect(&env::var("DATABASE_URL").expect("Internal server error 479")).await?;
+
+    let state = AppState { db_pool };
+
+    let app = Router::new()
+        //we may need a get request that returns the headers/options
+        .route("/rpc/:api_key", post(rpc_handler))
+        .route("/fetherkit/:api_key", post(rpc_handler))
+        .route("/payload", post(rpc_handler))
+        .with_state(state);
+
+    let listener = tokio::net::TcpListener::bind("0.0.0.0:3420").await.unwrap();
+    return Ok(axum::serve(listener, app).await.unwrap());
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct RpcRequestBody {
+    jsonrpc: String,
+    id: String,
+    method: String,
+    params: Vec<String>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct RpcResponseBody {
+    jsonrpc: String,
+    id: String,
+    result: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct RpcResponseError {
+    jsonrpc: String,
+    id: String,
+    error: RpcError,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+struct RpcError {
+    code: i32,
+    message: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+struct RpcResponse(Either<RpcResponseBody, RpcResponseError>);
+impl IntoResponse for RpcResponse {
+    fn into_response(self) -> axum::response::Response {
+        match self.0 {
+            Left(body) => (StatusCode::OK, Json(body)).into_response(),
+            Right(error) => (StatusCode::INTERNAL_SERVER_ERROR, Json(error)).into_response(),
+        }
+    }
+}
+
+#[debug_handler]
+async fn rpc_handler(
+    State(state): State<AppState>,
+    Path(api_key): Path<String>,
+    Json(payload): Json<RpcRequestBody>,
+) -> Result<Json<RpcResponse>, AppError> {
+    //1. validate the api key -- done
+    //2. validate the request -- done
+    //3. send the request to the anvil client
+    //4. return the anvil clients response
+    //5. create new transaciton in db
+
+    let db_pool = state.db_pool;
+
+    let res: Vec<_> = sqlx::query!(
+        "SELECT ApiKey.key FROM ApiKey WHERE ApiKey.key = ?",
+        api_key
+    )
+    .fetch_all(&db_pool)
+    .await?;
+
+    if res.len() == 0 {
+        return Err(AppError::from(anyhow::anyhow!("Invalid api key")));
+    }
+
+    let rpc_url = env::var("ANVIL_SERVER_IP").expect("Internal server error 480");
+
+    let client = reqwest::Client::new();
+
+    let test_res = client.post(&rpc_url).json(&payload).send().await?;
+
+    println!("{:?}", test_res.text().await);
+
+    let anvil_res = client
+        .post(rpc_url)
+        .json(&payload)
+        .send()
+        .await?
+        .text()
+        .await?;
+
+    println!("here is anvil res: {:?}", anvil_res);
+    return Ok(Json(RpcResponse(anvil_res)));
+}
