@@ -1,16 +1,18 @@
+use alloy_core::primitives::keccak256;
 use axum::{
     extract::{Path, State},
     http::StatusCode,
     response::{IntoResponse, Response},
-    routing::{get, post},
+    routing::{get, options, post},
     Json, Router,
 };
 use axum_macros::{self, debug_handler};
 use dotenv::dotenv;
-use reqwest;
+use reqwest::{self};
 use serde::{Deserialize, Serialize};
 use sqlx::{mysql::MySqlPool, MySql, Pool};
 use std::{env, result::Result};
+use tower_http::cors::CorsLayer;
 
 #[derive(Clone)]
 pub struct AppState {
@@ -32,10 +34,10 @@ async fn main() {
     let state = AppState { db_pool };
 
     let app = Router::new()
-        //we may need a get request that returns the headers/options
         .route("/rpc/:api_key", post(rpc_handler))
         .route("/fetherkit/:api_key", post(rpc_handler))
         .route("/payload", post(rpc_handler))
+        .layer(CorsLayer::permissive())
         .with_state(state);
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3420").await.unwrap();
@@ -72,12 +74,14 @@ struct RpcError {
 
 impl IntoResponse for RpcResponseBody {
     fn into_response(self) -> Response {
-        return (StatusCode::OK, Json(self)).into_response();
+        let res = (StatusCode::OK, Json(self)).into_response();
+        return res;
     }
 }
 impl IntoResponse for RpcResponseError {
     fn into_response(self) -> Response {
-        return (StatusCode::BAD_REQUEST, Json(self)).into_response();
+        let res = (StatusCode::BAD_REQUEST, Json(self)).into_response();
+        return res;
     }
 }
 
@@ -143,8 +147,18 @@ async fn rpc_handler(
         Err(_) => return Err(RpcResponseError::from_str("Unknown rpc response error")),
     };
 
-    let _response: RpcResponseBody = match serde_json::from_str(&res_string) {
-        Ok(res) => return Ok(res),
+    let success: RpcResponseBody = match serde_json::from_str(&res_string) {
+        Ok(res) => {
+            //valid tx, add it to database
+            if payload.method == "eth_sendRawTransaction" {
+                // let tx_hash = keccak256(payload);
+                println!("{:?}", payload)
+                //use anvil to get the tx details
+                //add to db
+                // match sqlx::query!("INSERT INTO Transaction ()")
+            }
+            return Ok(res);
+        }
         Err(_) => {
             let error_response: RpcResponseError = match serde_json::from_str(&res_string) {
                 Ok(res) => res,
