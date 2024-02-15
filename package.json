@@ -18,9 +18,9 @@
     "prisma:seed": "turbo run prisma:seed",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "anvil": "anvil --block-time 5 --chain-id 696969 --steps-tracing",
-    "ngrok": "ngrok http --domain=fether-testing.ngrok.app 3004",
+    "ngrok": "ngrok http --domain=fether-testing.ngrok.app 3420",
     "startup-mac": "open -a iTerm.app ./startup.zsh",
-    "startup": "wezterm start --cwd /home/unnamed/Desktop/code/fether -- ./startup.sh"
+    "startup": "./startup.sh"
   },
   "dependencies": {
     "@manypkg/cli": "^0.19.2",
