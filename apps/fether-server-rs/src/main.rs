@@ -1,6 +1,8 @@
 use alloy_core::primitives::keccak256;
 use axum::{
-    extract::{Path, State},
+    async_trait,
+    body::Bytes,
+    extract::{FromRequest, Path, Request, State},
     http::StatusCode,
     response::{IntoResponse, Response},
     routing::{get, options, post},
@@ -10,8 +12,9 @@ use axum_macros::{self, debug_handler};
 use dotenv::dotenv;
 use reqwest::{self};
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 use sqlx::{mysql::MySqlPool, MySql, Pool};
-use std::{env, result::Result};
+use std::{collections::HashMap, env, result::Result, string::String};
 use tower_http::cors::CorsLayer;
 
 #[derive(Clone)]
@@ -44,25 +47,27 @@ async fn main() {
     axum::serve(listener, app).await.unwrap();
 }
 
+struct UnknownJson(HashMap<String, Value>);
+
 #[derive(Serialize, Deserialize, Debug)]
-pub struct RpcRequestBody {
-    jsonrpc: String,
-    id: String,
-    method: String,
-    params: Vec<String>,
+#[serde(untagged)]
+enum RequestParams {
+    String(String),
+    Map(HashMap<String, String>),
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct RpcResponseBody {
+pub struct RpcRequestBody {
     jsonrpc: String,
-    id: String,
-    result: String,
+    id: i32,
+    method: String,
+    params: Option<Vec<RequestParams>>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct RpcResponseError {
     jsonrpc: String,
-    id: String,
+    id: i32,
     error: RpcError,
 }
 
@@ -72,12 +77,6 @@ struct RpcError {
     message: String,
 }
 
-impl IntoResponse for RpcResponseBody {
-    fn into_response(self) -> Response {
-        let res = (StatusCode::OK, Json(self)).into_response();
-        return res;
-    }
-}
 impl IntoResponse for RpcResponseError {
     fn into_response(self) -> Response {
         let res = (StatusCode::BAD_REQUEST, Json(self)).into_response();
@@ -89,7 +88,7 @@ impl RpcResponseError {
     fn from_str(s: &str) -> Self {
         return RpcResponseError {
             jsonrpc: "2.0".to_string(),
-            id: "0".to_string(),
+            id: 0,
             error: RpcError {
                 code: 480,
                 message: s.to_string(),
@@ -97,13 +96,39 @@ impl RpcResponseError {
         };
     }
 }
+struct ExtractRpcRequest(RpcRequestBody);
+
+#[async_trait]
+impl<T> FromRequest<T> for ExtractRpcRequest
+where
+    Bytes: FromRequest<T>,
+    T: Send + Sync,
+{
+    type Rejection = Response;
+    async fn from_request(req: Request, state: &T) -> Result<Self, Self::Rejection> {
+        let body = Bytes::from_request(req, state)
+            .await
+            .map_err(IntoResponse::into_response)?;
+
+        let body_string = String::from_utf8(body.to_vec()).unwrap();
+
+        let req_from_body = match serde_json::from_str::<RpcRequestBody>(&body_string) {
+            Ok(req) => req,
+            Err(_) => {
+                return Err((StatusCode::BAD_REQUEST, "Invalid rpc request shape").into_response());
+            }
+        };
+
+        Ok(Self(req_from_body))
+    }
+}
 
 #[debug_handler]
 async fn rpc_handler(
     State(state): State<AppState>,
     Path(api_key): Path<String>,
-    Json(payload): Json<RpcRequestBody>,
-) -> Result<RpcResponseBody, RpcResponseError> {
+    ExtractRpcRequest(payload): ExtractRpcRequest,
+) -> Result<impl IntoResponse, impl IntoResponse> {
     //1. validate the api key -- done
     //2. validate the request -- done
     //3. send the request to the anvil client -- done
@@ -142,29 +167,39 @@ async fn rpc_handler(
         }
     };
 
-    let res_string = match anvil_res.text().await {
+    let res: HashMap<String, Value> = match anvil_res.json().await {
         Ok(res) => res,
-        Err(_) => return Err(RpcResponseError::from_str("Unknown rpc response error")),
+        Err(_) => {
+            return Err(RpcResponseError::from_str("Unknown rpc response error"));
+        }
     };
 
-    let success: RpcResponseBody = match serde_json::from_str(&res_string) {
-        Ok(res) => {
-            //valid tx, add it to database
-            if payload.method == "eth_sendRawTransaction" {
-                // let tx_hash = keccak256(payload);
-                println!("{:?}", payload)
-                //use anvil to get the tx details
-                //add to db
-                // match sqlx::query!("INSERT INTO Transaction ()")
-            }
-            return Ok(res);
-        }
-        Err(_) => {
-            let error_response: RpcResponseError = match serde_json::from_str(&res_string) {
-                Ok(res) => res,
-                Err(_) => return Err(RpcResponseError::from_str("Unknown rpc response error")),
-            };
-            return Err(error_response);
-        }
-    };
+    return Ok(Json(res));
+
+    // println!("{:?}", n);
+    // let success: RpcResponseBody = match serde_json::from_str(&res_string) {
+    //     Ok(res) => {
+    //         //valid tx, add it to database
+    //         if payload.method == "eth_sendRawTransaction" {
+    //             // let tx_hash = keccak256(payload);
+    //             // println!("{:?}", payload)
+    //             //use anvil to get the tx details
+    //             //add to db
+    //             // match sqlx::query!("INSERT INTO Transaction ()")
+    //         }
+    //         return Ok(res);
+    //     }
+    //     Err(_) => {
+    //         let error_response: RpcResponseError = match serde_json::from_str(&res_string) {
+    //             Ok(res) => res,
+    //             Err(error) => {
+    //                 println!("this is the error: {:?}", error);
+    //                 return Err(RpcResponseError::from_str("Unknown rpc response error"));
+    //             }
+    //         };
+    //
+    //         println!("this is an error response: {:?}", error_response);
+    //         return Err(error_response);
+    //     }
+    // };
 }
