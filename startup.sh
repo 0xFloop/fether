@@ -2,10 +2,10 @@
 
 CWD='/home/unnamed/Desktop/code/fether'
 
-wezterm start --new-tab --cwd $CWD -- pnpm dev 
-wezterm start --new-tab --cwd $CWD -- pnpm anvil
-wezterm start --new-tab --cwd $CWD -- pnpm ngrok
-wezterm start --new-tab --cwd $CWD -- pnpm studio
+wezterm start --new-tab --cwd $CWD -- bash -c "pnpm dev;bash"
+wezterm start --new-tab --cwd $CWD -- bash -c "pnpm anvil;bash"
+wezterm start --new-tab --cwd $CWD -- bash -c "pnpm ngrok;bash"
+wezterm start --new-tab --cwd $CWD -- bash -c "pnpm studio;bash"
 
 OP=$(wezterm cli list | awk '{print $2}')
 TAB_NAMES=("Studio" "Ngrok" "Anvil" "Dev")
