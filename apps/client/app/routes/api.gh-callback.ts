@@ -9,7 +9,6 @@ async function handleAuthentication(
   code: string,
   redirectUri: string
 ): Promise<{ githubUsername: string | null; githubId: string | null }> {
-  console.log(redirectUri);
 
   let githubUsername: string | null = null;
   let githubId: string | null = null;
@@ -21,6 +20,7 @@ async function handleAuthentication(
       "Content-Type": "application/json",
       Accept: "application/json",
     },
+
     body: JSON.stringify({
       client_id: process.env.fetherGithubOAuthClientId as string,
       client_secret: process.env.fetherGithubOAuthClientSecret as string,
