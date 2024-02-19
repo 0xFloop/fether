@@ -1,4 +1,4 @@
-use alloy_core::primitives::keccak256;
+use alloy_core::*;
 use axum::{
     async_trait,
     body::Bytes,
@@ -53,13 +53,22 @@ struct UnknownJson(HashMap<String, Value>);
 #[serde(untagged)]
 enum RequestParams {
     String(String),
-    Map(HashMap<String, String>),
+    Map(HashMap<String, RequestParams>),
+    Bool(bool),
+    U64(u64),
+    Vec(Vec<RequestParams>),
 }
 
+#[derive(Serialize, PartialEq, Deserialize, Debug)]
+#[serde(untagged)]
+enum NumOrString {
+    U64(u64),
+    String(String),
+}
 #[derive(Serialize, Deserialize, Debug)]
 pub struct RpcRequestBody {
     jsonrpc: String,
-    id: i32,
+    id: NumOrString,
     method: String,
     params: Option<Vec<RequestParams>>,
 }
@@ -67,7 +76,7 @@ pub struct RpcRequestBody {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct RpcResponseError {
     jsonrpc: String,
-    id: i32,
+    id: NumOrString,
     error: RpcError,
 }
 
@@ -88,7 +97,7 @@ impl RpcResponseError {
     fn from_str(s: &str) -> Self {
         return RpcResponseError {
             jsonrpc: "2.0".to_string(),
-            id: 0,
+            id: NumOrString::U64(0),
             error: RpcError {
                 code: 480,
                 message: s.to_string(),
@@ -115,6 +124,7 @@ where
         let req_from_body = match serde_json::from_str::<RpcRequestBody>(&body_string) {
             Ok(req) => req,
             Err(_) => {
+                println!("{:?}", body_string);
                 return Err((StatusCode::BAD_REQUEST, "Invalid rpc request shape").into_response());
             }
         };
@@ -174,32 +184,18 @@ async fn rpc_handler(
         }
     };
 
-    return Ok(Json(res));
+    //valid tx, add it to database
+    if payload.method == "eth_sendRawTransaction" || payload.method == "eth_sendTransaction" {
+        //let tx_hash = keccak256(payload);
 
-    // println!("{:?}", n);
-    // let success: RpcResponseBody = match serde_json::from_str(&res_string) {
-    //     Ok(res) => {
-    //         //valid tx, add it to database
-    //         if payload.method == "eth_sendRawTransaction" {
-    //             // let tx_hash = keccak256(payload);
-    //             // println!("{:?}", payload)
-    //             //use anvil to get the tx details
-    //             //add to db
-    //             // match sqlx::query!("INSERT INTO Transaction ()")
-    //         }
-    //         return Ok(res);
-    //     }
-    //     Err(_) => {
-    //         let error_response: RpcResponseError = match serde_json::from_str(&res_string) {
-    //             Ok(res) => res,
-    //             Err(error) => {
-    //                 println!("this is the error: {:?}", error);
-    //                 return Err(RpcResponseError::from_str("Unknown rpc response error"));
-    //             }
-    //         };
-    //
-    //         println!("this is an error response: {:?}", error_response);
-    //         return Err(error_response);
-    //     }
-    // };
+        println!("send transaction Payload: {:?}", payload);
+        //use alloy to get the tx details
+        //add to db
+        match sqlx::query!("INSERT INTO Transaction (txHash, repositoryId, functionName, callerUsername, timestamp) VALUES (?,?,?,?,?)","welp","this","testFunction","0xflooooooop", "2024-02-17 13:37").execute(&db_pool).await {
+            Ok(res) => println!("{:?}",res),
+            Err(err) => println!("{:?}",err)
+        };
+    }
+
+    return Ok(Json(res));
 }
