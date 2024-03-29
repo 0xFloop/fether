@@ -1,4 +1,4 @@
-use alloy_core::*;
+use alloy_core::{hex, json_abi, primitives::FixedBytes};
 use axum::{
     async_trait,
     body::Bytes,
@@ -10,11 +10,16 @@ use axum::{
 };
 use axum_macros::{self, debug_handler};
 use dotenv::dotenv;
+use ethers_core::{
+    abi::{decode, AbiType},
+    types::{transaction::eip2718::TypedTransaction, TransactionRequest},
+    utils::rlp,
+};
 use reqwest::{self};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use sqlx::{mysql::MySqlPool, MySql, Pool};
-use std::{collections::HashMap, env, result::Result, string::String};
+use sqlx::{mysql::MySqlPool, query, MySql, Pool};
+use std::{collections::HashMap, env, hash::Hash, result::Result, string::String};
 use tower_http::cors::CorsLayer;
 
 #[derive(Clone)]
@@ -49,7 +54,7 @@ async fn main() {
 
 struct UnknownJson(HashMap<String, Value>);
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(untagged)]
 enum RequestParams {
     String(String),
@@ -89,20 +94,20 @@ struct RpcError {
 impl IntoResponse for RpcResponseError {
     fn into_response(self) -> Response {
         let res = (StatusCode::BAD_REQUEST, Json(self)).into_response();
-        return res;
+        res
     }
 }
 
 impl RpcResponseError {
     fn from_str(s: &str) -> Self {
-        return RpcResponseError {
+        RpcResponseError {
             jsonrpc: "2.0".to_string(),
             id: NumOrString::U64(0),
             error: RpcError {
                 code: 480,
                 message: s.to_string(),
             },
-        };
+        }
     }
 }
 struct ExtractRpcRequest(RpcRequestBody);
@@ -147,8 +152,8 @@ async fn rpc_handler(
 
     let db_pool = state.db_pool;
 
-    let res: Vec<_> = match sqlx::query!(
-        "SELECT ApiKey.key FROM ApiKey WHERE ApiKey.key = ?",
+    let db_res: Vec<_> = match sqlx::query!(
+        "SELECT a.key, u.id as userId, r.id as reposId, r.contractAbi FROM ApiKey a INNER JOIN User u ON a.userId = u.id INNER JOIN Repository r ON r.userId = u.id WHERE a.key = ?",
         api_key
     )
     .fetch_all(&db_pool)
@@ -162,7 +167,7 @@ async fn rpc_handler(
         }
     };
 
-    if res.len() == 0 {
+    if db_res.len() == 0 {
         return Err(RpcResponseError::from_str("Invalid api key"));
     }
 
@@ -185,17 +190,49 @@ async fn rpc_handler(
     };
 
     //valid tx, add it to database
-    if payload.method == "eth_sendRawTransaction" || payload.method == "eth_sendTransaction" {
-        //let tx_hash = keccak256(payload);
+    if payload.method == "eth_sendRawTransaction" {
+        let hash = match res.get("result").unwrap() {
+            Value::String(hash) => hash,
+            _ => return Ok(Json(res)),
+        };
 
-        println!("send transaction Payload: {:?}", payload);
-        //use alloy to get the tx details
-        //add to db
-        match sqlx::query!("INSERT INTO Transaction (txHash, repositoryId, functionName, callerUsername, timestamp) VALUES (?,?,?,?,?)","welp","this","testFunction","0xflooooooop", "2024-02-17 13:37").execute(&db_pool).await {
+        let Some(abi_string) = &db_res.get(0).unwrap().contractAbi else {
+            return Err(RpcResponseError::from_str("test error"));
+        };
+
+        let abi: json_abi::JsonAbi = serde_json::from_str(abi_string).unwrap();
+        let raw = payload.params.unwrap().get(0).unwrap().clone();
+
+        let tx_hex = match raw {
+            RequestParams::String(s) => s,
+            _ => return Err(RpcResponseError::from_str("Invalid sendRawTransaction")),
+        };
+        let function_name = decode_raw_tx(&tx_hex, &abi);
+
+        match sqlx::query!("INSERT INTO Transaction (txHash, repositoryId, functionName, callerUsername) VALUES (?,?,?,?)",hash,"clsc68gz60004i0l50dreuypo",function_name,"callerUsername").execute(&db_pool).await {
             Ok(res) => println!("{:?}",res),
             Err(err) => println!("{:?}",err)
         };
     }
 
-    return Ok(Json(res));
+    Ok(Json(res))
+}
+fn decode_raw_tx<'a>(raw_hex: &str, abi: &'a json_abi::JsonAbi) -> &'a str {
+    let mut selectors = abi.functions();
+
+    let hex = hex::decode(raw_hex).unwrap();
+
+    let tx_rlp = rlp::Rlp::new(hex.as_slice());
+
+    let (tx, _) = TypedTransaction::decode_signed(&tx_rlp).unwrap();
+
+    let tx_selector = hex::encode(&tx.data().unwrap()[..4]);
+
+    for function in selectors {
+        if function.selector().to_string() == "0x".to_string() + &tx_selector {
+            return &function.name;
+        }
+    }
+
+    ""
 }
