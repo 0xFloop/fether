@@ -289,15 +289,32 @@ async fn fetherkit_handler(
 struct TestRes {
     test: String,
 }
+#[derive(Serialize, Deserialize, Debug)]
+struct GithubPayload {
+    installation: Installation,
+}
+#[derive(Serialize, Deserialize, Debug)]
+struct Installation {
+    id: String,
+}
 async fn github_payload_handler(
     State(state): State<AppState>,
-    Json(payload): Json<UnknownJson>,
+    Json(payload): Json<GithubPayload>,
 ) -> Result<impl IntoResponse, impl IntoResponse> {
     println!("Data from github payload: {:?}", payload);
 
+    let repo_id = payload.installation.id;
+    // let repo_id = match .get("installation") {
+    //     Some(Value::Object(val)) => match val.get("id") {
+    //         Some(Value::String(id)) => id,
+    //         _ => return Err("Error parsing github payload"),
+    //     },
+    //     _ => return Err("Error parsing github payload"),
+    // };
+    //
     if "World" == "Hello" {
-        return Err(Json("Hello"));
+        return Err("Hello");
     }
 
-    Ok(Json("Hello"))
+    Ok("Hello")
 }
