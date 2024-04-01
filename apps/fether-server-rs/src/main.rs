@@ -44,7 +44,7 @@ async fn main() {
     let app = Router::new()
         .route("/rpc/:api_key", post(rpc_handler))
         .route("/fetherkit/:api_key", get(fetherkit_handler))
-        .route("/payload", post(fetherkit_handler))
+        .route("/payload", post(github_payload_handler))
         .layer(CorsLayer::permissive())
         .with_state(state);
 
