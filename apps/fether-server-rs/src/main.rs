@@ -18,7 +18,7 @@ use ethers_core::{
 use reqwest::{self};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use sqlx::{mysql::MySqlPool, query, MySql, Pool};
+use sqlx::{mysql::MySqlPool, query, MySql, Pool, Row};
 use std::{collections::HashMap, env, hash::Hash, result::Result, string::String};
 use tower_http::cors::CorsLayer;
 
@@ -147,13 +147,13 @@ async fn rpc_handler(
     //1. validate the api key -- done
     //2. validate the request -- done
     //3. send the request to the anvil client -- done
-    //4. create new transaciton in db
+    //4. create new transaciton in db -- done
     //5. return the anvil clients response
 
     let db_pool = state.db_pool;
 
     let db_res: Vec<_> = match sqlx::query!(
-        "SELECT a.key, u.id as userId, r.id as reposId, r.contractAbi FROM ApiKey a INNER JOIN User u ON a.userId = u.id INNER JOIN Repository r ON r.userId = u.id WHERE a.key = ?",
+        "SELECT a.key, u.id as userId, u.username, r.id as reposId, r.contractAbi FROM ApiKey a INNER JOIN User u ON a.userId = u.id INNER JOIN Repository r ON r.userId = u.id WHERE a.key = ?",
         api_key
     )
     .fetch_all(&db_pool)
@@ -191,8 +191,8 @@ async fn rpc_handler(
 
     //valid tx, add it to database
     if payload.method == "eth_sendRawTransaction" {
-        let hash = match res.get("result").unwrap() {
-            Value::String(hash) => hash,
+        let hash = match res.get("result") {
+            Some(Value::String(hash)) => hash,
             _ => return Ok(Json(res)),
         };
 
@@ -209,7 +209,9 @@ async fn rpc_handler(
         };
         let function_name = decode_raw_tx(&tx_hex, &abi);
 
-        match sqlx::query!("INSERT INTO Transaction (txHash, repositoryId, functionName, callerUsername) VALUES (?,?,?,?)",hash,"clsc68gz60004i0l50dreuypo",function_name,"callerUsername").execute(&db_pool).await {
+        let user_name = &db_res.get(0).unwrap().username;
+
+        match sqlx::query!("INSERT INTO Transaction (txHash, repositoryId, functionName, callerUsername) VALUES (?,?,?,?)",hash,"clsc68gz60004i0l50dreuypo",function_name,user_name).execute(&db_pool).await {
             Ok(res) => println!("{:?}",res),
             Err(err) => println!("{:?}",err)
         };
