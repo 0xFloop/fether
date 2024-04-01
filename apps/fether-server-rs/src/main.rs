@@ -43,8 +43,8 @@ async fn main() {
 
     let app = Router::new()
         .route("/rpc/:api_key", post(rpc_handler))
-        .route("/fetherkit/:api_key", post(rpc_handler))
-        .route("/payload", post(rpc_handler))
+        .route("/fetherkit/:api_key", get(fetherkit_handler))
+        .route("/payload", post(fetherkit_handler))
         .layer(CorsLayer::permissive())
         .with_state(state);
 
@@ -237,4 +237,56 @@ fn decode_raw_tx<'a>(raw_hex: &str, abi: &'a json_abi::JsonAbi) -> &'a str {
     }
 
     ""
+}
+// async fn github_payload_handler(
+//     State(state): State<AppState>,
+//     Path(api_key): Path<String>,
+//     ExtractRpcRequest(payload): ExtractRpcRequest,
+// ) -> Result<impl IntoResponse, impl IntoResponse> {
+//     Ok("hello word")
+// }
+
+async fn fetherkit_handler(
+    State(state): State<AppState>,
+    Path(api_key): Path<String>,
+) -> Result<impl IntoResponse, impl IntoResponse> {
+    let db_pool = state.db_pool;
+
+    let db_res = match sqlx::query!(
+        "SELECT r.contractAddress, r.contractAbi FROM ApiKey a INNER JOIN User u ON a.userId = u.id INNER JOIN Repository r ON r.userId = u.id WHERE a.key = ?",
+        api_key
+    )
+    .fetch_one(&db_pool)
+    .await
+    {
+        Ok(res) => res,
+        Err(_) => {
+            return Err(RpcResponseError::from_str(
+                "Internal server error retrieving key data",
+            ))
+        }
+    };
+    let contract_address = match &db_res.contractAddress {
+        Some(val) => val,
+        None => {
+            return Err(RpcResponseError::from_str(
+                "Internal server error retrieving key data",
+            ))
+        }
+    };
+
+    let contract_abi = match &db_res.contractAbi {
+        Some(val) => val,
+        None => {
+            return Err(RpcResponseError::from_str(
+                "Internal server error retrieving key data",
+            ))
+        }
+    };
+    let res: HashMap<&str, String> = HashMap::from([
+        ("contractAddress", contract_address.clone()),
+        ("contractAbi", contract_abi.clone()),
+    ]);
+
+    Ok(Json(res))
 }
