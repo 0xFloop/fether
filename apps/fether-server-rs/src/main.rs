@@ -293,7 +293,7 @@ async fn github_payload_handler(
     State(state): State<AppState>,
     Json(payload): Json<UnknownJson>,
 ) -> Result<impl IntoResponse, impl IntoResponse> {
-    println!("{:?}", payload);
+    println!("Data from github payload: {:?}", payload);
 
     if "World" == "Hello" {
         return Err(Json("Hello"));
