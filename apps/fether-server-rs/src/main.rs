@@ -52,6 +52,7 @@ async fn main() {
     axum::serve(listener, app).await.unwrap();
 }
 
+#[derive(Debug, Serialize, Deserialize)]
 struct UnknownJson(HashMap<String, Value>);
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -238,13 +239,6 @@ fn decode_raw_tx<'a>(raw_hex: &str, abi: &'a json_abi::JsonAbi) -> &'a str {
 
     ""
 }
-// async fn github_payload_handler(
-//     State(state): State<AppState>,
-//     Path(api_key): Path<String>,
-//     ExtractRpcRequest(payload): ExtractRpcRequest,
-// ) -> Result<impl IntoResponse, impl IntoResponse> {
-//     Ok("hello word")
-// }
 
 async fn fetherkit_handler(
     State(state): State<AppState>,
@@ -289,4 +283,21 @@ async fn fetherkit_handler(
     ]);
 
     Ok(Json(res))
+}
+
+#[derive(Serialize, PartialEq, Deserialize, Debug)]
+struct TestRes {
+    test: String,
+}
+async fn github_payload_handler(
+    State(state): State<AppState>,
+    Json(payload): Json<UnknownJson>,
+) -> Result<impl IntoResponse, impl IntoResponse> {
+    println!("{:?}", payload);
+
+    if "World" == "Hello" {
+        return Err(Json("Hello"));
+    }
+
+    Ok(Json("Hello"))
 }
