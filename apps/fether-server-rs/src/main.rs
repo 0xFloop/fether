@@ -291,7 +291,7 @@ struct TestRes {
 }
 async fn github_payload_handler(
     State(state): State<AppState>,
-    Json(payload): Json<UnknownJson>,
+    Json(payload): Json<HashMap<String, Value>>,
 ) -> Result<impl IntoResponse, impl IntoResponse> {
     println!("Data from github payload: {:?}", payload);
 
