@@ -156,8 +156,6 @@ interface FetherProviderProps {
 
 export function FetherProvider(props: FetherProviderProps) {
   const fetherInstance = new Fether(props.apiKey);
-  console.log(fetherInstance.abi);
-  console.log(fetherInstance.address);
 
   useEffect(() => {
     fetherInstance.init();
