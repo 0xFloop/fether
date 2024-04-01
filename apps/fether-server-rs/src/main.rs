@@ -299,11 +299,17 @@ struct Installation {
 }
 async fn github_payload_handler(
     State(state): State<AppState>,
-    Json(payload): Json<GithubPayload>,
+    Json(payload): Json<UnknownJson>,
 ) -> Result<impl IntoResponse, impl IntoResponse> {
     println!("Data from github payload: {:?}", payload);
 
-    let repo_id = payload.installation.id;
+    let repo_data =
+        match serde_json::from_str::<GithubPayload>(&serde_json::to_string(&payload).unwrap()) {
+            Ok(data) => data,
+            Err(_) => return Err("Error parsing github payload"),
+        };
+
+    println!("repo data: {:?}", repo_data);
     // let repo_id = match .get("installation") {
     //     Some(Value::Object(val)) => match val.get("id") {
     //         Some(Value::String(id)) => id,
