@@ -321,7 +321,7 @@ async fn github_payload_handler(
         };
 
     let repo_details = match sqlx::query!(
-        "SELECT r.* FROM Repository r INNER JOIN Team t ON t.id = r.teamId INNER JOIN User u ON u.id = r.userId INNER JOIN ApiKey a ON a.userId = u.id OR a.teamId = t.id WHERE r.id= ?",
+        "SELECT r.* FROM Repository r INNER JOIN Team t ON t.id = r.teamId INNER JOIN User u ON u.id = r.userId LEFT JOIN ApiKey a ON a.userId = u.id OR a.teamId = t.id WHERE r.id= ?",
         gh_payload.installation.id
     )
     .fetch_one(&db_pool)
