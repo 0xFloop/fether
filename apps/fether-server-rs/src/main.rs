@@ -311,6 +311,7 @@ async fn github_payload_handler(
 ) -> Result<impl IntoResponse, impl IntoResponse> {
     let db_pool = state.db_pool;
 
+    println!("heer");
     let gh_payload =
         match serde_json::from_str::<GithubPayload>(&serde_json::to_string(&payload).unwrap()) {
             Ok(data) => data,
@@ -320,6 +321,7 @@ async fn github_payload_handler(
             }
         };
 
+    println!("heer");
     let repo_details = match sqlx::query!(
         "SELECT r.* FROM Repository r INNER JOIN Team t ON t.id = r.teamId INNER JOIN User u ON u.id = r.userId LEFT JOIN ApiKey a ON a.userId = u.id OR a.teamId = t.id WHERE r.id= ?",
         gh_payload.installation.id
@@ -330,6 +332,7 @@ async fn github_payload_handler(
         Ok(res) => res,
         Err(_) => return Err("Internal server error retrieving key data"),
     };
+    println!("heer");
     // need to use repo_details to grab either the team or the user data based upon which is
     // present in the repo_details
     let associated_data: Option<String> = Option::None;
