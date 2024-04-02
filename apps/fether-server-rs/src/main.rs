@@ -311,7 +311,7 @@ async fn github_payload_handler(
 ) -> Result<impl IntoResponse, impl IntoResponse> {
     let db_pool = state.db_pool;
 
-    println!("heer");
+    println!("{:?}", payload);
     let gh_payload =
         match serde_json::from_str::<GithubPayload>(&serde_json::to_string(&payload).unwrap()) {
             Ok(data) => data,
