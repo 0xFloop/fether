@@ -295,7 +295,7 @@ struct GithubPayload {
 }
 #[derive(Serialize, Deserialize, Debug)]
 struct Installation {
-    id: String,
+    id: u64,
 }
 async fn github_payload_handler(
     State(state): State<AppState>,
