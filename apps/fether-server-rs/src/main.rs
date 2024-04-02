@@ -292,8 +292,9 @@ struct TestRes {
 #[derive(Serialize, Deserialize, Debug)]
 struct GithubPayload {
     installation: Installation,
-    file_ref: String,
+    _ref: String,
     repository: RepoDetails,
+    commits: Vec<Value>,
 }
 #[derive(Serialize, Deserialize, Debug)]
 struct Installation {
@@ -302,8 +303,6 @@ struct Installation {
 #[derive(Serialize, Deserialize, Debug)]
 struct RepoDetails {
     id: u64,
-    userId: String,
-    teamId: String,
 }
 async fn github_payload_handler(
     State(state): State<AppState>,
