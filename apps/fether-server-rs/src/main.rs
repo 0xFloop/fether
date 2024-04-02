@@ -301,7 +301,7 @@ async fn github_payload_handler(
     State(state): State<AppState>,
     Json(payload): Json<UnknownJson>,
 ) -> Result<impl IntoResponse, impl IntoResponse> {
-    println!("Data from github payload: {:?}", payload);
+    // println!("Data from github payload: {:?}", payload);
 
     let repo_data =
         match serde_json::from_str::<GithubPayload>(&serde_json::to_string(&payload).unwrap()) {
