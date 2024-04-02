@@ -306,7 +306,10 @@ async fn github_payload_handler(
     let repo_data =
         match serde_json::from_str::<GithubPayload>(&serde_json::to_string(&payload).unwrap()) {
             Ok(data) => data,
-            Err(_) => return Err("Error parsing github payload"),
+            Err(err) => {
+                println!("{:?}", err);
+                return Err("Error parsing github payload");
+            }
         };
 
     println!("repo data: {:?}", repo_data);
