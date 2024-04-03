@@ -321,9 +321,13 @@ async fn github_payload_handler(
             }
         };
 
+    // "SELECT r.*, a.key  FROM Repository r INNER JOIN Team t ON t.id = r.teamId INNER JOIN User u ON u.id = r.userId LEFT JOIN ApiKey a ON a.userId = u.id OR a.teamId = t.id WHERE r.id= ?",
+    // gh_payload.installation.id
+
     println!("heer2");
+
     let repo_details = match sqlx::query!(
-        "SELECT r.*, a.key  FROM Repository r INNER JOIN Team t ON t.id = r.teamId INNER JOIN User u ON u.id = r.userId LEFT JOIN ApiKey a ON a.userId = u.id OR a.teamId = t.id WHERE r.id= ?",
+        "SELECT r.teamId, r.userId FROM Repository r WHERE r.id= ?",
         gh_payload.installation.id
     )
     .fetch_one(&db_pool)
@@ -339,7 +343,12 @@ async fn github_payload_handler(
 
     println!("{:?}", repo_details);
 
-    if repo_details.userId.is_some() {}
+    if repo_details.userId.is_some() {
+        println!("has user id")
+    }
 
+    if repo_details.teamId.is_some() {
+        println!("has user id")
+    }
     Ok(Json(gh_payload))
 }
