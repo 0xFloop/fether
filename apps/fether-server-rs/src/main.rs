@@ -334,6 +334,7 @@ async fn github_payload_handler(
         Err(_) => return Err("Internal server error retrieving key data"),
     };
     //adapt the code below to loop through all the repositories that track this file
+
     for repo in repo_details {
         println!("{:?}", repo);
 
@@ -363,6 +364,14 @@ async fn github_payload_handler(
                 Ok(res) => res.key,
                 Err(_) => return Err("Internal server error retrieving key data"),
             };
+        } else {
+            return Err("Internal server error: unable to find api key");
+        }
+        if api_key == "" {
+            return Err("Internal server error: unable to find api key");
+        }
+        for commit in &gh_payload.commits {
+            println!("{:?}", commit);
         }
     }
     Ok(Json(gh_payload))
