@@ -292,7 +292,8 @@ struct TestRes {
 #[derive(Serialize, Deserialize, Debug)]
 struct GithubPayload {
     installation: Installation,
-    _ref: String,
+    #[serde(rename = "ref")]
+    gh_ref: String,
     repository: RepoDetails,
     commits: Vec<Value>,
 }
