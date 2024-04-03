@@ -344,11 +344,33 @@ async fn github_payload_handler(
 
     println!("{:?}", repo_details);
 
+    let mut api_key = String::new();
+
     if repo_details.userId.is_some() {
-        println!("has userId")
+        let key_data = match sqlx::query!(
+            "SELECT ApiKey.key FROM ApiKey WHERE ApiKey.userId = ?",
+            repo_details.userId
+        )
+        .fetch_one(&db_pool)
+        .await
+        {
+            Ok(res) => res,
+            Err(_) => return Err("Internal server error retrieving key data"),
+        };
+        println!("has userId: {:?}", key_data);
     }
     if repo_details.teamId.is_some() {
-        println!("has teamId")
+        let key_data = match sqlx::query!(
+            "SELECT ApiKey.key FROM ApiKey WHERE ApiKey.teamId = ?",
+            repo_details.teamId
+        )
+        .fetch_one(&db_pool)
+        .await
+        {
+            Ok(res) => res,
+            Err(_) => return Err("Internal server error retrieving key data"),
+        };
+        println!("has teamId: {:?}", key_data);
     }
 
     Ok(Json(gh_payload))
