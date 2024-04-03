@@ -311,7 +311,6 @@ async fn github_payload_handler(
 ) -> Result<impl IntoResponse, impl IntoResponse> {
     let db_pool = state.db_pool;
 
-    println!("heer1");
     let gh_payload =
         match serde_json::from_str::<GithubPayload>(&serde_json::to_string(&payload).unwrap()) {
             Ok(data) => data,
@@ -324,54 +323,47 @@ async fn github_payload_handler(
     // "SELECT r.*, a.key  FROM Repository r INNER JOIN Team t ON t.id = r.teamId INNER JOIN User u ON u.id = r.userId LEFT JOIN ApiKey a ON a.userId = u.id OR a.teamId = t.id WHERE r.id= ?",
     // gh_payload.installation.id
 
-    println!("heer2");
-    println!("{:?}", gh_payload.repository.id);
-
     let repo_details = match sqlx::query!(
         "SELECT * FROM Repository r WHERE r.repoId= ?",
         gh_payload.repository.id
     )
-    .fetch_one(&db_pool)
+    .fetch_all(&db_pool)
     .await
     {
         Ok(res) => res,
         Err(_) => return Err("Internal server error retrieving key data"),
     };
-    println!("heer3");
-    // need to use repo_details to grab either the team or the user data based upon which is
-    // present in the repo_details
-    let associated_data: Option<String> = Option::None;
+    //adapt the code below to loop through all the repositories that track this file
+    for repo in repo_details {
+        println!("{:?}", repo);
 
-    println!("{:?}", repo_details);
+        let associated_data: Option<String> = Option::None;
 
-    let mut api_key = String::new();
+        let mut api_key = String::new();
 
-    if repo_details.userId.is_some() {
-        api_key = match sqlx::query!(
-            "SELECT ApiKey.key FROM ApiKey WHERE ApiKey.userId = ?",
-            repo_details.userId
-        )
-        .fetch_one(&db_pool)
-        .await
-        {
-            Ok(res) => res.key,
-            Err(_) => return Err("Internal server error retrieving key data"),
-        };
-        println!("has userId: {:?}", api_key);
+        if repo.userId.is_some() {
+            api_key = match sqlx::query!(
+                "SELECT ApiKey.key FROM ApiKey WHERE ApiKey.userId = ?",
+                repo.userId
+            )
+            .fetch_one(&db_pool)
+            .await
+            {
+                Ok(res) => res.key,
+                Err(_) => return Err("Internal server error retrieving key data"),
+            };
+        } else if repo.teamId.is_some() {
+            api_key = match sqlx::query!(
+                "SELECT ApiKey.key FROM ApiKey WHERE ApiKey.teamId = ?",
+                repo.teamId
+            )
+            .fetch_one(&db_pool)
+            .await
+            {
+                Ok(res) => res.key,
+                Err(_) => return Err("Internal server error retrieving key data"),
+            };
+        }
     }
-    if repo_details.teamId.is_some() {
-        api_key = match sqlx::query!(
-            "SELECT ApiKey.key FROM ApiKey WHERE ApiKey.teamId = ?",
-            repo_details.teamId
-        )
-        .fetch_one(&db_pool)
-        .await
-        {
-            Ok(res) => res.key,
-            Err(_) => return Err("Internal server error retrieving key data"),
-        };
-        println!("has teamId: {:?}", api_key);
-    }
-
     Ok(Json(gh_payload))
 }
