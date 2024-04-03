@@ -344,7 +344,12 @@ async fn github_payload_handler(
 
     println!("{:?}", repo_details);
 
-    if repo_details.userId.is_some() {}
+    if repo_details.userId.is_some() {
+        println!("has userId")
+    }
+    if repo_details.teamId.is_some() {
+        println!("has teamId")
+    }
 
     Ok(Json(gh_payload))
 }
