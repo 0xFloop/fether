@@ -325,6 +325,7 @@ async fn github_payload_handler(
     // gh_payload.installation.id
 
     println!("heer2");
+    println!("{:?}", gh_payload.repository.id);
 
     let repo_details = match sqlx::query!(
         "SELECT r.*, a.key  FROM Repository r INNER JOIN Team t ON t.id = r.teamId INNER JOIN User u ON u.id = r.userId LEFT JOIN ApiKey a ON a.userId = u.id OR a.teamId = t.id WHERE r.id= ?",
