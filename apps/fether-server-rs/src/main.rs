@@ -327,7 +327,7 @@ async fn github_payload_handler(
     // "SELECT r.*, a.key  FROM Repository r INNER JOIN Team t ON t.id = r.teamId INNER JOIN User u ON u.id = r.userId LEFT JOIN ApiKey a ON a.userId = u.id OR a.teamId = t.id WHERE r.id= ?",
     // gh_payload.installation.id
 
-    let repo_details = match sqlx::query!(
+    let mut repo_details = match sqlx::query!(
         "SELECT * FROM Repository r WHERE r.repoId= ?",
         gh_payload.repository.id
     )
@@ -338,9 +338,7 @@ async fn github_payload_handler(
         Err(_) => return Err("Internal server error retrieving key data"),
     };
 
-    for repo in repo_details {
-        let associated_data: Option<String> = Option::None;
-
+    for repo in &mut repo_details {
         let mut api_key = String::new();
 
         if repo.userId.is_some() {
@@ -368,22 +366,26 @@ async fn github_payload_handler(
         } else {
             return Err("Internal server error: unable to find api key");
         }
-        if api_key == "" {
+        if api_key.is_empty() {
             return Err("Internal server error: unable to find api key");
         }
         for commit in &gh_payload.commits {
             for modified in &commit.modified {
-                let char_pos = modified.char_indices().nth_back(2).unwrap().0;
-                let file_extension = &modified[char_pos..];
-                println!(
-                    "does modified end with sol? {:?}",
-                    modified.ends_with("sol")
-                );
                 if modified.ends_with("sol") {
-                    println!("sol file modified");
-                }
-                if file_extension == "sol" {
                     println!("we modified this sol file : {:?}", modified);
+                    let file_name = match modified.split('/').last() {
+                        Some(name) => name,
+                        None => return Err("Error parsing modified file name."),
+                    };
+                    let tracked_filename = match repo.filename.take() {
+                        Some(name) => name,
+                        None => return Err("Error no repository file name present."),
+                    };
+                    if tracked_filename == file_name {
+                        println!("we modified the file we are tracking");
+                    } else {
+                        println!("we modified a file we are not tracking");
+                    }
                     //we modified a sol file
                 } else {
                     println!("we modified this NON sol file : {:?}", modified);
