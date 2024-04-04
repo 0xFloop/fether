@@ -383,6 +383,9 @@ async fn github_payload_handler(
                     if tracked_filename == file_name {
                         let repo_url = repo.repoName.clone();
                         let mut parts = repo_url.split('.');
+
+                        println!("repo_url: {}", repo_url);
+                        println!("parts: {:?}", parts);
                         let user_name = parts.next().unwrap();
                         let repo_name = parts.next().unwrap();
                         // let (user_name, repo_name): (&str, &str) =
