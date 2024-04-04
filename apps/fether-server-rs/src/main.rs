@@ -381,6 +381,7 @@ async fn github_payload_handler(
                         Some(name) => name,
                         None => return Err("Error no repository file name present."),
                     };
+                    println!("{} === {}", tracked_filename, file_name);
                     if tracked_filename == file_name {
                         println!("we modified the file we are tracking");
                     } else {
