@@ -373,6 +373,7 @@ async fn github_payload_handler(
         }
         for commit in &gh_payload.commits {
             for modified in &commit.modified {
+                println!("file modified: {:?}", modified);
                 if modified.split("/").nth(0) == Some("sol") {
                     println!("we modified this sol file : {:?}", modified);
                     //we modified a sol file
