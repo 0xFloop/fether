@@ -295,7 +295,11 @@ struct GithubPayload {
     #[serde(rename = "ref")]
     gh_ref: String,
     repository: RepoDetails,
-    commits: Vec<Value>,
+    commits: Vec<Commit>,
+}
+#[derive(Serialize, Deserialize, Debug)]
+struct Commit {
+    modified: Vec<String>,
 }
 #[derive(Serialize, Deserialize, Debug)]
 struct Installation {
@@ -333,11 +337,8 @@ async fn github_payload_handler(
         Ok(res) => res,
         Err(_) => return Err("Internal server error retrieving key data"),
     };
-    //adapt the code below to loop through all the repositories that track this file
 
     for repo in repo_details {
-        println!("{:?}", repo);
-
         let associated_data: Option<String> = Option::None;
 
         let mut api_key = String::new();
@@ -371,7 +372,14 @@ async fn github_payload_handler(
             return Err("Internal server error: unable to find api key");
         }
         for commit in &gh_payload.commits {
-            println!("{:?}", commit);
+            for modified in &commit.modified {
+                if modified.split("/").nth(0) == Some("sol") {
+                    println!("we modified this sol file : {:?}", modified);
+                    //we modified a sol file
+                } else {
+                    println!("we modified this NON sol file : {:?}", modified);
+                }
+            }
         }
     }
     Ok(Json(gh_payload))
