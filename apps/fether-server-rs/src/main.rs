@@ -377,7 +377,7 @@ async fn github_payload_handler(
                         Some(name) => name,
                         None => return Err("Error parsing modified file name."),
                     };
-                    let tracked_filename = match repo.filename.take() {
+                    let tracked_filename = match repo.filename.clone() {
                         Some(name) => name,
                         None => return Err("Error no repository file name present."),
                     };
