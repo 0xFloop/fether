@@ -373,10 +373,15 @@ async fn github_payload_handler(
         }
         for commit in &gh_payload.commits {
             for modified in &commit.modified {
-                println!("file modified: {:?}", modified);
                 let char_pos = modified.char_indices().nth_back(2).unwrap().0;
                 let file_extension = &modified[char_pos..];
-                println!("{file_extension}");
+                println!(
+                    "does modified end with sol? {:?}",
+                    modified.ends_with("sol")
+                );
+                if modified.ends_with("sol") {
+                    println!("sol file modified");
+                }
                 if file_extension == "sol" {
                     println!("we modified this sol file : {:?}", modified);
                     //we modified a sol file
