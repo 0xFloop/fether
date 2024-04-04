@@ -380,12 +380,32 @@ async fn github_payload_handler(
                         return Err("Error no repository file name present.");
                     };
 
-                    println!("{file_name}");
                     if tracked_filename == file_name {
+                        let repo_url = repo.repoName.clone();
+                        let mut parts = repo_url.split('.');
+                        let user_name = parts.next().unwrap();
+                        let repo_name = parts.next().unwrap();
+                        // let (user_name, repo_name): (&str, &str) =
+                        //     repo.repoName.clone().split('.').
+
                         let Some(root_dir) = &repo.foundryRootDir else {
                             return Err("Error unable to find foundry root directory.");
                         };
+                        let byte_code_path = root_dir.clone()
+                            + "/out/"
+                            + file_name
+                            + "/"
+                            + file_name
+                                .split(".")
+                                .next()
+                                .ok_or_else(|| "Error improper file name format")?
+                            + ".json";
+
                         println!("{root_dir}");
+                        println!("{file_name}");
+                        println!("{user_name}");
+                        println!("{repo_name}");
+
                         // let file_name =
                     }
                 } else {
