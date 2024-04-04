@@ -374,7 +374,7 @@ async fn github_payload_handler(
         for commit in &gh_payload.commits {
             for modified in &commit.modified {
                 println!("file modified: {:?}", modified);
-                let char_pos = modified.char_indices().nth_back(3).unwrap().0;
+                let char_pos = modified.char_indices().nth_back(2).unwrap().0;
                 let file_extension = &modified[char_pos..];
                 println!("{file_extension}");
                 if file_extension == "sol" {
