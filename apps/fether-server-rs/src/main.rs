@@ -20,6 +20,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use sqlx::{mysql::MySqlPool, query, MySql, Pool, Row};
 use std::{collections::HashMap, env, hash::Hash, result::Result, string::String};
+use tokio::io::split;
 use tower_http::cors::CorsLayer;
 
 #[derive(Clone)]
@@ -369,6 +370,20 @@ async fn github_payload_handler(
         if api_key.is_empty() {
             return Err("Internal server error: unable to find api key");
         }
+        let Some(github_ref) = gh_payload.gh_ref.split('/').last() else {
+            return Err("Error with payload ref string");
+        };
+
+        let Some(tracking_branch) = repo.branchName.clone() else {
+            return Err("Error parsing repository branch name");
+        };
+
+        println!("{github_ref}: {tracking_branch}");
+
+        if github_ref == &tracking_branch {
+            println!("modified our tracknig branch");
+        };
+
         for commit in &gh_payload.commits {
             for modified in &commit.modified {
                 if modified.ends_with("sol") {
@@ -383,13 +398,10 @@ async fn github_payload_handler(
                     if tracked_filename == file_name {
                         let repo_url = repo.repoName.clone();
                         let mut parts = repo_url.split('/');
-
-                        println!("repo_url: {}", repo_url);
-                        println!("parts: {:?}", parts);
-                        let user_name = parts.next().unwrap();
-                        let repo_name = parts.next().unwrap();
-                        // let (user_name, repo_name): (&str, &str) =
-                        //     repo.repoName.clone().split('.').
+                        let (Some(user_name), Some(repo_name)) = (parts.next(), parts.next())
+                        else {
+                            return Err("Error improperly formated repo url.");
+                        };
 
                         let Some(root_dir) = &repo.foundryRootDir else {
                             return Err("Error unable to find foundry root directory.");
