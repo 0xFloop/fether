@@ -424,6 +424,7 @@ async fn github_payload_handler(
         println!("here5");
         println!("{user_name}/{repo_name}");
         println!("{tracking_branch}");
+        println!("{byte_code_path}");
 
         let repo_contents = match octocrab::instance()
             .repos(user_name, repo_name)
