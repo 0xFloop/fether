@@ -427,6 +427,7 @@ async fn github_payload_handler(
         println!("{byte_code_path}");
 
         let repo_contents = match octocrab::instance()
+            .installation(octocrab::models::InstallationId(gh_payload.installation.id))
             .repos(user_name, repo_name)
             .get_content()
             .path(byte_code_path)
