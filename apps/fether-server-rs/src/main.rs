@@ -422,16 +422,18 @@ async fn github_payload_handler(
             + ".json";
 
         println!("here5");
-        let Ok(repo_contents) = octocrab::instance()
+        let repo_contents = match octocrab::instance()
             .repos(user_name, repo_name)
             .get_content()
             .r#ref(tracking_branch)
             .send()
             .await
-        else {
-            println!("here6");
-
-            return Err("Error initializing github installation");
+        {
+            Ok(val) => val,
+            Err(err) => {
+                println!("{err}");
+                return Err("Error initializing github installation");
+            }
         };
 
         println!("Repository contents:{repo_contents:?}");
