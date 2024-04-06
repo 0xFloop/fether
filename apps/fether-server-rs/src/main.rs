@@ -372,6 +372,7 @@ async fn github_payload_handler(
             continue 'repo_loop;
         };
 
+        println!("here");
         let Some(github_ref) = gh_payload.gh_ref.split('/').last() else {
             continue 'repo_loop;
         };
@@ -388,6 +389,7 @@ async fn github_payload_handler(
             continue 'repo_loop;
         };
 
+        println!("here2");
         let repo_url = repo.repoName.clone();
 
         let mut parts = repo_url.split('/');
@@ -396,6 +398,7 @@ async fn github_payload_handler(
             return Err("Error improperly formated repo url.");
         };
 
+        println!("here3");
         let Some(root_dir) = &repo.foundryRootDir else {
             return Err("Error unable to find foundry root directory.");
         };
@@ -407,6 +410,7 @@ async fn github_payload_handler(
             continue 'repo_loop;
         };
 
+        println!("here4");
         let byte_code_path = root_dir.clone()
             + "/out/"
             + file_name
@@ -417,6 +421,7 @@ async fn github_payload_handler(
                 .ok_or_else(|| "Error improper file name format")?
             + ".json";
 
+        println!("here5");
         let Ok(repo_contents) = octocrab::instance()
             .repos(user_name, repo_name)
             .get_content()
@@ -424,6 +429,8 @@ async fn github_payload_handler(
             .send()
             .await
         else {
+            println!("here6");
+
             return Err("Error initializing github installation");
         };
 
