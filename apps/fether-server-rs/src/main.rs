@@ -15,6 +15,7 @@ use ethers_core::{
     types::{transaction::eip2718::TypedTransaction, TransactionRequest},
     utils::rlp,
 };
+use octocrab::apps;
 use reqwest::{self};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -339,7 +340,7 @@ async fn github_payload_handler(
         Err(_) => return Err("Internal server error retrieving key data"),
     };
 
-    for repo in &mut repo_details {
+    'repo_loop: for repo in &mut repo_details {
         let mut api_key = String::new();
 
         if repo.userId.is_some() {
@@ -351,7 +352,7 @@ async fn github_payload_handler(
             .await
             {
                 Ok(res) => res.key,
-                Err(_) => return Err("Internal server error retrieving key data"),
+                Err(_) => continue 'repo_loop,
             };
         } else if repo.teamId.is_some() {
             api_key = match sqlx::query!(
@@ -362,66 +363,96 @@ async fn github_payload_handler(
             .await
             {
                 Ok(res) => res.key,
-                Err(_) => return Err("Internal server error retrieving key data"),
+                Err(_) => continue 'repo_loop,
             };
         } else {
-            return Err("Internal server error: unable to find api key");
+            continue 'repo_loop;
         }
         if api_key.is_empty() {
-            return Err("Internal server error: unable to find api key");
-        }
+            continue 'repo_loop;
+        };
+
         let Some(github_ref) = gh_payload.gh_ref.split('/').last() else {
-            return Err("Error with payload ref string");
+            continue 'repo_loop;
         };
 
         let Some(tracking_branch) = repo.branchName.clone() else {
-            return Err("Error parsing repository branch name");
+            continue 'repo_loop;
         };
 
-        println!("{github_ref}: {tracking_branch}");
-
-        if github_ref == &tracking_branch {
-            println!("modified our tracknig branch");
+        if !(github_ref == &tracking_branch) {
+            continue 'repo_loop;
         };
 
-        for commit in &gh_payload.commits {
-            for modified in &commit.modified {
+        let Some(tracked_filename) = repo.filename.clone() else {
+            continue 'repo_loop;
+        };
+
+        let repo_url = repo.repoName.clone();
+
+        let mut parts = repo_url.split('/');
+
+        let (Some(user_name), Some(repo_name)) = (parts.next(), parts.next()) else {
+            return Err("Error improperly formated repo url.");
+        };
+
+        let Some(root_dir) = &repo.foundryRootDir else {
+            return Err("Error unable to find foundry root directory.");
+        };
+
+        let Some(file_name) = &repo.filename else {
+            continue 'repo_loop;
+        };
+        let Some(deployer_address) = &repo.deployerAddress else {
+            continue 'repo_loop;
+        };
+
+        let byte_code_path = root_dir.clone()
+            + "/out/"
+            + file_name
+            + "/"
+            + file_name
+                .split(".")
+                .next()
+                .ok_or_else(|| "Error improper file name format")?
+            + ".json";
+
+        let Ok(repo_contents) = octocrab::instance()
+            .repos(user_name, repo_name)
+            .get_content()
+            .r#ref(tracking_branch)
+            .send()
+            .await
+        else {
+            return Err("Error initializing github installation");
+        };
+
+        println!("Repository contents:{repo_contents:?}");
+
+        'all_commits_loop: for commit in &gh_payload.commits {
+            'current_commit_loop: for modified in &commit.modified {
                 if modified.ends_with("sol") {
-                    let Some(file_name) = modified.split('/').last() else {
-                        return Err("Error parsing modified file name.");
+                    let Some(modified_file_name) = modified.split('/').last() else {
+                        continue 'current_commit_loop;
                     };
 
-                    let Some(tracked_filename) = repo.filename.clone() else {
-                        return Err("Error no repository file name present.");
-                    };
+                    if &tracked_filename == file_name {
+                        println!("Root dir: {root_dir}");
+                        println!("Mod file: {modified_file_name}");
+                        println!("Username: {user_name}");
+                        println!("Repo name: {repo_name}");
 
-                    if tracked_filename == file_name {
-                        let repo_url = repo.repoName.clone();
-                        let mut parts = repo_url.split('/');
-                        let (Some(user_name), Some(repo_name)) = (parts.next(), parts.next())
-                        else {
-                            return Err("Error improperly formated repo url.");
-                        };
-
-                        let Some(root_dir) = &repo.foundryRootDir else {
-                            return Err("Error unable to find foundry root directory.");
-                        };
-                        let byte_code_path = root_dir.clone()
-                            + "/out/"
-                            + file_name
-                            + "/"
-                            + file_name
-                                .split(".")
-                                .next()
-                                .ok_or_else(|| "Error improper file name format")?
-                            + ".json";
-
-                        println!("{root_dir}");
-                        println!("{file_name}");
-                        println!("{user_name}");
-                        println!("{repo_name}");
-
-                        // let file_name =
+                        //request the contetss of the bytecode path from github
+                        //grab bytecode from respose
+                        //use alloy/ethers to parse abi
+                        //get custom fether chain from api_key
+                        //if deployer balance <1, use admin to anvil setBalance
+                        //anvil impersonate deployer
+                        //deploy contract
+                        //stop impersonating
+                        //await transaction receipt
+                        //add tx to db
+                        //update repository in db with new contract address and lastDeployed time
                     }
                 } else {
                     println!("we modified this NON sol file : {:?}", modified);
@@ -429,5 +460,5 @@ async fn github_payload_handler(
             }
         }
     }
-    Ok(Json(gh_payload))
+    Ok(())
 }
