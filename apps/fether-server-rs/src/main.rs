@@ -431,7 +431,7 @@ async fn github_payload_handler(
         {
             Ok(val) => val,
             Err(err) => {
-                println!("{err}");
+                println!("error: {err:?}");
                 return Err("Error initializing github installation");
             }
         };
