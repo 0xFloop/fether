@@ -468,6 +468,7 @@ async fn github_payload_handler(
 
         let contents = repo_contents.take_items()[0].decoded_content().unwrap();
 
+        println!("{:?}", serde_json::to_string_pretty(&contents));
         let contents_json: BytecodeStruct = serde_json::from_str(&contents).unwrap();
 
         println!("{:?}", serde_json::to_string_pretty(&contents_json));
