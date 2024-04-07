@@ -319,7 +319,7 @@ struct OctokitResponse {
 }
 #[derive(Serialize, Deserialize, Debug)]
 struct BytecodeStruct {
-    abi: HashMap<String, Value>,
+    abi: String,
     bytecode: BytecodeObject,
 }
 #[derive(Serialize, Deserialize, Debug)]
