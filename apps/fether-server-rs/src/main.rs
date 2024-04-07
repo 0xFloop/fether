@@ -373,7 +373,6 @@ async fn github_payload_handler(
             continue 'repo_loop;
         };
 
-        println!("here");
         let Some(github_ref) = gh_payload.gh_ref.split('/').last() else {
             continue 'repo_loop;
         };
@@ -390,7 +389,6 @@ async fn github_payload_handler(
             continue 'repo_loop;
         };
 
-        println!("here2");
         let repo_url = repo.repoName.clone();
 
         let mut parts = repo_url.split('/');
@@ -399,7 +397,6 @@ async fn github_payload_handler(
             return Err("Error improperly formated repo url.");
         };
 
-        println!("here3");
         let Some(root_dir) = &repo.foundryRootDir else {
             return Err("Error unable to find foundry root directory.");
         };
@@ -411,7 +408,6 @@ async fn github_payload_handler(
             continue 'repo_loop;
         };
 
-        println!("here4");
         let byte_code_path = root_dir.clone()
             + "/out/"
             + file_name
@@ -422,7 +418,6 @@ async fn github_payload_handler(
                 .ok_or_else(|| "Error improper file name format")?
             + ".json";
 
-        println!("here5");
         println!("{user_name}/{repo_name}");
         println!("{tracking_branch}");
         println!("{byte_code_path}");
@@ -430,17 +425,22 @@ async fn github_payload_handler(
         let Ok(gh_app_id) = env::var("GH_APP_ID") else {
             return Err("Error parsing github app details");
         };
+        println!("here");
         let Ok(gh_app_pk) = env::var("GH_APP_PK") else {
             return Err("Error parsing github app details");
         };
+        println!("{gh_app_id}: {gh_app_pk:?}");
 
         let key = jsonwebtoken::EncodingKey::from_rsa_pem(gh_app_pk.as_bytes()).unwrap();
+        println!("here2");
 
         let app_id = gh_app_id.parse::<u64>().unwrap().into();
+        println!("here3");
 
         let Ok(octocrab) = Octocrab::builder().app(app_id, key).build() else {
             return Err("Error building octocrab instance");
         };
+        println!("here4");
 
         let repo_contents = match octocrab
             .repos(user_name, repo_name)
