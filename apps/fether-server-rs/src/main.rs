@@ -426,9 +426,16 @@ async fn github_payload_handler(
             return Err("Error parsing github app details");
         };
         println!("here: {gh_app_id}");
-        let Ok(gh_app_pk) = env::var("GH_APP_PK") else {
-            return Err("Error parsing github app details");
+        let gh_app_pk = match env::var("GH_APP_PK") {
+            Ok(pk) => pk,
+            Err(err) => {
+                println!("{err}");
+                return Err("Error parsing github app details");
+            }
         };
+        // let Ok(gh_app_pk) = env::var("GH_APP_PK") else {
+        //     return Err("Error parsing github app details");
+        // };
         println!("{gh_app_id}: {gh_app_pk:?}");
 
         let key = jsonwebtoken::EncodingKey::from_rsa_pem(gh_app_pk.as_bytes()).unwrap();
