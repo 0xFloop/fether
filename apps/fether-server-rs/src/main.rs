@@ -315,10 +315,10 @@ struct RepoDetails {
 }
 #[derive(Serialize, Deserialize, Debug)]
 struct OctokitResponse {
-    data: DataStruct,
+    data: BytecodeStruct,
 }
 #[derive(Serialize, Deserialize, Debug)]
-struct DataStruct {
+struct BytecodeStruct {
     abi: HashMap<String, Value>,
     bytecode: BytecodeObject,
 }
@@ -468,7 +468,7 @@ async fn github_payload_handler(
 
         let contents = repo_contents.take_items()[0].decoded_content().unwrap();
 
-        let contents_json: OctokitResponse = serde_json::from_str(&contents).unwrap();
+        let contents_json: BytecodeStruct = serde_json::from_str(&contents).unwrap();
 
         println!("{:?}", serde_json::to_string_pretty(&contents_json));
 
