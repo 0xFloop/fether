@@ -425,7 +425,7 @@ async fn github_payload_handler(
         let Ok(gh_app_id) = env::var("GH_APP_ID") else {
             return Err("Error parsing github app details");
         };
-        println!("here");
+        println!("here: {gh_app_id}");
         let Ok(gh_app_pk) = env::var("GH_APP_PK") else {
             return Err("Error parsing github app details");
         };
