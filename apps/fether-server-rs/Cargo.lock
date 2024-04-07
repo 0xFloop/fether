@@ -755,6 +755,7 @@ dependencies = [
  "dotenv",
  "either",
  "ethers-core",
+ "jsonwebtoken",
  "octocrab",
  "reqwest",
  "serde",

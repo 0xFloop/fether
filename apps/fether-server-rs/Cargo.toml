@@ -21,3 +21,4 @@ alloy-core = { version = "0.6.2", features = ["json-abi", "dyn-abi"] }
 chrono = "0.4.34"
 ethers-core = "2.0.14"
 octocrab = "0.37.0"
+jsonwebtoken = "9.3.0"

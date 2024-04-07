@@ -15,7 +15,8 @@ use ethers_core::{
     types::{transaction::eip2718::TypedTransaction, TransactionRequest},
     utils::rlp,
 };
-use octocrab::apps;
+use jsonwebtoken::*;
+use octocrab::Octocrab;
 use reqwest::{self};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -426,8 +427,22 @@ async fn github_payload_handler(
         println!("{tracking_branch}");
         println!("{byte_code_path}");
 
-        let repo_contents = match octocrab::instance()
-            .installation(octocrab::models::InstallationId(gh_payload.installation.id))
+        let Ok(gh_app_id) = env::var("GH_APP_ID") else {
+            return Err("Error parsing github app details");
+        };
+        let Ok(gh_app_pk) = env::var("GH_APP_PK") else {
+            return Err("Error parsing github app details");
+        };
+
+        let key = jsonwebtoken::EncodingKey::from_rsa_pem(gh_app_pk.as_bytes()).unwrap();
+
+        let app_id = gh_app_id.parse::<u64>().unwrap().into();
+
+        let Ok(octocrab) = Octocrab::builder().app(app_id, key).build() else {
+            return Err("Error building octocrab instance");
+        };
+
+        let repo_contents = match octocrab
             .repos(user_name, repo_name)
             .get_content()
             .path(byte_code_path)
