@@ -21,6 +21,7 @@ use reqwest::{self};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use sqlx::{mysql::MySqlPool, query, MySql, Pool, Row};
+use std::env;
 use std::{collections::HashMap, hash::Hash, result::Result, string::String};
 use tokio::io::split;
 use tower_http::cors::CorsLayer;
@@ -422,11 +423,11 @@ async fn github_payload_handler(
         println!("{tracking_branch}");
         println!("{byte_code_path}");
 
-        let Ok(gh_app_id) = std::env::var("GH_APP_ID") else {
+        let Ok(gh_app_id) = env::var("GH_APP_ID") else {
             return Err("Error parsing github app details");
         };
         println!("here: {gh_app_id}");
-        let gh_app_pk = match std::env::var("GH_APP_PK") {
+        let gh_app_pk = match env::var("GH_APP_PK") {
             Ok(pk) => pk,
             Err(err) => {
                 println!("{err}");
