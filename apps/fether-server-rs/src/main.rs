@@ -445,7 +445,7 @@ async fn github_payload_handler(
         };
         println!("here4");
 
-        let repo_contents = match octocrab
+        let mut repo_contents = match octocrab
             .installation(octocrab::models::InstallationId(gh_payload.installation.id))
             .repos(user_name, repo_name)
             .get_content()
@@ -460,8 +460,9 @@ async fn github_payload_handler(
                 return Err("Error initializing github installation");
             }
         };
+        let contents = repo_contents.take_items();
 
-        println!("Repository contents:{repo_contents:?}");
+        println!("Repository contents:{:?}", contents);
 
         'all_commits_loop: for commit in &gh_payload.commits {
             'current_commit_loop: for modified in &commit.modified {
