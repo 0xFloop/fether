@@ -313,6 +313,15 @@ struct Installation {
 struct RepoDetails {
     id: u64,
 }
+#[derive(Serialize, Deserialize, Debug)]
+struct OctokitResponse {
+    bytecode: BytecodeStruct,
+}
+#[derive(Serialize, Deserialize, Debug)]
+struct BytecodeStruct {
+    object: String,
+}
+
 async fn github_payload_handler(
     State(state): State<AppState>,
     Json(payload): Json<UnknownJson>,
@@ -462,7 +471,7 @@ async fn github_payload_handler(
         };
         let contents = repo_contents.take_items()[0].decoded_content().unwrap();
 
-        let contents_json: HashMap<String, Value> = serde_json::from_str(&contents).unwrap();
+        let contents_json: BytecodeStruct = serde_json::from_str(&contents).unwrap();
 
         println!("Repository contents:{:?}", contents_json);
 
