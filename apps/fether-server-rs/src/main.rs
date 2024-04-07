@@ -481,6 +481,7 @@ async fn github_payload_handler(
             "Repository contents:{:?}",
             serde_json::to_string_pretty(&contents_json)
         );
+        println!("{:?}", contents_json.bytecode.object);
 
         'all_commits_loop: for commit in &gh_payload.commits {
             'current_commit_loop: for modified in &commit.modified {
