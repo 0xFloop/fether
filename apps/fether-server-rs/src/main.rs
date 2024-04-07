@@ -432,7 +432,7 @@ async fn github_payload_handler(
 
         let pk = gh_app_pk.replace("/\\n/g", "\n");
 
-        println!("{gh_app_id}: {gh_app_pk:?}");
+        println!("{gh_app_id}: {pk:?}");
 
         let key = jsonwebtoken::EncodingKey::from_rsa_pem(pk.as_bytes()).unwrap();
         println!("here2");
@@ -446,6 +446,7 @@ async fn github_payload_handler(
         println!("here4");
 
         let repo_contents = match octocrab
+            .installation(octocrab::models::InstallationId(gh_payload.installation.id))
             .repos(user_name, repo_name)
             .get_content()
             .path(byte_code_path)
