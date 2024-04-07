@@ -460,11 +460,11 @@ async fn github_payload_handler(
                 return Err("Error initializing github installation");
             }
         };
-        let contents = repo_contents.take_items();
-        let c = &contents[0];
-        let decoded_content = c.decoded_content().unwrap();
+        let contents = repo_contents.take_items()[0].decoded_content().unwrap();
 
-        println!("Repository contents:{:?}", decoded_content);
+        let contents_json: HashMap<String, Value> = serde_json::from_str(&contents).unwrap();
+
+        println!("Repository contents:{:?}", contents_json);
 
         'all_commits_loop: for commit in &gh_payload.commits {
             'current_commit_loop: for modified in &commit.modified {
