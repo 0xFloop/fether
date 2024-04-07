@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 contract SecretKeeper is Ownable {
     string public secretPhrase;
     uint256 public secretNumber;
-    SecretStorage public secretInStorage = SecretStorage(6969, "leedle");
+    SecretStorage public secretInStorage = SecretStorage(6969, "leedleleedle");
 
     struct SecretStorage {
         uint secretNumber;

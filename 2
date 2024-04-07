@@ -315,11 +315,10 @@ struct RepoDetails {
 }
 #[derive(Serialize, Deserialize, Debug)]
 struct OctokitResponse {
-    data: DataStruct,
+    data: BytecodeStruct,
 }
 #[derive(Serialize, Deserialize, Debug)]
-struct DataStruct {
-    abi: HashMap<String, Value>,
+struct BytecodeStruct {
     bytecode: BytecodeObject,
 }
 #[derive(Serialize, Deserialize, Debug)]
@@ -446,31 +445,27 @@ async fn github_payload_handler(
 
         let pk = gh_app_pk.replace("/\\n/g", "\n");
 
+        println!("{gh_app_id}: {pk:?}");
+
         let key = jsonwebtoken::EncodingKey::from_rsa_pem(pk.as_bytes()).unwrap();
+        println!("here2");
 
         let app_id = gh_app_id.parse::<u64>().unwrap().into();
+        println!("here3");
 
         let Ok(octocrab) = Octocrab::builder().app(app_id, key).build() else {
             return Err("Error building octocrab instance");
         };
+        println!("here4");
 
-        let Ok(mut repo_contents) = octocrab
-            .installation(octocrab::models::InstallationId(gh_payload.installation.id))
-            .repos(user_name, repo_name)
-            .get_content()
-            .path(byte_code_path)
+        let mut Ok(repo_contents) = octocrab.installation(octocrab::models::InstallationId(gh_payload.installation.id)).repos(user_name, repo_name).get_content().path(byte_code_path)
             .r#ref(tracking_branch)
             .send()
-            .await
-        else {
-            return Err("Error fetching github installation");
-        };
+            .await else {return Err("Error initializing github installation")};
 
         let contents = repo_contents.take_items()[0].decoded_content().unwrap();
 
-        let contents_json: OctokitResponse = serde_json::from_str(&contents).unwrap();
-
-        println!("{:?}", serde_json::to_string_pretty(&contents_json));
+        let contents_json: BytecodeStruct = serde_json::from_str(&contents).unwrap();
 
         'all_commits_loop: for commit in &gh_payload.commits {
             'current_commit_loop: for modified in &commit.modified {
@@ -485,6 +480,8 @@ async fn github_payload_handler(
                         println!("Username: {user_name}");
                         println!("Repo name: {repo_name}");
 
+                        //request the contetss of the bytecode path from github
+                        //grab bytecode from respose
                         //use alloy/ethers to parse abi
                         //get custom fether chain from api_key
                         //if deployer balance <1, use admin to anvil setBalance
