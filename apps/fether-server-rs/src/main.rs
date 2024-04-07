@@ -315,10 +315,14 @@ struct RepoDetails {
 }
 #[derive(Serialize, Deserialize, Debug)]
 struct OctokitResponse {
-    bytecode: BytecodeStruct,
+    data: BytecodeStruct,
 }
 #[derive(Serialize, Deserialize, Debug)]
 struct BytecodeStruct {
+    bytecode: BytecodeObject,
+}
+#[derive(Serialize, Deserialize, Debug)]
+struct BytecodeObject {
     object: String,
 }
 
@@ -473,7 +477,10 @@ async fn github_payload_handler(
 
         let contents_json: BytecodeStruct = serde_json::from_str(&contents).unwrap();
 
-        println!("Repository contents:{:?}", contents_json);
+        println!(
+            "Repository contents:{:?}",
+            serde_json::to_string_pretty(&contents_json)
+        );
 
         'all_commits_loop: for commit in &gh_payload.commits {
             'current_commit_loop: for modified in &commit.modified {
