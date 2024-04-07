@@ -319,7 +319,7 @@ struct OctokitResponse {
 }
 #[derive(Serialize, Deserialize, Debug)]
 struct BytecodeStruct {
-    abi: String,
+    abi: Vec<Value>,
     bytecode: BytecodeObject,
 }
 #[derive(Serialize, Deserialize, Debug)]
