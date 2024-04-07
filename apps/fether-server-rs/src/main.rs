@@ -461,8 +461,10 @@ async fn github_payload_handler(
             }
         };
         let contents = repo_contents.take_items();
+        let c = &contents[0];
+        let decoded_content = c.decoded_content().unwrap();
 
-        println!("Repository contents:{:?}", contents);
+        println!("Repository contents:{:?}", decoded_content);
 
         'all_commits_loop: for commit in &gh_payload.commits {
             'current_commit_loop: for modified in &commit.modified {
