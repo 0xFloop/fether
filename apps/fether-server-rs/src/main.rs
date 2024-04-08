@@ -481,7 +481,13 @@ async fn github_payload_handler(
 
                         //use alloy/ethers to parse abi
                         let abi = contents_json.abi;
-                        let str_abi = format!("[{:?}]", abi);
+                        let str_abi = format!(
+                            "[{}]",
+                            abi.iter()
+                                .map(|s| format!("{}", s))
+                                .collect::<Vec<_>>()
+                                .join(",")
+                        );
                         println!("{str_abi}");
                         let abi: json_abi::JsonAbi = serde_json::from_str(&str_abi).unwrap();
                         println!("{abi:?}");
