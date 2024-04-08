@@ -424,9 +424,9 @@ async fn github_payload_handler(
             + file_name
             + "/"
             + file_name
-                .split(".")
+                .split('.')
                 .next()
-                .ok_or_else(|| "Error improper file name format")?
+                .ok_or("Error improper file name format")?
             + ".json";
 
         // println!("{user_name}/{repo_name}");
@@ -459,14 +459,12 @@ async fn github_payload_handler(
             .send()
             .await
         else {
-            return Err("Error fetching github installation");
+            continue 'repo_loop;
         };
 
         let contents = repo_contents.take_items()[0].decoded_content().unwrap();
 
         let contents_json: OctocrabResponse = serde_json::from_str(&contents).unwrap();
-
-        println!("{:?}", serde_json::to_string_pretty(&contents_json.abi));
 
         'all_commits_loop: for commit in &gh_payload.commits {
             'current_commit_loop: for modified in &commit.modified {
@@ -482,14 +480,35 @@ async fn github_payload_handler(
                         println!("Repo name: {repo_name}");
 
                         //use alloy/ethers to parse abi
+                        let abi = contents_json.abi;
+                        let str_abi = format!(
+                            "[{}]",
+                            abi.iter()
+                                .map(|s| format!("'{}'", s))
+                                .collect::<Vec<_>>()
+                                .join(",")
+                        );
+                        println!("{str_abi}");
+                        let abi: json_abi::JsonAbi = serde_json::from_str(&str_abi).unwrap();
+                        println!("{abi:?}");
+
                         //get custom fether chain from api_key
+
                         //if deployer balance <1, use admin to anvil setBalance
+
                         //anvil impersonate deployer
+
                         //deploy contract
+
                         //stop impersonating
+
                         //await transaction receipt
+
                         //add tx to db
+
                         //update repository in db with new contract address and lastDeployed time
+
+                        continue 'repo_loop;
                     }
                 } else {
                     println!("we modified this NON sol file : {:?}", modified);
