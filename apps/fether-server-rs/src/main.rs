@@ -484,7 +484,7 @@ async fn github_payload_handler(
                         let str_abi = format!(
                             "[{}]",
                             abi.iter()
-                                .map(|s| format!("'{}'", s))
+                                .map(|s| format!("{}", s))
                                 .collect::<Vec<_>>()
                                 .join(",")
                         );
