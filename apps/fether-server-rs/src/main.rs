@@ -10,21 +10,21 @@ use axum::{
 };
 use axum_macros::{self, debug_handler};
 use dotenv::dotenv;
-use ethers_core::{
-    abi::{decode, AbiType},
-    types::{transaction::eip2718::TypedTransaction, TransactionRequest},
-    utils::rlp,
+use ethers::{
+    core::{
+        abi::{decode, AbiType},
+        types::{transaction::eip2718::TypedTransaction, Address, TransactionRequest, U256},
+        utils::rlp,
+    },
+    providers::{Http, Middleware, Provider},
 };
-use ethers_providers::{Http, Middleware, Provider};
-use ethers_rs::{Address, Eip55};
 use jsonwebtoken::*;
 use octocrab::Octocrab;
 use reqwest::{self};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use sqlx::{mysql::MySqlPool, MySql, Pool};
-use std::env;
-use std::{collections::HashMap, result::Result, string::String};
+use std::{collections::HashMap, env, result::Result, string::String};
 use tower_http::cors::CorsLayer;
 
 #[derive(Clone)]
@@ -499,15 +499,15 @@ async fn github_payload_handler(
                             api_key
                         ))
                         .expect("could not instantiate provider");
-                        let addr = Address::from_str(&deployer_address, false);
 
-                        match provider.get_balance(addr, None).await {
-                            Ok(bal) => bal.as_u64(),
-                            Err(err) => {
-                                println!("balance getter err: {err}");
-                                0
-                            }
-                        };
+                        let deployer_balance =
+                            match provider.get_balance(deployer_address, None).await {
+                                Ok(bal) => bal.as_u64(),
+                                Err(err) => {
+                                    println!("balance getter err: {err}");
+                                    0
+                                }
+                            };
 
                         println!("balance: {deployer_balance}");
                         println!("deplyer address: {deployer_address}");
@@ -531,7 +531,7 @@ async fn github_payload_handler(
                         let new_deployer_balance = provider
                             .get_balance(deployer_address, None)
                             .await
-                            .unwrap_or(ethers_core::types::U256([0, 0, 0, 0]));
+                            .unwrap_or(U256([0, 0, 0, 0]));
 
                         println!("{new_deployer_balance}");
 

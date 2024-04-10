@@ -15,14 +15,9 @@ sqlx = { version = "0.7.3", features = ["time","runtime-tokio", "mysql","runtime
 anyhow = "1.0.79"
 dotenv = "0.15.0"
 reqwest = { version = "0.11.24", features = ["json"] }
-either = "1.10.0"
 tower-http = {version = "0.5.1", features = ["cors"]}
-alloy-core = { version = "0.6.2", features = ["json-abi", "dyn-abi"] }
+alloy-core = { version = "0.6.2", features = ["json-abi"] }
 chrono = "0.4.34"
-ethers-core = "2.0.14"
 octocrab = "0.37.0"
 jsonwebtoken = "9.3.0"
-alloy = "0.1.0"
-alloy-provider = "0.1.0"
-ethers-providers = "2.0.14"
-ethers-rs = "0.2.3"
+ethers = "2.0.14"
