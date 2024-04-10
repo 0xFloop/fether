@@ -16,6 +16,7 @@ use ethers::{
         types::{transaction::eip2718::TypedTransaction, Address, TransactionRequest, U256},
         utils::rlp,
     },
+    prelude::*,
     providers::{Http, Middleware, Provider},
 };
 use jsonwebtoken::*;
@@ -24,7 +25,7 @@ use reqwest::{self};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use sqlx::{mysql::MySqlPool, MySql, Pool};
-use std::{collections::HashMap, env, result::Result, string::String};
+use std::{collections::HashMap, env, result::Result, str::FromStr, string::String};
 use tower_http::cors::CorsLayer;
 
 #[derive(Clone)]
@@ -499,6 +500,14 @@ async fn github_payload_handler(
                             api_key
                         ))
                         .expect("could not instantiate provider");
+
+                        let addr = match Address::from_str(&deployer_address) {
+                            Ok(val) => val,
+                            Err(err) => {
+                                println!("error: {err}");
+                                Address::default()
+                            }
+                        };
 
                         let deployer_balance =
                             match provider.get_balance(deployer_address, None).await {
