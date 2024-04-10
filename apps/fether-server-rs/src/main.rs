@@ -14,6 +14,7 @@ use axum::{
 use axum_macros::{self, debug_handler};
 use dotenv::dotenv;
 use ethers::{
+    contract::{ContractInstance, DeploymentTxFactory},
     core::{
         types::{transaction::eip2718::TypedTransaction, Address, U256},
         utils::rlp,
@@ -553,8 +554,17 @@ async fn github_payload_handler(
                             ethers::types::Bytes::from_hex(&contents_json.bytecode.object).unwrap();
                         let deploy_args = &repo.cachedConstructorArgs;
 
-                        println!("contract data: {contract_data:?}");
-                        println!("deploy args: {deploy_args:?}");
+                        let abi: ethers::abi::Abi = serde_json::from_str(&str_abi).unwrap();
+
+                        let deploy_factory =
+                            DeploymentTxFactory::new(abi, contract_data.clone(), provider);
+
+                        let ummm = deploy_factory.deploy(["333".to_string(), "hello".to_string()]);
+
+                        println!("{:?}", ummm);
+
+                        println!("contract data: {:?}", &contract_data);
+                        println!("{deploy_args:?}");
 
                         let deploy_tx: TransactionRequest = TransactionRequest {
                             from: Some(addr),
@@ -582,11 +592,11 @@ async fn github_payload_handler(
                         //         continue 'repo_loop;
                         //     }
                         // };
-                        match provider.send_transaction(deploy_tx, None).await {
-                            Ok(res) => println!("tx success res: {res:?}"),
-                            Err(err) => println!("deploy err: {err}"),
-                        };
-                        //deploy contract
+                        // match provider.send_transaction(deploy_tx, None).await {
+                        //     Ok(res) => println!("tx success res: {res:?}"),
+                        //     Err(err) => println!("deploy err: {err}"),
+                        // };
+                        // deploy contract
 
                         //stop impersonating
 
