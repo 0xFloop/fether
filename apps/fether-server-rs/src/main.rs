@@ -1,4 +1,7 @@
-use alloy_core::{hex, json_abi};
+use alloy_core::{
+    hex::{self, FromHex},
+    json_abi,
+};
 use axum::{
     async_trait,
     body::Bytes,
@@ -12,14 +15,12 @@ use axum_macros::{self, debug_handler};
 use dotenv::dotenv;
 use ethers::{
     core::{
-        abi::{decode, AbiType},
-        types::{transaction::eip2718::TypedTransaction, Address, TransactionRequest, U256},
+        types::{transaction::eip2718::TypedTransaction, Address, U256},
         utils::rlp,
     },
-    prelude::*,
     providers::{Http, Middleware, Provider},
+    types::TransactionRequest,
 };
-use jsonwebtoken::*;
 use octocrab::Octocrab;
 use reqwest::{self};
 use serde::{Deserialize, Serialize};
@@ -501,14 +502,13 @@ async fn github_payload_handler(
                         ))
                         .expect("could not instantiate provider");
 
-                        let addr = match Address::from_str(&deployer_address) {
+                        let addr = match Address::from_str(deployer_address) {
                             Ok(val) => val,
                             Err(err) => {
                                 println!("error: {err}");
-                                Address::default()
+                                continue 'repo_loop;
                             }
                         };
-                        println!("parsed addr: {addr}");
 
                         let deployer_balance = match provider.get_balance(addr, None).await {
                             Ok(bal) => bal.as_u64(),
@@ -517,9 +517,6 @@ async fn github_payload_handler(
                                 0
                             }
                         };
-
-                        println!("balance: {deployer_balance}");
-                        println!("deplyer address: {deployer_address}");
 
                         if deployer_balance == 0 {
                             match provider
@@ -536,14 +533,37 @@ async fn github_payload_handler(
                                 }
                             };
                         };
+
                         //anvil impersonate deployer
-                        let new_deployer_balance = provider
-                            .get_balance(deployer_address, None)
+
+                        match provider
+                            .request::<[&str; 1], Value>(
+                                "anvil_impersonateAccount",
+                                [deployer_address],
+                            )
                             .await
-                            .unwrap_or(U256([0, 0, 0, 0]));
-
-                        println!("{new_deployer_balance}");
-
+                        {
+                            Ok(_) => (),
+                            Err(err) => {
+                                println!("Err: {err}");
+                                continue 'repo_loop;
+                            }
+                        };
+                        let deploy_tx: TransactionRequest = TransactionRequest {
+                            from: Some(addr),
+                            to: None,
+                            gas: None,
+                            gas_price: None,
+                            value: None,
+                            data: Some(
+                                ethers::types::Bytes::from_hex(contents_json.bytecode.object)
+                                    .unwrap(),
+                            ),
+                            nonce: None,
+                            chain_id: None,
+                        };
+                        println!("{deploy_tx:?}");
+                        ///match provider.send_transaction(tx, block);
                         //deploy contract
 
                         //stop impersonating
@@ -553,7 +573,6 @@ async fn github_payload_handler(
                         //add tx to db
 
                         //update repository in db with new contract address and lastDeployed time
-
                         continue 'repo_loop;
                     }
                 } else {
