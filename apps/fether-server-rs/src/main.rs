@@ -515,7 +515,7 @@ async fn github_payload_handler(
                             match provider
                                 .request::<[&str; 2], String>(
                                     "anvil_setBalance",
-                                    [deployer_address, "0x1000"],
+                                    [deployer_address, "0xDE0B6B3A7640000"],
                                 )
                                 .await
                             {
