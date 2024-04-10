@@ -503,12 +503,13 @@ async fn github_payload_handler(
                             .unwrap_or(ethers_core::types::U256([0, 0, 0, 0]));
 
                         println!("balance: {deployer_balance}");
+                        println!("deplyer address: {deployer_address}");
 
                         if deployer_balance == ethers_core::types::U256([0, 0, 0, 0]) {
                             match provider
                                 .request::<[&str; 2], String>(
                                     "anvil_setBalance",
-                                    [deployer_address, "0xDE0B6B3A7640000"],
+                                    [deployer_address, "0x1000"],
                                 )
                                 .await
                             {
