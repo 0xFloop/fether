@@ -14,7 +14,7 @@ use axum::{
 use axum_macros::{self, debug_handler};
 use dotenv::dotenv;
 use ethers::{
-    contract::{ContractInstance, DeploymentTxFactory},
+    contract::{ContractFactory, ContractInstance, DeploymentTxFactory},
     core::{
         types::{transaction::eip2718::TypedTransaction, Address, U256},
         utils::rlp,
@@ -556,10 +556,12 @@ async fn github_payload_handler(
 
                         let abi: ethers::abi::Abi = serde_json::from_str(&str_abi).unwrap();
 
-                        let deploy_factory =
-                            DeploymentTxFactory::new(abi, contract_data.clone(), provider);
+                        let provider = std::sync::Arc::new(provider);
 
-                        let ummm = deploy_factory.deploy("[33, 'hello']".to_string());
+                        let deploy_factory =
+                            ContractFactory::new(abi, contract_data.clone(), provider);
+
+                        let ummm = deploy_factory.deploy("['33', 'hello']".to_string());
 
                         println!("{:?}", ummm);
 
