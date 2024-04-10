@@ -1,4 +1,4 @@
-use alloy_core::{hex, json_abi, primitives::FixedBytes};
+use alloy_core::{hex, json_abi};
 use axum::{
     async_trait,
     body::Bytes,
@@ -15,15 +15,15 @@ use ethers_core::{
     types::{transaction::eip2718::TypedTransaction, TransactionRequest},
     utils::rlp,
 };
+use ethers_providers::{Http, Middleware, Provider};
 use jsonwebtoken::*;
 use octocrab::Octocrab;
 use reqwest::{self};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use sqlx::{mysql::MySqlPool, query, MySql, Pool, Row};
+use sqlx::{mysql::MySqlPool, MySql, Pool};
 use std::env;
-use std::{collections::HashMap, hash::Hash, result::Result, string::String};
-use tokio::io::split;
+use std::{collections::HashMap, result::Result, string::String};
 use tower_http::cors::CorsLayer;
 
 #[derive(Clone)]
@@ -225,7 +225,7 @@ async fn rpc_handler(
     Ok(Json(res))
 }
 fn decode_raw_tx<'a>(raw_hex: &str, abi: &'a json_abi::JsonAbi) -> &'a str {
-    let mut selectors = abi.functions();
+    let selectors = abi.functions();
 
     let hex = hex::decode(raw_hex).unwrap();
 
@@ -479,24 +479,53 @@ async fn github_payload_handler(
                         println!("Username: {user_name}");
                         println!("Repo name: {repo_name}");
 
-                        //use alloy/ethers to parse abi
-                        let abi = contents_json.abi;
                         let str_abi = format!(
                             "[{}]",
-                            abi.iter()
+                            contents_json
+                                .abi
+                                .iter()
                                 .map(|s| format!("{}", s))
                                 .collect::<Vec<_>>()
                                 .join(",")
                         );
-                        println!("{str_abi}");
-                        let abi: json_abi::JsonAbi = serde_json::from_str(&str_abi).unwrap();
-                        println!("{abi:?}");
 
                         //get custom fether chain from api_key
 
                         //if deployer balance <1, use admin to anvil setBalance
 
+                        let provider =
+                            Provider::<Http>::try_from("https://fether-testing.ngrok.app")
+                                .expect("could not instantiate provider");
+
+                        let deployer_balance = provider
+                            .get_balance(deployer_address, None)
+                            .await
+                            .unwrap_or(ethers_core::types::U256([0, 0, 0, 0]));
+
+                        println!("balance: {deployer_balance}");
+
+                        if deployer_balance == ethers_core::types::U256([0, 0, 0, 0]) {
+                            match provider
+                                .request::<[&str; 2], String>(
+                                    "anvil_setBalance",
+                                    [deployer_address, "0xDE0B6B3A7640000"],
+                                )
+                                .await
+                            {
+                                Ok(res) => (),
+                                Err(err) => {
+                                    println!("{err}");
+                                    return Err("Error increasing deployer address balance");
+                                }
+                            };
+                        };
                         //anvil impersonate deployer
+                        let new_deployer_balance = provider
+                            .get_balance(deployer_address, None)
+                            .await
+                            .unwrap_or(ethers_core::types::U256([0, 0, 0, 0]));
+
+                        println!("{new_deployer_balance}");
 
                         //deploy contract
 
