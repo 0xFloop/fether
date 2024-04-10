@@ -559,7 +559,7 @@ async fn github_payload_handler(
                         let deploy_factory =
                             DeploymentTxFactory::new(abi, contract_data.clone(), provider);
 
-                        let ummm = deploy_factory.deploy(["333".to_string(), "hello".to_string()]);
+                        let ummm = deploy_factory.deploy("[33, 'hello']".to_string());
 
                         println!("{:?}", ummm);
 
