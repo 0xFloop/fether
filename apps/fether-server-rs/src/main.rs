@@ -561,32 +561,27 @@ async fn github_payload_handler(
                         let deploy_factory =
                             ContractFactory::new(abi, contract_data.clone(), provider);
 
-                        let ummm = deploy_factory
-                            .deploy_tokens(vec![
-                                ethers::abi::Token::Uint(U256::from(98)),
-                                ethers::abi::Token::String("hello".to_string()),
-                            ])
-                            .unwrap()
-                            .send()
-                            .await
-                            .unwrap();
+                        let contract_deployment = deploy_factory.deploy_tokens(vec![
+                            ethers::abi::Token::Uint(U256::from(98)),
+                            ethers::abi::Token::String("hello".to_string()),
+                        ]);
 
-                        println!("Contract instance below");
-                        println!("{:?}", ummm);
-
-                        let deploy_tx: TransactionRequest = TransactionRequest {
-                            from: Some(addr),
-                            to: None,
-                            gas: None,
-                            gas_price: None,
-                            value: None,
-                            data: Some(
-                                ethers::types::Bytes::from_hex(contents_json.bytecode.object)
-                                    .unwrap(),
-                            ),
-                            nonce: None,
-                            chain_id: None,
-                        };
+                        println!("{:?}", &contract_deployment);
+                        let imm = contract_deployment.unwrap();
+                        let umm = imm.send().await;
+                        println!("{:?}", &umm);
+                        // let deploy_tx: TransactionRequest = TransactionRequest { from: Some(addr),
+                        //     to: None,
+                        //     gas: None,
+                        //     gas_price: None,
+                        //     value: None,
+                        //     data: Some(
+                        //         ethers::types::Bytes::from_hex(contents_json.bytecode.object)
+                        //             .unwrap(),
+                        //     ),
+                        //     nonce: None,
+                        //     chain_id: None,
+                        // };
                         // match provider
                         //     .request::<[&str; 1], Value>(
                         //         "anvil_stopImpersonatingAccount",
