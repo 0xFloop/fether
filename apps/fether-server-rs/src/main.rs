@@ -508,15 +508,15 @@ async fn github_payload_handler(
                                 Address::default()
                             }
                         };
+                        println!("parsed addr: {addr}");
 
-                        let deployer_balance =
-                            match provider.get_balance(deployer_address, None).await {
-                                Ok(bal) => bal.as_u64(),
-                                Err(err) => {
-                                    println!("balance getter err: {err}");
-                                    0
-                                }
-                            };
+                        let deployer_balance = match provider.get_balance(addr, None).await {
+                            Ok(bal) => bal.as_u64(),
+                            Err(err) => {
+                                println!("balance getter err: {err}");
+                                0
+                            }
+                        };
 
                         println!("balance: {deployer_balance}");
                         println!("deplyer address: {deployer_address}");
