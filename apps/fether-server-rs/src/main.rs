@@ -493,14 +493,20 @@ async fn github_payload_handler(
 
                         //if deployer balance <1, use admin to anvil setBalance
 
-                        let provider =
-                            Provider::<Http>::try_from("https://fether-testing.ngrok.app")
-                                .expect("could not instantiate provider");
+                        let provider = Provider::<Http>::try_from(format!(
+                            "https://fether-testing.ngrok.app/rpc/{}",
+                            api_key
+                        ))
+                        .expect("could not instantiate provider");
 
-                        let deployer_balance = provider
-                            .get_balance(deployer_address, None)
-                            .await
-                            .unwrap_or(ethers_core::types::U256([0, 0, 0, 0]));
+                        let deployer_balance =
+                            match provider.get_balance(deployer_address, None).await {
+                                Ok(bal) => bal,
+                                Err(err) => {
+                                    println!("balance getter err: {err}");
+                                    ethers_core::types::U256([0, 0, 0, 0])
+                                }
+                            };
 
                         println!("balance: {deployer_balance}");
                         println!("deplyer address: {deployer_address}");
