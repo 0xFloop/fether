@@ -566,10 +566,11 @@ async fn github_payload_handler(
                             ethers::abi::Token::String("hello".to_string()),
                         ]);
 
-                        println!("{:?}", &contract_deployment);
+                        println!("contract_deployment: {:?}", &contract_deployment);
                         let imm = contract_deployment.unwrap();
                         let umm = imm.send().await;
-                        println!("{:?}", &umm);
+                        println!("umm: {:?}", &umm);
+
                         // let deploy_tx: TransactionRequest = TransactionRequest { from: Some(addr),
                         //     to: None,
                         //     gas: None,
