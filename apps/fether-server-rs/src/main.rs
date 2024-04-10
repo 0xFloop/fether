@@ -561,7 +561,7 @@ async fn github_payload_handler(
                         let deploy_factory =
                             ContractFactory::new(abi, contract_data.clone(), provider);
 
-                        let ummm = deploy_factory.deploy("(33, 'hello')".to_string());
+                        let ummm = deploy_factory.deploy("(33, \"hello\")".to_string());
 
                         println!("{:?}", ummm);
 
