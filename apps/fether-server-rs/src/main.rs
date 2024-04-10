@@ -549,6 +549,11 @@ async fn github_payload_handler(
                                 continue 'repo_loop;
                             }
                         };
+                        let deploy_data =
+                            ethers::types::Bytes::from_hex(&contents_json.bytecode.object).unwrap();
+
+                        println!("{deploy_data}");
+
                         let deploy_tx: TransactionRequest = TransactionRequest {
                             from: Some(addr),
                             to: None,
@@ -562,7 +567,6 @@ async fn github_payload_handler(
                             nonce: None,
                             chain_id: None,
                         };
-                        println!("{deploy_tx:?}");
                         // match provider
                         //     .request::<[&str; 1], Value>(
                         //         "anvil_stopImpersonatingAccount",
