@@ -561,15 +561,18 @@ async fn github_payload_handler(
                         let deploy_factory =
                             ContractFactory::new(abi, contract_data.clone(), provider);
 
-                        let ummm = deploy_factory.deploy_tokens(vec![
-                            ethers::abi::Token::Uint(U256::from(98)),
-                            ethers::abi::Token::String("hello".to_string()),
-                        ]);
+                        let ummm = deploy_factory
+                            .deploy_tokens(vec![
+                                ethers::abi::Token::Uint(U256::from(98)),
+                                ethers::abi::Token::String("hello".to_string()),
+                            ])
+                            .unwrap()
+                            .send()
+                            .await
+                            .unwrap();
 
+                        println!("Contract instance below");
                         println!("{:?}", ummm);
-
-                        println!("contract data: {:?}", &contract_data);
-                        println!("{deploy_args:?}");
 
                         let deploy_tx: TransactionRequest = TransactionRequest {
                             from: Some(addr),
