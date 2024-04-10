@@ -514,7 +514,7 @@ async fn github_payload_handler(
                             {
                                 Ok(res) => (),
                                 Err(err) => {
-                                    println!("{err}");
+                                    println!("provider error: {err}");
                                     return Err("Error increasing deployer address balance");
                                 }
                             };
