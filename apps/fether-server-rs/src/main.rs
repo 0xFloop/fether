@@ -12,7 +12,7 @@ use axum_macros::{self, debug_handler};
 use dotenv::dotenv;
 use ethers_core::{
     abi::{decode, AbiType},
-    types::{transaction::eip2718::TypedTransaction, TransactionRequest},
+    types::{transaction::eip2718::TypedTransaction, Address, TransactionRequest},
     utils::rlp,
 };
 use ethers_providers::{Http, Middleware, Provider};
