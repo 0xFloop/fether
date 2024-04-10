@@ -549,10 +549,12 @@ async fn github_payload_handler(
                                 continue 'repo_loop;
                             }
                         };
-                        let deploy_data =
+                        let contract_data =
                             ethers::types::Bytes::from_hex(&contents_json.bytecode.object).unwrap();
+                        let deploy_args = &repo.cachedConstructorArgs;
 
-                        println!("{deploy_data}");
+                        println!("contract data: {contract_data:?}");
+                        println!("deploy args: {deploy_args:?}");
 
                         let deploy_tx: TransactionRequest = TransactionRequest {
                             from: Some(addr),
