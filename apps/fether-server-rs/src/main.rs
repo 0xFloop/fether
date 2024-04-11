@@ -607,7 +607,7 @@ async fn github_payload_handler(
                         println!();
                         println!("tx_receipt: {tx_receipt:?}");
 
-                        let receipt = provider.get_transaction_receipt(tx_receipt.0).await;
+                        let receipt = tx_receipt.confirmations(3).await;
                         println!();
                         println!("receipt: {receipt:?}");
                         //add tx to db
