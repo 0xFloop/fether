@@ -625,6 +625,7 @@ async fn github_payload_handler(
 
                         println!();
                         println!();
+                        sleep(time::Duration::from_secs(6));
                         let receipt = provider.get_transaction_receipt(hash).await;
                         println!("reciept: {receipt:?}");
                         sleep(time::Duration::from_secs(10));
