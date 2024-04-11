@@ -19,6 +19,7 @@ use ethers::{
         types::{transaction::eip2718::TypedTransaction, Address, U256},
         utils::rlp,
     },
+    middleware::transformer::ds_proxy::factory,
     providers::{Http, Middleware, Provider},
     types::TransactionRequest,
 };
@@ -553,18 +554,7 @@ async fn github_payload_handler(
                             ethers::abi::Token::String("hello".to_string()),
                         ]);
 
-                        //this is where we are at, currently getting some error with deployment
-                        //jsonrpc shape
-                        println!();
-                        println!();
-                        println!("contract_deployment: {:?}", &contract_deployment);
-                        println!();
-                        println!();
-                        let imm = contract_deployment.unwrap();
-                        println!("imm: {:?}", &imm);
-                        println!();
-                        println!();
-                        //println!("umm: {:?}", &umm);
+                        let factory_deploy_details = contract_deployment.unwrap();
 
                         let deploy_tx: TransactionRequest = TransactionRequest {
                             from: Some(addr),
@@ -572,15 +562,10 @@ async fn github_payload_handler(
                             gas: None,
                             gas_price: None,
                             value: None,
-                            data: Some(imm.tx.data().unwrap().clone()),
+                            data: Some(factory_deploy_details.tx.data().unwrap().clone()),
                             nonce: None,
                             chain_id: None,
                         };
-
-                        println!("{deploy_tx:?}");
-
-                        println!();
-                        println!();
 
                         match provider
                             .request::<[&str; 1], Value>(
@@ -595,29 +580,26 @@ async fn github_payload_handler(
                                 continue 'repo_loop;
                             }
                         };
-                        // match provider.send_transaction(deploy_tx, None).await {
-                        //     Ok(res) => println!("tx success res: {res:?}"),
-                        //     Err(err) => println!("deploy err: {err}"),
-                        // };
-                        let umm = imm.send().await;
-                        match provider
+                        let tx_res = provider.send_transaction(deploy_tx, None).await;
+
+                        let Ok(_) = provider
                             .request::<[&str; 1], Value>(
                                 "anvil_stopImpersonatingAccount",
                                 [deployer_address],
                             )
                             .await
-                        {
-                            Ok(_) => (),
-                            Err(err) => {
-                                println!("Err: {err}");
-                                continue 'repo_loop;
-                            }
+                        else {
+                            continue 'repo_loop;
                         };
-                        // deploy contract
-
-                        //stop impersonating
-
                         //await transaction receipt
+                        match &tx_res {
+                            Ok(res) => println!("{res:?}"),
+                            Err(err) => println!("{err}"),
+                        }
+                        if tx_res.is_ok() {
+                            //add tx to db
+                            println!("tx success add it to the db");
+                        }
 
                         //add tx to db
 
