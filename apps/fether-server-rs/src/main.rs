@@ -602,39 +602,10 @@ async fn github_payload_handler(
                         };
                         println!("between");
                         let hash = tx_res.unwrap().tx_hash();
-                        let tx = provider.get_transaction(hash).await;
-                        //await transaction receipt
-                        // match &tx_res {
-                        //     Ok(res) => println!("{res:?}"),
-                        //     Err(err) => println!("{err}"),
-                        // }
-                        // if tx_res.is_err() {
-                        //     println!("tx success add it to the db");
-                        //     continue 'repo_loop;
-                        // }
-                        //
-                        // let pending_tx = tx_res.expect("1").confirmations(1).await.expect("2");
-                        // // let hash = pending_tx.tx_hash();
-                        // let receipt = provider.get_transaction_receipt(hash).await;
-                        //
-                        println!();
-                        //println!("receipt1: {receipt:?}");
-                        println!();
-                        println!("tx: {tx:?}");
-                        //add tx to db
-
-                        println!();
-                        println!();
-                        sleep(time::Duration::from_secs(6));
+                        //let tx = provider.get_transaction(hash).await;
+                        //sleep(time::Duration::from_secs(6));
                         let receipt = provider.get_transaction_receipt(hash).await;
                         println!("reciept: {receipt:?}");
-                        sleep(time::Duration::from_secs(10));
-                        //
-                        println!("after sleep");
-                        println!("hash: {hash:?}");
-
-                        let receipt = provider.get_transaction(hash).await;
-                        println!("tx: {tx:?}");
                         //update repository in db with new contract address and lastDeployed time
                         continue 'repo_loop;
                     }
