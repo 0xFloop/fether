@@ -580,12 +580,7 @@ async fn github_payload_handler(
                                 continue 'repo_loop;
                             }
                         };
-                        let tx_res = provider
-                            .send_transaction(deploy_tx, None)
-                            .await
-                            .unwrap()
-                            .await
-                            .unwrap();
+                        let tx_res = provider.send_transaction(deploy_tx, None).await;
 
                         let Ok(_) = provider
                             .request::<[&str; 1], Value>(
@@ -597,20 +592,25 @@ async fn github_payload_handler(
                             continue 'repo_loop;
                         };
                         //await transaction receipt
-                        // match &tx_res {
-                        //     Ok(res) => println!("{res:?}"),
-                        //     Err(err) => println!("{err}"),
-                        // }
-                        // if tx_res.is_err() {
-                        //     println!("tx success add it to the db");
-                        //     continue 'repo_loop;
-                        // }
-                        // println!("deez");
-                        // let tx_receipt = tx_res.unwrap().await;
-                        //
-                        println!();
-                        println!("tx_receipt: {tx_res:?}");
+                        match &tx_res {
+                            Ok(res) => println!("{res:?}"),
+                            Err(err) => println!("{err}"),
+                        }
+                        if tx_res.is_err() {
+                            println!("tx success add it to the db");
+                            continue 'repo_loop;
+                        }
 
+                        println!("deez");
+                        let tx_receipt = tx_res.unwrap();
+
+                        println!();
+                        println!("tx_receipt: {tx_receipt:?}");
+
+                        let receipt = tx_receipt.await;
+
+                        println!();
+                        println!("receipt: {receipt:?}");
                         //add tx to db
 
                         //update repository in db with new contract address and lastDeployed time
