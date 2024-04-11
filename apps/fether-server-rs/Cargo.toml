@@ -11,13 +11,13 @@ axum = "0.7.3"
 axum-macros = "0.4.1"
 serde_json = "1.0.113"
 serde = { version = "1.0.196", features = ["derive"] }
-sqlx = { version = "0.7.3", features = ["time","runtime-tokio", "mysql","runtime-tokio-native-tls"] }
+sqlx = { version = "0.7.3", features = ["chrono","time","runtime-tokio", "mysql","runtime-tokio-native-tls"] }
 anyhow = "1.0.79"
 dotenv = "0.15.0"
 reqwest = { version = "0.11.24", features = ["json"] }
 tower-http = {version = "0.5.1", features = ["cors"]}
 alloy-core = { version = "0.6.2", features = ["json-abi"] }
-chrono = "0.4.34"
+chrono = { version = "0.4.34", features = ["serde"] }
 octocrab = "0.37.0"
 jsonwebtoken = "9.3.0"
 ethers = "2.0.14"

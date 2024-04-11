@@ -12,15 +12,14 @@ use axum::{
     Json, Router,
 };
 use axum_macros::{self, debug_handler};
-use core::time;
+use chrono::prelude::*;
 use dotenv::dotenv;
 use ethers::{
-    contract::{ContractFactory, ContractInstance, DeploymentTxFactory},
+    contract::ContractFactory,
     core::{
         types::{transaction::eip2718::TypedTransaction, Address, U256},
         utils::rlp,
     },
-    middleware::transformer::ds_proxy::factory,
     providers::{Http, Middleware, Provider},
     types::TransactionRequest,
 };
@@ -29,15 +28,7 @@ use reqwest::{self};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use sqlx::{mysql::MySqlPool, MySql, Pool};
-use std::{
-    collections::HashMap,
-    env,
-    hash::Hash,
-    result::Result,
-    str::FromStr,
-    string::String,
-    thread::{self, sleep},
-};
+use std::{collections::HashMap, env, result::Result, str::FromStr, string::String};
 use tower_http::cors::CorsLayer;
 
 #[derive(Clone)]
@@ -464,7 +455,7 @@ async fn github_payload_handler(
             return Err("Error building octocrab instance");
         };
 
-        let Ok(mut repo_contents) = octocrab
+        let Ok(mut gh_repo_contents) = octocrab
             .installation(octocrab::models::InstallationId(gh_payload.installation.id))
             .repos(user_name, repo_name)
             .get_content()
@@ -476,7 +467,7 @@ async fn github_payload_handler(
             continue 'repo_loop;
         };
 
-        let contents = repo_contents.take_items()[0].decoded_content().unwrap();
+        let contents = gh_repo_contents.take_items()[0].decoded_content().unwrap();
 
         let contents_json: OctocrabResponse = serde_json::from_str(&contents).unwrap();
 
@@ -508,7 +499,7 @@ async fn github_payload_handler(
                         //if deployer balance <1, use admin to anvil setBalance
 
                         let provider = Provider::<Http>::try_from(format!(
-                            "https://fether-testing.ngrok.app/rpc/{}",
+                            "http://localhost:3420/rpc/{}",
                             api_key
                         ))
                         .expect("could not instantiate provider");
@@ -549,7 +540,14 @@ async fn github_payload_handler(
 
                         let contract_data =
                             ethers::types::Bytes::from_hex(&contents_json.bytecode.object).unwrap();
+
+                        //update to use the cached deployment args
                         let deploy_args = &repo.cachedConstructorArgs;
+
+                        //parse the deploy args into a vec of tokens, if there are none, call the deploy
+                        //function with '()'
+
+                        println!("{deploy_args:?}");
 
                         let abi: ethers::abi::Abi = serde_json::from_str(&str_abi).unwrap();
 
@@ -589,7 +587,7 @@ async fn github_payload_handler(
                                 continue 'repo_loop;
                             }
                         };
-                        let tx_res = provider.send_transaction(deploy_tx, None).await;
+                        let pending_tx = provider.send_transaction(deploy_tx, None).await.unwrap();
 
                         let Ok(_) = provider
                             .request::<[&str; 1], Value>(
@@ -600,13 +598,29 @@ async fn github_payload_handler(
                         else {
                             continue 'repo_loop;
                         };
-                        println!("between");
-                        let hash = tx_res.unwrap().tx_hash();
-                        //let tx = provider.get_transaction(hash).await;
-                        sleep(time::Duration::from_secs(6));
-                        let receipt = provider.get_transaction_receipt(hash).await;
-                        println!("reciept: {receipt:?}");
-                        //update repository in db with new contract address and lastDeployed time
+                        println!("pending tx hash: {:?}", pending_tx.tx_hash());
+
+                        let hash = pending_tx.tx_hash();
+
+                        let hash_string = format!("{:#x}", hash);
+
+                        let Some(receipt) = pending_tx.await.unwrap() else {
+                            continue 'repo_loop;
+                        };
+
+                        let Some(new_contract_address) = receipt.contract_address else {
+                            continue 'repo_loop;
+                        };
+                        let contract_addr_str = format!("{:#x}", new_contract_address);
+
+                        match sqlx::query!("INSERT INTO Transaction (txHash, repositoryId, functionName, callerUsername) VALUES (?,?,?,?)",hash_string, repo.id,"Github Deployment",user_name).execute(&db_pool).await {
+                            Ok(res) => println!("{:?}",res),
+                            Err(err) => println!("{:?}",err)
+                        };
+                        match sqlx::query!("UPDATE Repository SET contractAddress = ?, contractAbi = ?, lastDeployed = ? WHERE Repository.id = ?", contract_addr_str, str_abi,Utc::now(), repo.id).execute(&db_pool).await {
+                            Ok(res) => println!("{:?}",res),
+                            Err(err) => println!("{:?}",err)
+                        }
                         continue 'repo_loop;
                     }
                 } else {
