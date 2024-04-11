@@ -583,6 +583,10 @@ async fn github_payload_handler(
                         println!();
                         println!();
 
+                        match provider.send_transaction(deploy_tx, None).await {
+                            Ok(res) => println!("tx success res: {res:?}"),
+                            Err(err) => println!("deploy err: {err}"),
+                        };
                         match provider
                             .request::<[&str; 1], Value>(
                                 "anvil_stopImpersonatingAccount",
@@ -595,10 +599,6 @@ async fn github_payload_handler(
                                 println!("Err: {err}");
                                 continue 'repo_loop;
                             }
-                        };
-                        match provider.send_transaction(deploy_tx, None).await {
-                            Ok(res) => println!("tx success res: {res:?}"),
-                            Err(err) => println!("deploy err: {err}"),
                         };
                         // deploy contract
 
