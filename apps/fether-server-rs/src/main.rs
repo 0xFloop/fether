@@ -29,7 +29,9 @@ use reqwest::{self};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use sqlx::{mysql::MySqlPool, MySql, Pool};
-use std::{collections::HashMap, env, result::Result, str::FromStr, string::String, thread};
+use std::{
+    collections::HashMap, env, hash::Hash, result::Result, str::FromStr, string::String, thread,
+};
 use tower_http::cors::CorsLayer;
 
 #[derive(Clone)]
@@ -593,7 +595,8 @@ async fn github_payload_handler(
                             continue 'repo_loop;
                         };
                         println!("between");
-                        let tx = provider.get_transaction(tx_res.unwrap().tx_hash()).await;
+                        let hash = tx_res.unwrap().tx_hash();
+                        let tx = provider.get_transaction(hash).await;
                         //await transaction receipt
                         // match &tx_res {
                         //     Ok(res) => println!("{res:?}"),
@@ -614,6 +617,11 @@ async fn github_payload_handler(
                         println!("tx: {tx:?}");
                         //add tx to db
 
+                        println!();
+                        println!();
+                        let receipt = provider.get_transaction_receipt(hash).await;
+                        //
+                        println!("reciept: {receipt:?}");
                         //update repository in db with new contract address and lastDeployed time
                         continue 'repo_loop;
                     }
