@@ -610,8 +610,9 @@ async fn github_payload_handler(
 
                         thread::sleep(time::Duration::from_secs(10));
                         println!("sleep over");
-                        println!("hash: {:?}", tx_receipt.0);
-                        let receipt = provider.get_transaction_receipt(tx_receipt.0.clone()).await;
+                        println!("hash: {:?}", tx_receipt.tx_hash());
+                        let hash = tx_receipt.tx_hash();
+                        let receipt = provider.get_transaction_receipt(hash).await;
 
                         println!();
                         println!("receipt1: {receipt:?}");
