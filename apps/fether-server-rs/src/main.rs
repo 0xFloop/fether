@@ -600,14 +600,9 @@ async fn github_payload_handler(
                             println!("tx success add it to the db");
                             continue 'repo_loop;
                         }
-                        let tx = provider.get_transaction(tx_res.as_ref().unwrap().0).await;
-                        let tx_receipt = provider
-                            .get_transaction_receipt(tx_res.as_ref().unwrap().0)
-                            .await;
+                        let tx_receipt = tx_res.unwrap().await;
 
                         println!("deez");
-                        println!();
-                        println!("tx: {tx:?}");
                         println!();
                         println!("tx_receipt: {tx_receipt:?}");
 
