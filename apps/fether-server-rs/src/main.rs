@@ -30,7 +30,13 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use sqlx::{mysql::MySqlPool, MySql, Pool};
 use std::{
-    collections::HashMap, env, hash::Hash, result::Result, str::FromStr, string::String, thread,
+    collections::HashMap,
+    env,
+    hash::Hash,
+    result::Result,
+    str::FromStr,
+    string::String,
+    thread::{self, sleep},
 };
 use tower_http::cors::CorsLayer;
 
@@ -620,7 +626,11 @@ async fn github_payload_handler(
                         println!();
                         println!();
                         let receipt = provider.get_transaction_receipt(hash).await;
+                        println!("reciept: {receipt:?}");
+                        sleep(time::Duration::from_secs(10));
                         //
+                        println!("after sleep");
+                        let receipt = provider.get_transaction_receipt(hash).await;
                         println!("reciept: {receipt:?}");
                         //update repository in db with new contract address and lastDeployed time
                         continue 'repo_loop;
