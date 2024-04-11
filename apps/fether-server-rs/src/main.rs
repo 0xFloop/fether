@@ -581,7 +581,15 @@ async fn github_payload_handler(
                                 continue 'repo_loop;
                             }
                         };
-                        let tx_res = provider.send_transaction(deploy_tx, None).await;
+                        let tx_res = provider
+                            .send_transaction(deploy_tx, None)
+                            .await
+                            .expect("1")
+                            .confirmations(3)
+                            .await
+                            .expect("2");
+
+                        println!("after tx_res");
 
                         let Ok(_) = provider
                             .request::<[&str; 1], Value>(
@@ -593,23 +601,23 @@ async fn github_payload_handler(
                             continue 'repo_loop;
                         };
                         //await transaction receipt
-                        match &tx_res {
-                            Ok(res) => println!("{res:?}"),
-                            Err(err) => println!("{err}"),
-                        }
-                        if tx_res.is_err() {
-                            println!("tx success add it to the db");
-                            continue 'repo_loop;
-                        }
-
-                        let pending_tx = tx_res.expect("1").confirmations(1).await.expect("2");
-                        // let hash = pending_tx.tx_hash();
+                        // match &tx_res {
+                        //     Ok(res) => println!("{res:?}"),
+                        //     Err(err) => println!("{err}"),
+                        // }
+                        // if tx_res.is_err() {
+                        //     println!("tx success add it to the db");
+                        //     continue 'repo_loop;
+                        // }
+                        //
+                        // let pending_tx = tx_res.expect("1").confirmations(1).await.expect("2");
+                        // // let hash = pending_tx.tx_hash();
                         // let receipt = provider.get_transaction_receipt(hash).await;
                         //
-                        // println!();
+                        println!();
                         //println!("receipt1: {receipt:?}");
                         println!();
-                        println!("receipt2: {pending_tx:?}");
+                        println!("receipt: {tx_res:?}");
                         //add tx to db
 
                         //update repository in db with new contract address and lastDeployed time
