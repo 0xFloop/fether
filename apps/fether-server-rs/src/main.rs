@@ -596,10 +596,15 @@ async fn github_payload_handler(
                             Ok(res) => println!("{res:?}"),
                             Err(err) => println!("{err}"),
                         }
-                        if tx_res.is_ok() {
-                            //add tx to db
+                        if tx_res.is_err() {
                             println!("tx success add it to the db");
+                            continue 'repo_loop;
                         }
+                        let tx_receipt = tx_res.unwrap().await;
+
+                        println!();
+                        println!();
+                        println!("{tx_receipt:?}");
 
                         //add tx to db
 
