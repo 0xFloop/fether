@@ -12,6 +12,7 @@ use axum::{
     Json, Router,
 };
 use axum_macros::{self, debug_handler};
+use core::time;
 use dotenv::dotenv;
 use ethers::{
     contract::{ContractFactory, ContractInstance, DeploymentTxFactory},
@@ -28,7 +29,7 @@ use reqwest::{self};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use sqlx::{mysql::MySqlPool, MySql, Pool};
-use std::{collections::HashMap, env, result::Result, str::FromStr, string::String};
+use std::{collections::HashMap, env, result::Result, str::FromStr, string::String, thread};
 use tower_http::cors::CorsLayer;
 
 #[derive(Clone)]
@@ -607,9 +608,14 @@ async fn github_payload_handler(
                         println!();
                         println!("tx_receipt: {tx_receipt:?}");
 
-                        let receipt = tx_receipt.confirmations(3).await;
+                        thread::sleep(time::Duration::from_secs(10));
+                        let receipt = provider.get_transaction_receipt(tx_receipt.0.clone()).await;
+
                         println!();
-                        println!("receipt: {receipt:?}");
+                        println!("receipt1: {receipt:?}");
+                        let receipt = tx_receipt.await;
+                        println!();
+                        println!("receipt2: {receipt:?}");
                         //add tx to db
 
                         //update repository in db with new contract address and lastDeployed time
