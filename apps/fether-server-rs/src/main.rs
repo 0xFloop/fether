@@ -581,15 +581,7 @@ async fn github_payload_handler(
                                 continue 'repo_loop;
                             }
                         };
-                        let tx_res = provider
-                            .send_transaction(deploy_tx, None)
-                            .await
-                            .expect("1")
-                            .confirmations(3)
-                            .await
-                            .expect("2");
-
-                        println!("after tx_res");
+                        let tx_res = provider.send_transaction(deploy_tx, None).await;
 
                         let Ok(_) = provider
                             .request::<[&str; 1], Value>(
@@ -600,6 +592,8 @@ async fn github_payload_handler(
                         else {
                             continue 'repo_loop;
                         };
+                        println!("between");
+                        let tx = provider.get_transaction(tx_res.unwrap().tx_hash()).await;
                         //await transaction receipt
                         // match &tx_res {
                         //     Ok(res) => println!("{res:?}"),
@@ -617,7 +611,7 @@ async fn github_payload_handler(
                         println!();
                         //println!("receipt1: {receipt:?}");
                         println!();
-                        println!("receipt: {tx_res:?}");
+                        println!("tx: {tx:?}");
                         //add tx to db
 
                         //update repository in db with new contract address and lastDeployed time
