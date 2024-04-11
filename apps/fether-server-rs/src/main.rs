@@ -568,12 +568,21 @@ async fn github_payload_handler(
 
                         //this is where we are at, currently getting some error with deployment
                         //jsonrpc shape
+                        println!();
+                        println!();
                         println!("contract_deployment: {:?}", &contract_deployment);
+                        println!();
+                        println!();
                         let imm = contract_deployment.unwrap();
                         println!("imm: {:?}", &imm);
+                        println!();
+                        println!();
                         let umm = imm.send().await;
                         println!("umm: {:?}", &umm);
+                        println!();
+                        println!();
 
+                        println!("final log");
                         // let deploy_tx: TransactionRequest = TransactionRequest { from: Some(addr),
                         //     to: None,
                         //     gas: None,
