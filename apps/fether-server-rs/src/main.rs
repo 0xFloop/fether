@@ -602,8 +602,8 @@ async fn github_payload_handler(
                         };
                         println!("between");
                         let hash = tx_res.unwrap().tx_hash();
-                        let tx = provider.get_transaction(hash).await;
-                        //sleep(time::Duration::from_secs(6));
+                        //let tx = provider.get_transaction(hash).await;
+                        sleep(time::Duration::from_secs(6));
                         let receipt = provider.get_transaction_receipt(hash).await;
                         println!("reciept: {receipt:?}");
                         //update repository in db with new contract address and lastDeployed time
