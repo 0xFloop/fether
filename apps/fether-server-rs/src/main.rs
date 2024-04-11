@@ -602,23 +602,14 @@ async fn github_payload_handler(
                             continue 'repo_loop;
                         }
 
-                        println!("deez");
-                        let tx_receipt = tx_res.unwrap();
-
+                        let pending_tx = tx_res.expect("1").confirmations(1).await.expect("2");
+                        // let hash = pending_tx.tx_hash();
+                        // let receipt = provider.get_transaction_receipt(hash).await;
+                        //
+                        // println!();
+                        //println!("receipt1: {receipt:?}");
                         println!();
-                        println!("tx_receipt: {tx_receipt:?}");
-
-                        thread::sleep(time::Duration::from_secs(10));
-                        println!("sleep over");
-                        println!("hash: {:?}", tx_receipt.tx_hash());
-                        let hash = tx_receipt.tx_hash();
-                        let receipt = provider.get_transaction_receipt(hash).await;
-
-                        println!();
-                        println!("receipt1: {receipt:?}");
-                        let receipt = tx_receipt.await;
-                        println!();
-                        println!("receipt2: {receipt:?}");
+                        println!("receipt2: {pending_tx:?}");
                         //add tx to db
 
                         //update repository in db with new contract address and lastDeployed time
