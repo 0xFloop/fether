@@ -566,6 +566,8 @@ async fn github_payload_handler(
                             ethers::abi::Token::String("hello".to_string()),
                         ]);
 
+                        //this is where we are at, currently getting some error with deployment
+                        //jsonrpc shape
                         println!("contract_deployment: {:?}", &contract_deployment);
                         let imm = contract_deployment.unwrap();
                         println!("imm: {:?}", &imm);
