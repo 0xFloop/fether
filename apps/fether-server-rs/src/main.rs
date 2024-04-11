@@ -537,19 +537,6 @@ async fn github_payload_handler(
 
                         //anvil impersonate deployer
 
-                        match provider
-                            .request::<[&str; 1], Value>(
-                                "anvil_impersonateAccount",
-                                [deployer_address],
-                            )
-                            .await
-                        {
-                            Ok(_) => (),
-                            Err(err) => {
-                                println!("Err: {err}");
-                                continue 'repo_loop;
-                            }
-                        };
                         let contract_data =
                             ethers::types::Bytes::from_hex(&contents_json.bytecode.object).unwrap();
                         let deploy_args = &repo.cachedConstructorArgs;
@@ -559,7 +546,7 @@ async fn github_payload_handler(
                         let provider = std::sync::Arc::new(provider);
 
                         let deploy_factory =
-                            ContractFactory::new(abi, contract_data.clone(), provider);
+                            ContractFactory::new(abi, contract_data.clone(), provider.clone());
 
                         let contract_deployment = deploy_factory.deploy_tokens(vec![
                             ethers::abi::Token::Uint(U256::from(98)),
@@ -577,41 +564,42 @@ async fn github_payload_handler(
                         println!("imm: {:?}", &imm);
                         println!();
                         println!();
-                        let umm = imm.send().await;
-                        println!("umm: {:?}", &umm);
+                        //let umm = imm.send().await;
+                        //println!("umm: {:?}", &umm);
+
+                        let deploy_tx: TransactionRequest = TransactionRequest {
+                            from: Some(addr),
+                            to: None,
+                            gas: None,
+                            gas_price: None,
+                            value: None,
+                            data: Some(imm.tx.data().unwrap().clone()),
+                            nonce: None,
+                            chain_id: None,
+                        };
+
+                        println!("{deploy_tx:?}");
+
                         println!();
                         println!();
 
-                        println!("final log");
-                        // let deploy_tx: TransactionRequest = TransactionRequest { from: Some(addr),
-                        //     to: None,
-                        //     gas: None,
-                        //     gas_price: None,
-                        //     value: None,
-                        //     data: Some(
-                        //         ethers::types::Bytes::from_hex(contents_json.bytecode.object)
-                        //             .unwrap(),
-                        //     ),
-                        //     nonce: None,
-                        //     chain_id: None,
-                        // };
-                        // match provider
-                        //     .request::<[&str; 1], Value>(
-                        //         "anvil_stopImpersonatingAccount",
-                        //         [deployer_address],
-                        //     )
-                        //     .await
-                        // {
-                        //     Ok(_) => (),
-                        //     Err(err) => {
-                        //         println!("Err: {err}");
-                        //         continue 'repo_loop;
-                        //     }
-                        // };
-                        // match provider.send_transaction(deploy_tx, None).await {
-                        //     Ok(res) => println!("tx success res: {res:?}"),
-                        //     Err(err) => println!("deploy err: {err}"),
-                        // };
+                        match provider
+                            .request::<[&str; 1], Value>(
+                                "anvil_stopImpersonatingAccount",
+                                [deployer_address],
+                            )
+                            .await
+                        {
+                            Ok(_) => (),
+                            Err(err) => {
+                                println!("Err: {err}");
+                                continue 'repo_loop;
+                            }
+                        };
+                        match provider.send_transaction(deploy_tx, None).await {
+                            Ok(res) => println!("tx success res: {res:?}"),
+                            Err(err) => println!("deploy err: {err}"),
+                        };
                         // deploy contract
 
                         //stop impersonating
