@@ -24,7 +24,7 @@ export default function Index() {
     const number = await publicClient.readContract({
       address: fether.address,
       abi: fether.abi,
-      functionName: "getSecretNumber",
+      functionName: "secretNumber",
     });
 
     setNumber(Number(number));

@@ -80,6 +80,7 @@ export const action = async ({ request }: ActionArgs) => {
                 let validatedJSON = zodContractBuildFileSchema.parse(fileJSON);
 
                 let bytecode = validatedJSON.bytecode.object as `0x${string}`;
+                console.log(bytecode);  
                 let abi = Abi.parse(fileJSON.abi);
                 console.log(abi);
                 let dbAbi = JSON.stringify(fileJSON.abi);

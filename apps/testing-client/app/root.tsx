@@ -1,14 +1,10 @@
 import type { LoaderArgs, MetaFunction, V2_MetaFunction } from "@remix-run/node";
 import { Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration } from "@remix-run/react";
 
-import { BaseFetherChain, FetherProvider, fetherChainFromKey } from "fetherkit";
+import { FetherProvider} from "fetherkit";
 
 import rainbowStylesUrl from "@rainbow-me/rainbowkit/styles.css";
 
-import { getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
-import { configureChains, createConfig, WagmiConfig } from "wagmi";
-import { alchemyProvider } from "wagmi/providers/alchemy";
-import { publicProvider } from "wagmi/providers/public";
 import { WalletProvider } from "./components/WalletProvider";
 
 export function links() {
@@ -34,8 +30,7 @@ export const meta: V2_MetaFunction = () => {
 };
 
 export default function App() {
-  // const fetherChain = fetherChainFromKey(apiKey);
-  const fetherKey = "clm45vcrb0002z9sqtt55ddnr";
+  const fetherKey = "clsc687nw0002i0l5esn1apo6";
 
   return (
     <html lang="en">
