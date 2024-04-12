@@ -1,35 +1,15 @@
-use alloy_core::{
-    hex::{self, FromHex},
-    json_abi,
-};
-use axum::{
-    async_trait,
-    body::Bytes,
-    extract::{FromRequest, Path, Request, State},
-    http::StatusCode,
-    response::{IntoResponse, Response},
-    routing::{get, options, post},
-    Json, Router,
-};
-use axum_macros::{self, debug_handler};
+use axum::{extract::State, response::IntoResponse, Json};
 use chrono::prelude::*;
-use dotenv::dotenv;
 use ethers::{
     contract::ContractFactory,
-    core::{
-        types::{transaction::eip2718::TypedTransaction, Address, U256},
-        utils::rlp,
-    },
+    core::types::{Address, U256},
     providers::{Http, Middleware, Provider},
     types::TransactionRequest,
 };
 use octocrab::Octocrab;
-use reqwest::{self};
 use serde::{Deserialize, Serialize};
-use serde_json::{Number, Value};
-use sqlx::{mysql::MySqlPool, MySql, Pool};
-use std::{collections::HashMap, env, result::Result, str::FromStr, string::String};
-use tower_http::cors::CorsLayer;
+use serde_json::Value;
+use std::{env, result::Result, str::FromStr, string::String};
 
 #[derive(Serialize, Deserialize, Debug)]
 struct GithubPayload {
@@ -61,6 +41,8 @@ struct BytecodeObject {
     object: String,
 }
 
+use crate::AppState;
+
 pub async fn github_payload_handler(
     State(state): State<AppState>,
     Json(payload): Json<Value>,
@@ -75,9 +57,6 @@ pub async fn github_payload_handler(
                 return Err("Error parsing github payload");
             }
         };
-
-    // "SELECT r.*, a.key  FROM Repository r INNER JOIN Team t ON t.id = r.teamId INNER JOIN User u ON u.id = r.userId LEFT JOIN ApiKey a ON a.userId = u.id OR a.teamId = t.id WHERE r.id= ?",
-    // gh_payload.installation.id
 
     let mut repo_details = match sqlx::query!(
         "SELECT * FROM Repository r WHERE r.repoId= ?",
@@ -272,7 +251,7 @@ pub async fn github_payload_handler(
                         //anvil impersonate deployer
 
                         let contract_data =
-                            ethers::types::Bytes::from_hex(&contents_json.bytecode.object).unwrap();
+                            ethers::types::Bytes::from_str(&contents_json.bytecode.object).unwrap();
 
                         //update to use the cached deployment args
                         let deploy_args_str = &repo.cachedConstructorArgs;
@@ -281,7 +260,7 @@ pub async fn github_payload_handler(
                             deploy_args_str.as_ref().unwrap(),
                         ) {
                             Ok(val) => val,
-                            Err(err) => Vec::new(),
+                            Err(_err) => Vec::new(),
                         };
                         println!("raw args: {raw_args:?}");
 

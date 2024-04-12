@@ -1,35 +1,12 @@
-use alloy_core::{
-    hex::{self, FromHex},
-    json_abi,
-};
 use axum::{
-    async_trait,
-    body::Bytes,
-    extract::{FromRequest, Path, Request, State},
-    http::StatusCode,
-    response::{IntoResponse, Response},
-    routing::{get, options, post},
-    Json, Router,
+    extract::{Path, State},
+    response::IntoResponse,
+    Json,
 };
-use axum_macros::{self, debug_handler};
-use chrono::prelude::*;
-use dotenv::dotenv;
-use ethers::{
-    contract::ContractFactory,
-    core::{
-        types::{transaction::eip2718::TypedTransaction, Address, U256},
-        utils::rlp,
-    },
-    providers::{Http, Middleware, Provider},
-    types::TransactionRequest,
-};
-use octocrab::Octocrab;
-use reqwest::{self};
-use serde::{Deserialize, Serialize};
-use serde_json::{Number, Value};
-use sqlx::{mysql::MySqlPool, MySql, Pool};
-use std::{collections::HashMap, env, result::Result, str::FromStr, string::String};
-use tower_http::cors::CorsLayer;
+use std::{collections::HashMap, result::Result, string::String};
+
+use crate::fether_routes::rpc::RpcResponseError;
+use crate::AppState;
 
 pub async fn fetherkit_handler(
     State(state): State<AppState>,

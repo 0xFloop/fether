@@ -1,5 +1,5 @@
 use alloy_core::{
-    hex::{self, FromHex},
+    hex::{self},
     json_abi,
 };
 use axum::{
@@ -8,28 +8,16 @@ use axum::{
     extract::{FromRequest, Path, Request, State},
     http::StatusCode,
     response::{IntoResponse, Response},
-    routing::{get, options, post},
-    Json, Router,
+    Json,
 };
 use axum_macros::{self, debug_handler};
-use chrono::prelude::*;
-use dotenv::dotenv;
-use ethers::{
-    contract::ContractFactory,
-    core::{
-        types::{transaction::eip2718::TypedTransaction, Address, U256},
-        utils::rlp,
-    },
-    providers::{Http, Middleware, Provider},
-    types::TransactionRequest,
-};
-use octocrab::Octocrab;
+use ethers::core::{types::transaction::eip2718::TypedTransaction, utils::rlp};
 use reqwest::{self};
 use serde::{Deserialize, Serialize};
-use serde_json::{Number, Value};
-use sqlx::{mysql::MySqlPool, MySql, Pool};
-use std::{collections::HashMap, env, result::Result, str::FromStr, string::String};
-use tower_http::cors::CorsLayer;
+use serde_json::Value;
+use std::{collections::HashMap, env, result::Result, string::String};
+
+use crate::AppState;
 
 #[derive(Debug, Serialize, Deserialize)]
 struct UnknownJson(HashMap<String, Value>);
@@ -79,7 +67,7 @@ impl IntoResponse for RpcResponseError {
 }
 
 impl RpcResponseError {
-    fn from_str(s: &str) -> Self {
+    pub fn from_str(s: &str) -> Self {
         RpcResponseError {
             jsonrpc: "2.0".to_string(),
             id: NumOrString::U64(0),
@@ -90,7 +78,7 @@ impl RpcResponseError {
         }
     }
 }
-struct ExtractRpcRequest(RpcRequestBody);
+pub struct ExtractRpcRequest(RpcRequestBody);
 
 #[async_trait]
 impl<T> FromRequest<T> for ExtractRpcRequest
