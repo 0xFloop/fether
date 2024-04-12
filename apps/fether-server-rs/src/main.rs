@@ -26,7 +26,7 @@ use ethers::{
 use octocrab::Octocrab;
 use reqwest::{self};
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
+use serde_json::{Number, Value};
 use sqlx::{mysql::MySqlPool, MySql, Pool};
 use std::{collections::HashMap, env, result::Result, str::FromStr, string::String};
 use tower_http::cors::CorsLayer;
@@ -542,12 +542,25 @@ async fn github_payload_handler(
                             ethers::types::Bytes::from_hex(&contents_json.bytecode.object).unwrap();
 
                         //update to use the cached deployment args
-                        let deploy_args = &repo.cachedConstructorArgs;
+                        let deploy_args_str = &repo.cachedConstructorArgs;
+
+                        let raw_args = match serde_json::from_str::<Vec<Value>>(
+                            deploy_args_str.as_ref().unwrap(),
+                        ) {
+                            Ok(val) => val,
+                            Err(err) => Vec::new(),
+                        };
+                        println!("raw args: {raw_args:?}");
+
+                        let deploy_args: Vec<ethers::abi::Token> = raw_args
+                            .iter()
+                            .map(|val| parse_serde_value_to_ethers_token(val).unwrap())
+                            .collect::<Vec<ethers::abi::Token>>();
 
                         //parse the deploy args into a vec of tokens, if there are none, call the deploy
                         //function with '()'
 
-                        println!("{deploy_args:?}");
+                        println!("deploy args: {deploy_args:?}");
 
                         let abi: ethers::abi::Abi = serde_json::from_str(&str_abi).unwrap();
 
@@ -556,10 +569,7 @@ async fn github_payload_handler(
                         let deploy_factory =
                             ContractFactory::new(abi, contract_data.clone(), provider.clone());
 
-                        let contract_deployment = deploy_factory.deploy_tokens(vec![
-                            ethers::abi::Token::Uint(U256::from(98)),
-                            ethers::abi::Token::String("hello".to_string()),
-                        ]);
+                        let contract_deployment = deploy_factory.deploy_tokens(deploy_args);
 
                         let factory_deploy_details = contract_deployment.unwrap();
 
@@ -630,4 +640,34 @@ async fn github_payload_handler(
         }
     }
     Ok(())
+}
+
+//i absolutely guarantee this has bugs and will not work properly, but im just building this to
+//learn rust so i dont mind terribly that it is bugless
+
+fn parse_serde_value_to_ethers_token(val: &Value) -> Result<ethers::abi::Token, &'static str> {
+    let token = match val {
+        serde_json::Value::Bool(val) => ethers::abi::Token::Bool(*val),
+        serde_json::Value::String(val) => ethers::abi::Token::String(val.clone()),
+        serde_json::Value::Number(val) => match val.as_u64() {
+            Some(val2) => ethers::abi::Token::Uint(U256::from(val2)),
+            None => match val.as_i64() {
+                Some(val3) => ethers::abi::Token::Int(U256::from(val3)),
+                None => return Err("error parsing value"),
+            },
+        },
+        //im quite happy with how this works
+        serde_json::Value::Array(val) => ethers::abi::Token::Array(
+            val.iter()
+                .map(|val2| parse_serde_value_to_ethers_token(val2).unwrap())
+                .collect::<Vec<ethers::abi::Token>>(),
+        ),
+        serde_json::Value::Object(val) => ethers::abi::Token::Tuple(
+            val.into_iter()
+                .map(|(_, val3)| parse_serde_value_to_ethers_token(val3).unwrap())
+                .collect::<Vec<ethers::abi::Token>>(),
+        ),
+        serde_json::Value::Null => return Err("error parsing value"),
+    };
+    Ok(token)
 }
